@@ -1,0 +1,6 @@
+@EPR.Calculator.FSS.API_HostAddress = http://localhost:5197
+
+GET {{EPR.Calculator.FSS.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
