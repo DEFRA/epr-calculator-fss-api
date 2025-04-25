@@ -1,0 +1,16 @@
+# Change filename from DEVX-development.yaml to DEV10-development.yaml -- Remove this comment
+# Remove all comments once details are placed 
+variables:
+  azureSubscription: ''     # Example 'AZD-RWD-DEV10'-- Remove this comment
+  docker.imageName: ''      # Example 'epranyimagename'-- Remove this comment
+  acr.azureContainerRegistryName: 'devrwdinfac1401'
+  acr.repositoryName: ''    # Example 'epranyimagenamerepository'-- Remove this comment
+  serviceName: ''           # Example 'DEVRWDWEBFA4410'-- Remove this comment
+# --------------------------------------------------------------------------------------------- 
+# DB Pipeline step - this is only needed if there is an sql pipeline - if not remove this line
+  kvName: DEVRWDINFKV1401
+  sqlDBserver: 'devrwddbssq1401.database.windows.net'
+  sqlDB: ''                 # Example 'PRN'-- Remove this comment
+  acr.Subscription: 'AZD-RWD-DEV1'
+# Remove comments once completed
+# ---------------------------------------------------------------------------------------------
