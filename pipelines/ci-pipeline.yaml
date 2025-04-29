@@ -26,28 +26,22 @@ parameters:
 pool: DEFRA-COMMON-ubuntu2004-SSV3
 
 variables:
-  - template: vars/DEV4-development.yaml
+  - template: vars/DEV11-development.yaml
   - name: solutionFolder
     value: src
   - name: projectFolder
-    value: ''                 # Example 'EPR.Payment.Mopup'-- Remove this comment
+    value: 'EPR.Calculator.FSS.API'                
   - name: testProjectFolder
-    value: ''                 # Example 'EPR.Payment.Mopup.Common.UnitTests'-- Remove this comment
-# ---------------------------------------------------------------------------------------------------------------------- 
-# DB Pipeline step - this is only needed if there is an sql pipeline - if not remove the line of code and this comments
+    value: 'EPR.Calculator.FSS.API.UnitTests'                 
   - name: DataFolder
-    value: ''                 # Example 'EPR.Payment.Mopup.Common.Data'-- Remove this comment
-# Remove comments once completed
-# -----------------------------------------------------------------------------------------------------------------------
+    value: 'EPR.Calculator.FSS.API.Data'
   - name: sonarQubeProjectKey
-    value:                     # Example: epr-prn-obligationcalculations-function -- Remove this comment
+    value: epr-calculator-fss-api                   
   - name: sonarQubeProjectName
-    value:                     # Example: epr-prn-obligationcalculations-function -- Remove this comment
+    value: epr-calculator-fss-api                    
   - name: runNugetTasks
-# ----------------------------------------------------------------------------------------------------------------------- 
-# Set the NuGet Task to TRUE only for Frontend, else FALSE -  remove this comments
     value: false
-# ----------------------------------------------------------------------------------------------------------------------- 
+
   - name: dotnetVersion
     value: dotnetVersion8
 
@@ -63,10 +57,7 @@ extends:
   parameters:
     solutionFolder: ${{ variables.solutionFolder }}
     projectFolder: ${{ variables.projectFolder }}
-# ---------------------------------------------------------------------------------------------------------------------- 
-# DB Pipeline step - this is only needed if there is an sql pipeline - if not remove the line of code and this comments
     DataFolder: ${{ variables.DataFolder }}
-# ----------------------------------------------------------------------------------------------------------------------- 
     testProjectFolder: ${{ variables.testProjectFolder }}
     sonarQubeProjectKey: ${{ variables.sonarQubeProjectKey }}
     sonarQubeProjectName: ${{ variables.sonarQubeProjectName }}
@@ -78,9 +69,6 @@ extends:
     branchName: ${{ replace(replace(variables['Build.SourceBranch'], 'refs/heads/', ''), '/', '_') }}
     runNugetTasks: ${{ variables.runNugetTasks }}
     serviceName: $(serviceName)
-# ---------------------------------------------------------------------------------------------------------------------- 
-# DB Pipeline step - this is only needed if there is an sql pipeline - if not remove the line of code or set to FALSE and this comments
-    buildMigrationScript: true
-# ----------------------------------------------------------------------------------------------------------------------- 
+    buildMigrationScript: false
     sonarqubeInstance: ${{ parameters.sonarqubeInstance }}
     dotnetVersion: ${{ variables.dotnetVersion }}
