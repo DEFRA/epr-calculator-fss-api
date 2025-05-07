@@ -3,4 +3,4 @@ variables:
   docker.imageName: 'eprcalculatorfssapi'      
   acr.azureContainerRegistryName: 'devrwdinfac1401'
   acr.repositoryName: 'eprcalculatorfssapirepository'   
-  serviceName: 'DEVRWDWEBWAD426'          
+  serviceName: 'devrwdwebwad426'          
