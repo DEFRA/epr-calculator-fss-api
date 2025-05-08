@@ -25,6 +25,12 @@ COPY EPR.Calculator.FSS.API.Common/. ./EPR.Calculator.FSS.API.Common/.
 COPY EPR.Calculator.FSS.API/NuGet.Config ./NuGet.Config
 COPY EPR.Calculator.FSS.API/Package ./Package
 
+
+# Debugging steps
+RUN ls -la /src
+RUN ls -la /src/Package
+RUN cat /src/NuGet.Config
+
 RUN dotnet restore "./EPR.Calculator.FSS.API/EPR.Calculator.FSS.API.csproj" --configfile ./NuGet.Config
 
 # Copy the rest of the source code
