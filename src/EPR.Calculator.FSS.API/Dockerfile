@@ -14,19 +14,25 @@ COPY ["EPR.Calculator.FSS.API/EPR.Calculator.FSS.API.csproj", "EPR.Calculator.FS
 COPY EPR.Calculator.FSS.API.Common/. ./EPR.Calculator.FSS.API.Common/.
 
 # Copy the nuget.config and local package file
-#COPY EPR.Calculator.FSS.API/NuGet.Config ./Nuget.Config
+COPY EPR.Calculator.FSS.API/NuGet.Config ./NuGet.Config
 #COPY EPR.Calculator.FSS.API/Package ./Package
 
 # Restore dependencies
-RUN dotnet restore "./EPR.Calculator.FSS.API/EPR.Calculator.FSS.API.csproj" /p:AzureBuild=true --configfile ./EPR.Calculator.FSS.API/NuGet.Config
+RUN dotnet restore "./EPR.Calculator.FSS.API/EPR.Calculator.FSS.API.csproj" /p:AzureBuild=true --configfile .NuGet.Config
+
+# Copy the rest of the source code
 COPY . .
+
+# Set the working directory and build the project
 WORKDIR "/src/EPR.Calculator.FSS.API"
 RUN dotnet build "./EPR.Calculator.FSS.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
+# Publish the application
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish "./EPR.Calculator.FSS.API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
+# Final runtime image
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
