@@ -640,6 +640,7 @@
     <Rule Id="S6422" Action="None" />
     <Rule Id="S6424" Action="None" />
     <Rule Id="S6444" Action="None" />
+	<Rule Id="S6504" Action="None" />
     <Rule Id="S6561" Action="None" />
     <Rule Id="S6562" Action="None" />
     <Rule Id="S6575" Action="None" />
