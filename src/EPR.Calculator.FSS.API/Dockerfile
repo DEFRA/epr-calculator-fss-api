@@ -24,7 +24,7 @@ COPY EPR.Calculator.FSS.API.Common/. ./EPR.Calculator.FSS.API.Common/.
 # Copy the nuget.config and local package file
 COPY NuGet.Config ./NuGet.Config
 COPY Package ./Package
-COPY stylecop.json ./stylecop.json
+#COPY stylecop.json ./stylecop.json
 
 # Debugging steps
 RUN ls -la /src
@@ -32,6 +32,7 @@ RUN ls -la /src/EPR.Calculator.FSS.API
 RUN ls -la /src/Package
 RUN cat /src/NuGet.Config
 
+# TODO - leaving in now, once confirmed app works from the image and data works correctly - this can be removed 
 #RUN dotnet restore "./EPR.Calculator.FSS.API/EPR.Calculator.FSS.API.csproj" --configfile ./NuGet.Config
 RUN dotnet restore "./EPR.Calculator.FSS.API/EPR.Calculator.FSS.API.csproj"
 
