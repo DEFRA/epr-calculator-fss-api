@@ -8,16 +8,17 @@ EXPOSE 8081
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
+
 WORKDIR /src
 COPY ["EPR.Calculator.FSS.API/EPR.Calculator.FSS.API.csproj", "EPR.Calculator.FSS.API/"]
 COPY EPR.Calculator.FSS.API.Common/. ./EPR.Calculator.FSS.API.Common/.
 
 # Copy the nuget.config and local package file
-COPY EPR.Calculator.FSS.API/NuGet.Config ./Nuget.Config
-COPY EPR.Calculator.FSS.API/Package ./Package
+#COPY EPR.Calculator.FSS.API/NuGet.Config ./Nuget.Config
+#COPY EPR.Calculator.FSS.API/Package ./Package
 
 # Restore dependencies
-RUN dotnet restore "./EPR.Calculator.FSS.API/EPR.Calculator.FSS.API.csproj" --configfile ./Nuget.Config
+RUN dotnet restore "./EPR.Calculator.FSS.API/EPR.Calculator.FSS.API.csproj" -c Release /p:AzureBuild=true --configfile ./Nuget.Config
 COPY . .
 WORKDIR "/src/EPR.Calculator.FSS.API"
 RUN dotnet build "./EPR.Calculator.FSS.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
