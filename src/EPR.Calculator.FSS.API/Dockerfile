@@ -25,7 +25,6 @@ COPY EPR.Calculator.FSS.API.Common/. ./EPR.Calculator.FSS.API.Common/.
 COPY EPR.Calculator.FSS.API/NuGet.Config ./NuGet.Config
 COPY EPR.Calculator.FSS.API/Package ./Package
 
-
 # Debugging steps
 RUN ls -la /src
 RUN ls -la /src/EPR.Calculator.FSS.API
