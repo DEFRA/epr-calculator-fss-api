@@ -44,6 +44,9 @@
 	<None Update="Dockerfile">
 		<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	</None>
+	<None Update="Package\EPR.Calculator.API.Data.1.0.1.nupkg">
+	  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	</None>
    </ItemGroup>
 
 </Project>
