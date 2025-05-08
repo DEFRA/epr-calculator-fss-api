@@ -1,8 +1,10 @@
 ﻿using EPR.Calculator.API.Data;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics.CodeAnalysis;
 
 namespace EPR.Calculator.FSS.API.Controllers
 {
+    [ExcludeFromCodeCoverage]
     [Route("api/[controller]")]
     [ApiController]
     public class ExampleController(ApplicationDBContext context) : ControllerBase
