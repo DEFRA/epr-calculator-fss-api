@@ -10,6 +10,7 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["EPR.Calculator.FSS.API/EPR.Calculator.FSS.API.csproj", "EPR.Calculator.FSS.API/"]
+COPY EPR.Calculator.FSS.API.Common/. ./EPR.Calculator.FSS.API.Common/.
 RUN dotnet restore "./EPR.Calculator.FSS.API/EPR.Calculator.FSS.API.csproj"
 COPY . .
 WORKDIR "/src/EPR.Calculator.FSS.API"
