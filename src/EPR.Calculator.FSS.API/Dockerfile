@@ -12,11 +12,9 @@ WORKDIR /src
 COPY ["EPR.Calculator.FSS.API/EPR.Calculator.FSS.API.csproj", "EPR.Calculator.FSS.API/"]
 COPY EPR.Calculator.FSS.API.Common/. ./EPR.Calculator.FSS.API.Common/.
 
-# Copy the nuget.config file
-COPY nuget.config ./nuget.config
-
-# Copy the local package folder
-COPY Package ./Package
+# Copy the nuget.config and local package file
+COPY EPR.Calculator.FSS.API/NuGet.Config ./nuget.config
+COPY EPR.Calculator.FSS.API/Package ./Package
 
 # Restore dependencies
 RUN dotnet restore "./EPR.Calculator.FSS.API/EPR.Calculator.FSS.API.csproj"
