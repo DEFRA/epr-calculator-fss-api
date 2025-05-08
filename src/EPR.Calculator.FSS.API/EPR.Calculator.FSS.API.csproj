@@ -16,7 +16,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Remove="NuGet.Config" />
+  </ItemGroup>
+
+  <ItemGroup>
     <AdditionalFiles Include="..\stylecop.json" Link="stylecop.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="NuGet.Config" />
   </ItemGroup>
 
   <ItemGroup>
@@ -37,7 +45,7 @@
 
   <ItemGroup>
 	<None Update="Dockerfile">
-		<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		<CopyToOutputDirectory>Never</CopyToOutputDirectory>
 	</None>
 	<None Update="Package\EPR.Calculator.API.Data.1.0.1.nupkg">
 	  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
