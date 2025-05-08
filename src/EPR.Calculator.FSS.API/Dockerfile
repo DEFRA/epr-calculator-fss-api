@@ -18,7 +18,7 @@ COPY EPR.Calculator.FSS.API.Common/. ./EPR.Calculator.FSS.API.Common/.
 #COPY EPR.Calculator.FSS.API/Package ./Package
 
 # Restore dependencies
-RUN dotnet restore "./EPR.Calculator.FSS.API/EPR.Calculator.FSS.API.csproj" -c Release /p:AzureBuild=true --configfile ./Nuget.Config
+RUN dotnet restore "./EPR.Calculator.FSS.API/EPR.Calculator.FSS.API.csproj" /p:AzureBuild=true --configfile ./Nuget.Config
 COPY . .
 WORKDIR "/src/EPR.Calculator.FSS.API"
 RUN dotnet build "./EPR.Calculator.FSS.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
