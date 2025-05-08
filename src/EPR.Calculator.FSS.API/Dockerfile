@@ -11,6 +11,14 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["EPR.Calculator.FSS.API/EPR.Calculator.FSS.API.csproj", "EPR.Calculator.FSS.API/"]
 COPY EPR.Calculator.FSS.API.Common/. ./EPR.Calculator.FSS.API.Common/.
+
+# Copy the nuget.config file
+COPY nuget.config ./nuget.config
+
+# Copy the local package folder
+COPY Package ./Package
+
+# Restore dependencies
 RUN dotnet restore "./EPR.Calculator.FSS.API/EPR.Calculator.FSS.API.csproj"
 COPY . .
 WORKDIR "/src/EPR.Calculator.FSS.API"
