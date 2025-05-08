@@ -9,13 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="NewFolder\**" />
-    <Content Remove="NewFolder\**" />
-    <EmbeddedResource Remove="NewFolder\**" />
-    <None Remove="NewFolder\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <AdditionalFiles Include="..\stylecop.json" Link="stylecop.json" />
   </ItemGroup>
 
@@ -39,6 +32,10 @@
 		<Version>1.0.1</Version>
 		<Source>./Package</Source>
 	</PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\EPR.Calculator.FSS.API.Common\EPR.Calculator.FSS.API.Common.csproj" />
   </ItemGroup>
   <ItemGroup>
 	<None Update="Dockerfile">
