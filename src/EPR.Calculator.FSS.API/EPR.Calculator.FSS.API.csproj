@@ -44,4 +44,15 @@
 	</None>
    </ItemGroup>
 
+    <ItemGroup>
+	    <SonarQubeSetting Include="sonar.coverage.exclusions">
+		    <Value>Dtos/*.cs,Constants/*.cs,Models/*.cs,Program.cs</Value>
+	    </SonarQubeSetting>
+    </ItemGroup>
+    <ItemGroup>
+	    <SonarQubeSetting Include="sonar.cpd.exclusions">
+		    <Value>Dtos/*.cs,Constants/*.cs,Models/*.cs,Program.cs</Value>
+	    </SonarQubeSetting>
+    </ItemGroup>
+
 </Project>
