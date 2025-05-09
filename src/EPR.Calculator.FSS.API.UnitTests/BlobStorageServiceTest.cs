@@ -1,5 +1,6 @@
 ﻿using Azure;
 using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using Moq;
 
 namespace EPR.Calculator.FSS.API.UnitTests
@@ -32,6 +33,17 @@ namespace EPR.Calculator.FSS.API.UnitTests
 
             this.mockBlobClient.Setup(x => x.ExistsAsync(default))
                 .ReturnsAsync(Response.FromValue(true, null!));
+
+            var content = "test content";
+            var binaryData = BinaryData.FromString(content);
+            var downloadDetails = BlobsModelFactory.BlobDownloadDetails(
+                contentLength: content.Length,
+                contentType: "application/octet-stream");
+
+            var downloadResult = BlobsModelFactory.BlobDownloadResult(
+                content: binaryData,
+                details: downloadDetails);
+            this.mockBlobClient.Setup(x => x.DownloadContentAsync()).ReturnsAsync(Response.FromValue(downloadResult, null!));
         }
 
         [TestMethod]
@@ -48,6 +60,23 @@ namespace EPR.Calculator.FSS.API.UnitTests
             bool result = await this.blobStorageService.IsBlobExistsAsync(fileName);
 
             Assert.IsTrue(result);
+        }
+
+        [TestMethod]
+        public async Task GetFileContents_WhenFileExists_ReturnsContents()
+        {
+            using CancellationTokenSource cancellationTokenSource = new();
+            var fileName = "test.txt";
+            var blobUri = "https://example.com/test.txt";
+
+            this.mockBlobClient.Setup(x => x.ExistsAsync(cancellationTokenSource.Token)).ReturnsAsync(Response.FromValue(true, null!));
+            this.mockBlobClient.Setup(x => x.Uri).Returns(new Uri(blobUri));
+            blobUri = string.Empty;
+
+            var result = await this.blobStorageService.GetFileContents(fileName);
+
+            Assert.IsNotNull(result);
+            Assert.AreEqual("test content", result);
         }
     }
 }
