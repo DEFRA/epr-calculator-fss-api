@@ -6,9 +6,9 @@ namespace EPR.Calculator.FSS.API.Controllers
     [Route("api/[controller]")]
     public class BillingController
     {
-        private readonly IBillingservice billingService;
+        private readonly IBillingService billingService;
 
-        public BillingController(IBillingservice billingService)
+        public BillingController(IBillingService billingService)
         {
             this.billingService = billingService;
         }

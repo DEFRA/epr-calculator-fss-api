@@ -22,7 +22,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddFluentValidationClientsideAdapters();
-builder.Services.AddScoped<IBillingservice, Billingservice>();
+builder.Services.AddScoped<IBillingService, BillingService>();
 builder.Services.AddScoped<IStorageService, StorageService>();
 
 // Configure the database context.

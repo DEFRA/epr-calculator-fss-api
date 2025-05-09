@@ -1,13 +1,14 @@
 ﻿using EPR.Calculator.API.Data;
 using EPR.Calculator.FSS.API.Common;
+using Microsoft.EntityFrameworkCore;
 namespace EPR.Calculator.FSS.API
 {
-    public class Billingservice : IBillingservice
+    public class BillingService : IBillingService
     {
         private readonly IStorageService storageService;
         private readonly ApplicationDBContext context;
 
-        public Billingservice(
+        public BillingService(
             IStorageService storageService,
             ApplicationDBContext context)
         {
@@ -15,9 +16,18 @@ namespace EPR.Calculator.FSS.API
             this.context = context;
         }
 
-        public Task<string> GetBillingData(int calcRunId)
+        public async Task<string> GetBillingData(int calcRunId)
         {
-            // this.context.
+            var calculatorBillingFileMetadata = await this.context.
+                CalculatorRunBillingFileMetadata.SingleOrDefaultAsync(x => x.CalculatorRunId == calcRunId);
+
+            if (calculatorBillingFileMetadata != null
+                &&
+                !string.IsNullOrWhiteSpace(calculatorBillingFileMetadata.BillingJsonFileName))
+            {
+                var content = await this.storageService.GetFileContents(calculatorBillingFileMetadata.BillingJsonFileName);
+                return content;
+            }
 
             throw new NotImplementedException();
         }

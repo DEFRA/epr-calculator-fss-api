@@ -28,9 +28,9 @@ namespace EPR.Calculator.FSS.API
                 throw new ConfigurationErrorsException(ContainerNameMissingError));
         }
 
-        public async Task<string> DownloadFile(string fileName, string blobUri)
+        public async Task<string> GetFileContents(string fileName)
         {
-            BlobClient blobClient = this.GetBlobClient(fileName, blobUri);
+            BlobClient blobClient = this.GetBlobClient(fileName);
 
             if (!await blobClient.ExistsAsync())
             {
@@ -42,32 +42,16 @@ namespace EPR.Calculator.FSS.API
             return content;
         }
 
-        public async Task<bool> IsBlobExistsAsync(string fileName, string blobUri, CancellationToken cancellationToken)
+        public async Task<bool> IsBlobExistsAsync(string fileName, CancellationToken cancellationToken)
         {
-            BlobClient blobClient = this.GetBlobClient(fileName, blobUri);
+            BlobClient blobClient = this.GetBlobClient(fileName);
 
             return await blobClient.ExistsAsync(cancellationToken);
         }
 
-        private BlobClient GetBlobClient(string fileName, string blobUri)
+        private BlobClient GetBlobClient(string fileName)
         {
-            BlobClient? blobClient = null;
-
-            if (!string.IsNullOrEmpty(blobUri))
-            {
-                try
-                {
-                    blobClient = new BlobClient(new Uri(blobUri), this.sharedKeyCredential);
-                }
-                catch (UriFormatException exception)
-                {
-                    blobClient ??= this.containerClient.GetBlobClient(fileName);
-                }
-            }
-            else
-            {
-                blobClient ??= this.containerClient.GetBlobClient(fileName);
-            }
+            BlobClient? blobClient = this.containerClient.GetBlobClient(fileName);
 
             return blobClient;
         }
