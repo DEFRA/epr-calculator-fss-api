@@ -13,16 +13,10 @@ namespace EPR.Calculator.FSS.API
         public const string AccountNameMissingError = "Account name is missing in configuration.";
         public const string OctetStream = "application/octet-stream";
         private readonly BlobContainerClient containerClient;
-        private readonly StorageSharedKeyCredential sharedKeyCredential;
 
         public BlobStorageService(BlobServiceClient blobServiceClient, IConfiguration configuration)
         {
             var settings = configuration.GetSection(BlobStorageSection).Get<BlobStorageSettings>() ?? throw new ConfigurationErrorsException(BlobSettingsMissingError);
-
-            settings.ExtractAccountDetails();
-
-            this.sharedKeyCredential = new StorageSharedKeyCredential(settings.AccountName, settings.AccountKey) ??
-                throw new ConfigurationErrorsException(AccountNameMissingError);
 
             this.containerClient = blobServiceClient.GetBlobContainerClient(settings.ContainerName ??
                 throw new ConfigurationErrorsException(ContainerNameMissingError));
