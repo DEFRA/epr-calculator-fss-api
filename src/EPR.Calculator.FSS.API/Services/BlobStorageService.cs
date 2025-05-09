@@ -5,7 +5,7 @@ using EPR.Calculator.FSS.API.Constants;
 using System.Configuration;
 namespace EPR.Calculator.FSS.API
 {
-    public class StorageService : IStorageService
+    public class BlobStorageService : IBlobStorageService
     {
         public const string BlobStorageSection = "BlobStorage";
         public const string BlobSettingsMissingError = "BlobStorage settings are missing in configuration.";
@@ -15,7 +15,7 @@ namespace EPR.Calculator.FSS.API
         private readonly BlobContainerClient containerClient;
         private readonly StorageSharedKeyCredential sharedKeyCredential;
 
-        public StorageService(BlobServiceClient blobServiceClient, IConfiguration configuration)
+        public BlobStorageService(BlobServiceClient blobServiceClient, IConfiguration configuration)
         {
             var settings = configuration.GetSection(BlobStorageSection).Get<BlobStorageSettings>() ?? throw new ConfigurationErrorsException(BlobSettingsMissingError);
 
@@ -30,7 +30,7 @@ namespace EPR.Calculator.FSS.API
 
         public async Task<string> GetFileContents(string fileName)
         {
-            BlobClient blobClient = this.GetBlobClient(fileName);
+            BlobClient blobClient = this.GetBlobFileClient(fileName);
 
             if (!await blobClient.ExistsAsync())
             {
@@ -44,12 +44,12 @@ namespace EPR.Calculator.FSS.API
 
         public async Task<bool> IsBlobExistsAsync(string fileName)
         {
-            BlobClient blobClient = this.GetBlobClient(fileName);
+            BlobClient blobClient = this.GetBlobFileClient(fileName);
 
             return await blobClient.ExistsAsync();
         }
 
-        private BlobClient GetBlobClient(string fileName)
+        private BlobClient GetBlobFileClient(string fileName)
         {
             BlobClient? blobClient = this.containerClient.GetBlobClient(fileName);
 

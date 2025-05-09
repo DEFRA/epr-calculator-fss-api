@@ -23,7 +23,7 @@ builder.Services.AddControllers();
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddFluentValidationClientsideAdapters();
 builder.Services.AddScoped<IBillingService, BillingService>();
-builder.Services.AddScoped<IStorageService, StorageService>();
+builder.Services.AddScoped<IBlobStorageService, BlobStorageService>();
 
 // Configure the database context.
 builder.Services.AddDbContext<ApplicationDBContext>(options =>

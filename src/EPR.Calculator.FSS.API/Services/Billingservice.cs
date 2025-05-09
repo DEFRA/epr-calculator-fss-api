@@ -5,11 +5,11 @@ namespace EPR.Calculator.FSS.API
 {
     public class BillingService : IBillingService
     {
-        private readonly IStorageService storageService;
+        private readonly IBlobStorageService storageService;
         private readonly ApplicationDBContext context;
 
         public BillingService(
-            IStorageService storageService,
+            IBlobStorageService storageService,
             ApplicationDBContext context)
         {
             this.storageService = storageService;

@@ -1,6 +1,6 @@
 ﻿namespace EPR.Calculator.FSS.API.Common
 {
-    public interface IStorageService
+    public interface IBlobStorageService
     {
         /// <summary>
         /// Downloads a file from the specified blob storage.
