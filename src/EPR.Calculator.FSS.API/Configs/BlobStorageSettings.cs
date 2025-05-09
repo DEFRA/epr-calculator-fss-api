@@ -1,5 +1,8 @@
-﻿namespace EPR.Calculator.FSS.API.Constants
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace EPR.Calculator.FSS.API.Constants
 {
+    [ExcludeFromCodeCoverage]
     public class BlobStorageSettings
     {
         public string ConnectionString { get; set; } = string.Empty;
