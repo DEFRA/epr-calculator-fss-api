@@ -42,11 +42,11 @@ namespace EPR.Calculator.FSS.API
             return content;
         }
 
-        public async Task<bool> IsBlobExistsAsync(string fileName, CancellationToken cancellationToken)
+        public async Task<bool> IsBlobExistsAsync(string fileName)
         {
             BlobClient blobClient = this.GetBlobClient(fileName);
 
-            return await blobClient.ExistsAsync(cancellationToken);
+            return await blobClient.ExistsAsync();
         }
 
         private BlobClient GetBlobClient(string fileName)

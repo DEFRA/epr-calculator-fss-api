@@ -19,17 +19,28 @@ namespace EPR.Calculator.FSS.API
         public async Task<string> GetBillingData(int calcRunId)
         {
             var calculatorBillingFileMetadata = await this.context.
-                CalculatorRunBillingFileMetadata.SingleOrDefaultAsync(x => x.CalculatorRunId == calcRunId);
-
-            if (calculatorBillingFileMetadata != null
-                &&
-                !string.IsNullOrWhiteSpace(calculatorBillingFileMetadata.BillingJsonFileName))
+                CalculatorRunBillingFileMetadata.
+                SingleOrDefaultAsync(x => x.CalculatorRunId == calcRunId);
+            if (calculatorBillingFileMetadata == null)
             {
-                var content = await this.storageService.GetFileContents(calculatorBillingFileMetadata.BillingJsonFileName);
-                return content;
+                throw new KeyNotFoundException($"CalculatorBillingFileMetadata is not available for the calculator Id {calcRunId}");
             }
 
-            throw new NotImplementedException();
+
+            var fileName = calculatorBillingFileMetadata.BillingJsonFileName;
+            if (string.IsNullOrWhiteSpace(fileName))
+            {
+                throw new KeyNotFoundException($"CalculatorBillingFileMetadata is not available for the calculator Id {calcRunId}");
+            }
+
+            if (!await this.storageService.IsBlobExistsAsync(fileName))
+            {
+                throw new FileNotFoundException(fileName);
+            }
+
+            var content = await this.storageService.GetFileContents(fileName);
+
+            return content;
         }
     }
 }
