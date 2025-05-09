@@ -23,7 +23,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Package", "Package", "{36FB97BA-18FA-4C94-83DB-326302181914}"
 	ProjectSection(SolutionItems) = preProject
-		Package\EPR.Calculator.API.Data.1.0.1.nupkg = Package\EPR.Calculator.API.Data.1.0.1.nupkg
+		Package\EPR.Calculator.API.Data.1.0.3.nupkg = Package\EPR.Calculator.API.Data.1.0.3.nupkg
 	EndProjectSection
 EndProject
 Global
