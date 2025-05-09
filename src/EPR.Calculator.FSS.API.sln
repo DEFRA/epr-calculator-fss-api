@@ -5,13 +5,13 @@ VisualStudioVersion = 17.9.34902.65
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EPR.Calculator.FSS.API", "EPR.Calculator.FSS.API\EPR.Calculator.FSS.API.csproj", "{F78DD7AF-8712-45A2-81E5-3DCE0FF882EA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EPR.Calculator.FSS.API.Common", "EPR.Calculator.FSS.API.Common\EPR.Calculator.FSS.API.Common.csproj", "{B5B3184E-5E32-4922-8485-61FAF1168497}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPR.Calculator.FSS.API.Common", "EPR.Calculator.FSS.API.Common\EPR.Calculator.FSS.API.Common.csproj", "{B5B3184E-5E32-4922-8485-61FAF1168497}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{268A1780-1CCF-4615-94C9-775D23AC9732}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EPR.Calculator.FSS.API.UnitTests", "EPR.Calculator.FSS.API.UnitTests\EPR.Calculator.FSS.API.UnitTests.csproj", "{02734F63-0874-4C15-9213-016B04449C0C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPR.Calculator.FSS.API.UnitTests", "EPR.Calculator.FSS.API.UnitTests\EPR.Calculator.FSS.API.UnitTests.csproj", "{02734F63-0874-4C15-9213-016B04449C0C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EPR.Calculator.FSS.API.Common.UnitTests", "EPR.Calculator.FSS.API.Common.UnitTests\EPR.Calculator.FSS.API.Common.UnitTests.csproj", "{A6F4E07B-D513-4127-8FEC-173ACDAE8F11}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPR.Calculator.FSS.API.Common.UnitTests", "EPR.Calculator.FSS.API.Common.UnitTests\EPR.Calculator.FSS.API.Common.UnitTests.csproj", "{A6F4E07B-D513-4127-8FEC-173ACDAE8F11}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 	ProjectSection(SolutionItems) = preProject
