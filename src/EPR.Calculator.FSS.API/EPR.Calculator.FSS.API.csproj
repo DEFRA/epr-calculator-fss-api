@@ -6,10 +6,13 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>e7bcafa6-ad86-4616-8f7f-8f1db227e2a0</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <AnalysisLevel>5.0-recommended</AnalysisLevel>
+    <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\stylecop.json" Link="stylecop.json" />
+    <AdditionalFiles Include="..\stylecop.json" Link="stylecop.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -57,6 +60,9 @@
 		<SonarQubeSetting Include="sonar.exclusions">
 			<Value>Dockerfile</Value>
 		</SonarQubeSetting>
+	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Validators\" />
 	</ItemGroup>
 
 </Project>
