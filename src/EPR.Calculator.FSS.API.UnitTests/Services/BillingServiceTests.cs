@@ -1,15 +1,14 @@
 namespace EPR.Calculator.FSS.API.UnitTests
 {
-    using System;
-    using System.Threading.Tasks;
     using AutoFixture;
     using EPR.Calculator.API.Data;
+    using EPR.Calculator.API.Data.DataModels;
     using EPR.Calculator.FSS.API;
     using EPR.Calculator.FSS.API.Common;
     using FluentAssertions;
     using Microsoft.EntityFrameworkCore;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Microsoft.EntityFrameworkCore.Diagnostics;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Moq;
 
     [TestClass]
@@ -57,6 +56,69 @@ namespace EPR.Calculator.FSS.API.UnitTests
 
             Assert.ThrowsExceptionAsync<KeyNotFoundException>(
                 () => instance.GetBillingData(calcRunId: 1)).Wait();
+        }
+
+        [TestMethod]
+        public void Expect_KeyNotFoundException_WhenJsonFileColumn_Missing()
+        {
+            _context.CalculatorRunBillingFileMetadata.Add(new CalculatorRunBillingFileMetadata
+            {
+                CalculatorRunId = 1,
+                BillingJsonFileName = null,
+                BillingFileCreatedDate = DateTime.UtcNow,
+                BillingFileCreatedBy = "Test",
+            });
+            _context.SaveChanges();
+
+            var instance = new BillingService(_storageService.Object, _context);
+
+            Assert.ThrowsExceptionAsync<KeyNotFoundException>(
+                () => instance.GetBillingData(calcRunId: 1)).Wait();
+        }
+
+        [TestMethod]
+        public void Expect_FileNotFoundException()
+        {
+            _context.CalculatorRunBillingFileMetadata.Add(new CalculatorRunBillingFileMetadata
+            {
+                CalculatorRunId = 1,
+                BillingJsonFileName = "FileName.json",
+                BillingFileCreatedDate = DateTime.UtcNow,
+                BillingFileCreatedBy = "Test",
+            });
+            _context.SaveChanges();
+
+            var instance = new BillingService(_storageService.Object, _context);
+            _storageService.Setup(x => x.IsBlobExistsAsync(It.IsAny<string>()))
+                .ReturnsAsync(false);
+
+            Assert.ThrowsExceptionAsync<FileNotFoundException>(
+                () => instance.GetBillingData(calcRunId: 1)).Wait();
+        }
+
+        [TestMethod]
+        public void Expect_FileContents()
+        {
+            _context.CalculatorRunBillingFileMetadata.Add(new CalculatorRunBillingFileMetadata
+            {
+                CalculatorRunId = 1,
+                BillingJsonFileName = "FileName.json",
+                BillingFileCreatedDate = DateTime.UtcNow,
+                BillingFileCreatedBy = "Test",
+            });
+            _context.SaveChanges();
+
+            var instance = new BillingService(_storageService.Object, _context);
+            _storageService.Setup(x => x.IsBlobExistsAsync(It.IsAny<string>()))
+                .ReturnsAsync(true);
+            _storageService.Setup(x => x.GetFileContents(It.IsAny<string>())).ReturnsAsync("Some content");
+
+            var result = instance.GetBillingData(calcRunId: 1);
+            result.Wait();
+
+            var content = result.Result;
+            content.Should().NotBeNullOrEmpty();
+            content.Should().Be("Some content");
         }
     }
 }
