@@ -3,7 +3,7 @@ using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Moq;
 
-namespace EPR.Calculator.FSS.API.UnitTests
+namespace EPR.Calculator.FSS.API.UnitTests.Services
 {
     [TestClass]
     public class BlobStorageServiceTest

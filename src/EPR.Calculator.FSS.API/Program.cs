@@ -1,4 +1,3 @@
-using System.Configuration;
 using Azure.Storage.Blobs;
 using EPR.Calculator.API.Data;
 using EPR.Calculator.FSS.API;
@@ -7,6 +6,7 @@ using EPR.Calculator.FSS.API.Constants;
 using EPR.Calculator.FSS.API.HealthCheck;
 using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
+using System.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 var environmentName = builder.Environment.EnvironmentName?.ToLower() ?? string.Empty;
