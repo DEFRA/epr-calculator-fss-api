@@ -5,14 +5,13 @@
     using EPR.Calculator.FSS.API.Common.Services;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
-    using Microsoft.AspNetCore.Routing;
-    using Microsoft.Extensions.Logging;
     using System.Diagnostics.CodeAnalysis;
+    using System.Net;
 
     [ExcludeFromCodeCoverage]
     [ApiController]
     [Route("api/organisations")]
-    public class OrganisationsController
+    public class OrganisationsController : ControllerBase
     {
         private readonly IOrganisationService organisationService;
         private readonly ILogger<OrganisationsController> _logger;
