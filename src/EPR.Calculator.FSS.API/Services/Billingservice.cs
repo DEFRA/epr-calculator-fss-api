@@ -26,16 +26,11 @@ namespace EPR.Calculator.FSS.API
                 throw new KeyNotFoundException($"CalculatorBillingFileMetadata is not available for the calculator Id {calcRunId}");
             }
 
-
             var fileName = calculatorBillingFileMetadata.BillingJsonFileName;
             if (string.IsNullOrWhiteSpace(fileName))
             {
-                throw new KeyNotFoundException($"CalculatorBillingFileMetadata is not available for the calculator Id {calcRunId}");
-            }
-
-            if (!await this.storageService.IsBlobExistsAsync(fileName))
-            {
-                throw new FileNotFoundException(fileName);
+                var errorMessage = $"{nameof(calculatorBillingFileMetadata.BillingJsonFileName)} is not available for the calculator Id {calcRunId}";
+                throw new KeyNotFoundException(errorMessage);
             }
 
             var content = await this.storageService.GetFileContents(fileName);

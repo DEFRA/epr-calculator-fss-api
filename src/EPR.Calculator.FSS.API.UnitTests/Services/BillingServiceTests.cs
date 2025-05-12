@@ -77,26 +77,6 @@ namespace EPR.Calculator.FSS.API.UnitTests
         }
 
         [TestMethod]
-        public void Expect_FileNotFoundException()
-        {
-            _context.CalculatorRunBillingFileMetadata.Add(new CalculatorRunBillingFileMetadata
-            {
-                CalculatorRunId = 1,
-                BillingJsonFileName = "FileName.json",
-                BillingFileCreatedDate = DateTime.UtcNow,
-                BillingFileCreatedBy = "Test",
-            });
-            _context.SaveChanges();
-
-            var instance = new BillingService(_storageService.Object, _context);
-            _storageService.Setup(x => x.IsBlobExistsAsync(It.IsAny<string>()))
-                .ReturnsAsync(false);
-
-            Assert.ThrowsExceptionAsync<FileNotFoundException>(
-                () => instance.GetBillingData(calcRunId: 1)).Wait();
-        }
-
-        [TestMethod]
         public void Expect_FileContents()
         {
             _context.CalculatorRunBillingFileMetadata.Add(new CalculatorRunBillingFileMetadata
