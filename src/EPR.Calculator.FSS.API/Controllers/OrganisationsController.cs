@@ -36,7 +36,13 @@
         public async Task<IActionResult> GetOrganisationsDetails(string createdOrModifiedAfter = null)
         {
             var organisationList = await this.organisationService.GetOrganisationsDetails(createdOrModifiedAfter);
-            if (organisationList.Count > 0)
+
+            if (organisationList is null)
+            {
+                return NotFound("Organisation not found");
+            }
+
+            if (organisationList?.Count > 0)
             {
                 return Ok(organisationList);
             }
