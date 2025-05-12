@@ -3,6 +3,7 @@ using EPR.Calculator.API.Data;
 using EPR.Calculator.API.Data.DataModels;
 using EPR.Calculator.FSS.API.Controllers;
 using FluentAssertions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -13,6 +14,18 @@ using Moq;
 
 namespace EPR.Calculator.FSS.API.UnitTests.Controllers
 {
+    [TestClass]
+    public class OrganisatoinsControllerTests
+    {
+        [TestInitialize]
+        public void Setup()
+        {
+            _httpContextMock = new Mock<HttpContext>();
+            _sut = new OrganisationsController(_nullLogger, _mockOrganisationService.Object, _serviceRolesLookupServiceMock.Object);
+            _sut.AddDefaultContextWithOid(_oid, "TestAuth");
+        }
+    }
+
     [TestClass]
     public class ExampleControllerTests
     {
@@ -52,5 +65,9 @@ namespace EPR.Calculator.FSS.API.UnitTests.Controllers
             var value = result.Value as IEnumerable<CalculatorRunFinancialYear>;
             value.Should().BeEquivalentTo(financialYears);
         }
+
+
+
+
     }
 }

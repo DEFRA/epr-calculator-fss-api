@@ -33,7 +33,7 @@
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetOrganisationsDetails(string createdOrModifiedAfter)
+        public async Task<IActionResult> GetOrganisationsDetails(string createdOrModifiedAfter = null)
         {
             var organisationList = await this.organisationService.GetOrganisationsDetails(createdOrModifiedAfter);
             if (organisationList.Count > 0)
@@ -46,5 +46,4 @@
             }
         }
     }
-
 }
