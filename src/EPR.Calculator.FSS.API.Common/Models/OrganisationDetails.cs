@@ -2,7 +2,7 @@ namespace EPR.Calculator.FSS.API.Common.Models;
 
 public class OrganisationDetails
 {
-    required public string OrganisationId { get; set; }
+    public string OrganisationId { get; set; }
 
     public string? OrganisationName { get; set; }
 

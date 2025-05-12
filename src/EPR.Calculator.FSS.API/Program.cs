@@ -2,6 +2,7 @@ using System.Configuration;
 using Azure.Storage.Blobs;
 using EPR.Calculator.API.Data;
 using EPR.Calculator.FSS.API;
+using EPR.Calculator.FSS.API.Common.Data;
 using EPR.Calculator.FSS.API.Common.Services;
 using EPR.Calculator.FSS.API.Constants;
 using EPR.Calculator.FSS.API.HealthCheck;
@@ -29,6 +30,12 @@ builder.Services.AddDbContext<ApplicationDBContext>(options =>
 {
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection"));
+});
+
+builder.Services.AddDbContext<SynapseDbContext>(options =>
+{
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("SynapseDatabase"));
 });
 
 // Configure blob storage settings.
