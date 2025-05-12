@@ -1,5 +1,6 @@
 ﻿using EPR.Calculator.FSS.API.Common;
 using EPR.Calculator.FSS.API.Common.Validators;
+using FluentValidation;
 using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,12 +16,12 @@ namespace EPR.Calculator.FSS.API.Controllers
     public class BillingController(
         IBillingservice billingService,
         TelemetryClient telemetryClient,
-        RunIdValidator runIdValidator)
+        AbstractValidator<int> runIdValidator)
         : Controller
     {
         private IBillingservice BillingService { get; init; } = billingService;
 
-        private RunIdValidator RunIdValidator { get; init; } = runIdValidator;
+        private AbstractValidator<int> RunIdValidator { get; init; } = runIdValidator;
 
         private TelemetryClient TelemetryClient { get; init; } = telemetryClient;
 
@@ -57,7 +58,6 @@ namespace EPR.Calculator.FSS.API.Controllers
                     $"error: {ex.Message}.");
                 return this.NotFound();
             }
-
         }
     }
 }

@@ -31,15 +31,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\EPR.Calculator.FSS.API.Common.UnitTests\EPR.Calculator.FSS.API.Common.UnitTests.csproj" />
     <ProjectReference Include="..\EPR.Calculator.FSS.API\EPR.Calculator.FSS.API.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Using Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Controllers\" />
   </ItemGroup>
 
 </Project>
