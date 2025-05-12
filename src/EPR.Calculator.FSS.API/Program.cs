@@ -1,6 +1,8 @@
 using System.Configuration;
 using Azure.Storage.Blobs;
 using EPR.Calculator.API.Data;
+using EPR.Calculator.FSS.API;
+using EPR.Calculator.FSS.API.Common.Services;
 using EPR.Calculator.FSS.API.Constants;
 using EPR.Calculator.FSS.API.HealthCheck;
 using FluentValidation.AspNetCore;
@@ -20,6 +22,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddFluentValidationClientsideAdapters();
+builder.Services.AddScoped<IOrganisationService, OrganisationService>();
 
 // Configure the database context.
 builder.Services.AddDbContext<ApplicationDBContext>(options =>
