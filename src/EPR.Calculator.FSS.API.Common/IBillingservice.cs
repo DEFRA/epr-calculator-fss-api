@@ -1,6 +1,6 @@
 ﻿namespace EPR.Calculator.FSS.API.Common
 {
-    public interface IBillingservice
+    public interface IBillingService
     {
         /// <summary>
         /// Get the Billing File Data for the calculatorRunId

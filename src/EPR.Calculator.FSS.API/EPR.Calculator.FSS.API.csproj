@@ -24,7 +24,6 @@
     <PackageReference Include="EPR.Calculator.API.Data" Version="1.0.3" />
     <PackageReference Include="FluentValidation" Version="12.0.0" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
-	<PackageReference Include="EPR.Calculator.API.Data" Version="1.0.1" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.23.0" />
     <PackageReference Include="Microsoft.Extensions.Azure" Version="1.11.0" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.2" />
@@ -64,6 +63,9 @@
 		<SonarQubeSetting Include="sonar.exclusions">
 			<Value>Dockerfile</Value>
 		</SonarQubeSetting>
+	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Package\" />
 	</ItemGroup>
 	<ItemGroup>
 	  <Folder Include="Validators\" />

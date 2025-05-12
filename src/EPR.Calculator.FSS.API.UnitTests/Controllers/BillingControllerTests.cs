@@ -24,7 +24,7 @@ namespace EPR.Calculator.FSS.API.UnitTests.Controllers
         public BillingControllerTests()
         {
             this.Fixture = new Fixture();
-            this.MockBillingService = new Mock<IBillingservice>();
+            this.MockBillingService = new Mock<IBillingService>();
 
             this.MockRunIdValidator = new MockValidator<int>(() => this.validationResult);
 
@@ -41,7 +41,7 @@ namespace EPR.Calculator.FSS.API.UnitTests.Controllers
 
         private IFixture Fixture { get; init; }
 
-        private Mock<IBillingservice> MockBillingService { get; init; }
+        private Mock<IBillingService> MockBillingService { get; init; }
 
         private AbstractValidator<int> MockRunIdValidator { get; init; }
 

@@ -9,17 +9,17 @@ namespace EPR.Calculator.FSS.API.Controllers
     /// <summary>
     /// Controller for the API to retrieve billings files.
     /// </summary>
-    /// <param name="billingService">A service object that implements <see cref="IBillingservice"/>.</param>
+    /// <param name="billingService">A service object that implements <see cref="IBillingService"/>.</param>
     /// <param name="telemetryClient">A <see cref="TelemetryClient"/>.</param>
     /// <param name="runIdValidator">A validator for the run ID.</param>
     [Route("api/[controller]")]
     public class BillingController(
-        IBillingservice billingService,
+        IBillingService billingService,
         TelemetryClient telemetryClient,
         AbstractValidator<int> runIdValidator)
         : Controller
     {
-        private IBillingservice BillingService { get; init; } = billingService;
+        private IBillingService BillingService { get; init; } = billingService;
 
         private AbstractValidator<int> RunIdValidator { get; init; } = runIdValidator;
 
