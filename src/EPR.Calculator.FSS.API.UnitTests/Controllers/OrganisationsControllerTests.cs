@@ -17,7 +17,7 @@ using System.Net;
 namespace EPR.Calculator.FSS.API.UnitTests.Controllers
 {
     [TestClass]
-    public class OrganisatoinsControllerTests
+    public class OrganisationsControllerTests
     {
         private readonly Mock<ApplicationDBContext> _mockContext;
         private readonly ExampleController _controller;
@@ -26,7 +26,7 @@ namespace EPR.Calculator.FSS.API.UnitTests.Controllers
         private Mock<IUserService> _userServiceMock = null!;
         private readonly NullLogger<OrganisationsController> _nullLogger = new();
 
-        public OrganisatoinsControllerTests()
+        public OrganisationsControllerTests()
         {
             _mockContext = new Mock<ApplicationDBContext>();
             _controller = new ExampleController(_mockContext.Object);
