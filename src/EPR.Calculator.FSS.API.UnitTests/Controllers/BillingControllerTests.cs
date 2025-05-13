@@ -1,23 +1,15 @@
+using AutoFixture;
+using EPR.Calculator.FSS.API.Common;
+using EPR.Calculator.FSS.API.Common.UnitTests.Validators;
+using EPR.Calculator.FSS.API.Common.Validators;
+using EPR.Calculator.FSS.API.Controllers;
+using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.Extensibility;
+using Microsoft.AspNetCore.Mvc;
+using Moq;
+
 namespace EPR.Calculator.FSS.API.UnitTests.Controllers
 {
-    using System;
-    //using System.ComponentModel.DataAnnotations;
-    using System.Threading.Tasks;
-    using AutoFixture;
-    using EPR.Calculator.FSS.API.Common;
-    using EPR.Calculator.FSS.API.Controllers;
-    using FluentAssertions;
-    using FluentValidation;
-    using Microsoft.ApplicationInsights;
-    using Microsoft.ApplicationInsights.Extensibility;
-    using Microsoft.IdentityModel.Abstractions;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Moq;
-    using FluentValidation.Results;
-    using EPR.Calculator.FSS.API.Common.UnitTests.Validators;
-    using System.Text;
-    using Microsoft.AspNetCore.Mvc;
-
     [TestClass]
     public class BillingControllerTests
     {
@@ -26,7 +18,7 @@ namespace EPR.Calculator.FSS.API.UnitTests.Controllers
             this.Fixture = new Fixture();
             this.MockBillingService = new Mock<IBillingService>();
 
-            this.MockRunIdValidator = new MockValidator<int>(() => this.validationResult);
+            this.MockRunIdValidator = new MockRunIdValidator(() => this.validationResult);
 
             this.TestClass = new BillingController(
                 this.MockBillingService.Object,
@@ -42,7 +34,7 @@ namespace EPR.Calculator.FSS.API.UnitTests.Controllers
 
         private Mock<IBillingService> MockBillingService { get; init; }
 
-        private AbstractValidator<int> MockRunIdValidator { get; init; }
+        private RunIdValidator MockRunIdValidator { get; init; }
 
         private BillingController TestClass { get; init; }
 
