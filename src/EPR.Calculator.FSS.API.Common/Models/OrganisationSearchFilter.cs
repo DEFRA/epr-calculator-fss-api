@@ -1,0 +1,13 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace EPR.Calculator.FSS.API.Common.Models
+{
+    public class OrganisationSearchFilter
+    {
+        public string? CreatedOrModifiedAfter { get; set; }
+    }
+}
