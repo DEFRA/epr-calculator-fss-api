@@ -1,9 +1,4 @@
 ﻿using FluentValidation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EPR.Calculator.FSS.API.Common.Validators
 {
@@ -17,7 +12,7 @@ namespace EPR.Calculator.FSS.API.Common.Validators
         /// </summary>
         public RunIdValidator()
         {
-            RuleFor(runId => runId)
+            this.RuleFor(runId => runId)
                 .NotEmpty()
                 .WithMessage("Run ID cannot be empty.")
                 .GreaterThan(0)

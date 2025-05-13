@@ -18,7 +18,7 @@ namespace EPR.Calculator.FSS.API.UnitTests.Controllers
             this.Fixture = new Fixture();
             this.MockBillingService = new Mock<IBillingService>();
 
-            this.MockRunIdValidator = new MockRunIdValidator(() => this.validationResult);
+            this.MockRunIdValidator = new MockRunIdValidator(() => this.ValidationResult);
 
             this.TestClass = new BillingController(
                 this.MockBillingService.Object,
@@ -38,7 +38,7 @@ namespace EPR.Calculator.FSS.API.UnitTests.Controllers
 
         private BillingController TestClass { get; init; }
 
-        private bool validationResult { get; set; }
+        private bool ValidationResult { get; set; }
 
         [TestMethod]
         public async Task CallGetBillingsDetails_Success()
@@ -48,7 +48,7 @@ namespace EPR.Calculator.FSS.API.UnitTests.Controllers
             var billingsDetails = this.Fixture.Create<string>();
             this.MockBillingService.Setup(service => service.GetBillingData(runId))
                 .ReturnsAsync(billingsDetails);
-            this.validationResult = true;
+            this.ValidationResult = true;
 
             // Act
             var result = await this.TestClass.GetBillingsDetails(runId);
@@ -65,7 +65,7 @@ namespace EPR.Calculator.FSS.API.UnitTests.Controllers
             var billingsDetails = this.Fixture.Create<string>();
             this.MockBillingService.Setup(service => service.GetBillingData(runId))
                 .ReturnsAsync(billingsDetails);
-            this.validationResult = false;
+            this.ValidationResult = false;
 
             // Act
             var result = await this.TestClass.GetBillingsDetails(runId);
@@ -78,8 +78,8 @@ namespace EPR.Calculator.FSS.API.UnitTests.Controllers
         /// Checks that the controller returns a 404 when the service throws a KeyNotFoundException
         /// or a FileNotFoundException.
         /// </summary>
-        /// <param name="exceptionType"></param>
-        /// <returns></returns>
+        /// <param name="exceptionType">The type of exception to test.</param>
+        /// <returns>A <see cref="Task"/>.</returns>
         [TestMethod]
         [DataRow(typeof(KeyNotFoundException))]
         [DataRow(typeof(FileNotFoundException))]
@@ -87,10 +87,9 @@ namespace EPR.Calculator.FSS.API.UnitTests.Controllers
         {
             // Arrange
             var runId = this.Fixture.Create<int>();
-            var billingsDetails = this.Fixture.Create<string>();
             this.MockBillingService.Setup(service => service.GetBillingData(runId))
-                .Throws((Exception)Activator.CreateInstance(exceptionType)!);
-            this.validationResult = true;
+                .Throws((Exception)Activator.CreateInstance(exceptionType) !);
+            this.ValidationResult = true;
 
             // Act
             var result = await this.TestClass.GetBillingsDetails(runId);
