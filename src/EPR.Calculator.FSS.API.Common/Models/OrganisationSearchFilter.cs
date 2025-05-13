@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Diagnostics.CodeAnalysis;
 
 namespace EPR.Calculator.FSS.API.Common.Models
 {
+    [ExcludeFromCodeCoverage]
     public class OrganisationSearchFilter
     {
         public string? CreatedOrModifiedAfter { get; set; }

@@ -1,5 +1,8 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace EPR.Calculator.FSS.API.Common.Models;
 
+[ExcludeFromCodeCoverage]
 public class OrganisationDetails
 {
     required public string OrganisationId { get; set; }
