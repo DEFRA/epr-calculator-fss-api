@@ -36,7 +36,6 @@ namespace EPR.Calculator.FSS.API.UnitTests.Controllers
                     DisableTelemetry = true,
                 }),
                 this.MockRunIdValidator);
-            
         }
 
         private IFixture Fixture { get; init; }

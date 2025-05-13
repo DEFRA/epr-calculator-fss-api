@@ -36,10 +36,10 @@ namespace EPR.Calculator.FSS.API.Controllers
         {
             var validationResult = this.RunIdValidator.Validate(runId);
             if (!validationResult.IsValid)
-            {
+        {
                 this.TelemetryClient.TrackTrace($"RunId \"{runId}\"is invalid.");
                 return this.NotFound();
-            }
+        }
 
             try
             {
@@ -52,7 +52,7 @@ namespace EPR.Calculator.FSS.API.Controllers
                 return billingData;
             }
             catch (Exception ex) when (ex is KeyNotFoundException || ex is FileNotFoundException)
-            {
+        {
                 this.TelemetryClient.TrackTrace($"Billing data not found for runId \"{runId}\" " +
                     $"at {DateTime.Now}, " +
                     $"error: {ex.Message}.");
