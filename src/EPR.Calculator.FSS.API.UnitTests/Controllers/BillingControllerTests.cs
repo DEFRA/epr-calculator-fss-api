@@ -1,4 +1,4 @@
-using AutoFixture;
+﻿using AutoFixture;
 using EPR.Calculator.FSS.API.Common;
 using EPR.Calculator.FSS.API.Common.UnitTests.Validators;
 using EPR.Calculator.FSS.API.Common.Validators;
@@ -89,7 +89,7 @@ namespace EPR.Calculator.FSS.API.UnitTests.Controllers
             // Arrange
             var runId = this.Fixture.Create<int>();
             this.MockBillingService.Setup(service => service.GetBillingData(runId))
-                .Throws((Exception)Activator.CreateInstance(exceptionType) !);
+                .Throws((Exception)Activator.CreateInstance(exceptionType)!);
             this.ValidationResult = true;
 
             // Act

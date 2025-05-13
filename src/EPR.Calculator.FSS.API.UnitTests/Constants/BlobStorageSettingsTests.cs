@@ -3,18 +3,19 @@ using EPR.Calculator.FSS.API.Constants;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace EPR.Calculator.FSS.API.UnitTests.Constants
-{        
+{
     [TestClass]
     public class BlobStorageSettingsTests
     {
-        private BlobStorageSettings TestClass;
-        private IFixture Fixture;
-
         public BlobStorageSettingsTests()
         {
             Fixture = new Fixture();
             this.TestClass = new BlobStorageSettings();
         }
+
+        private BlobStorageSettings TestClass { get; init; }
+
+        private IFixture Fixture { get; init; }
 
         [TestMethod]
         public void CanSetAndGetConnectionString()

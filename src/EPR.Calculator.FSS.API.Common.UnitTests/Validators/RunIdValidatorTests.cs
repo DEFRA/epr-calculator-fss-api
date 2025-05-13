@@ -1,4 +1,4 @@
-using AutoFixture;
+﻿using AutoFixture;
 using EPR.Calculator.FSS.API.Common.Validators;
 
 namespace EPR.Calculator.FSS.API.Common.UnitTests.Validators
