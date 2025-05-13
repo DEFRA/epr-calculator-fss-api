@@ -29,6 +29,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\EPR.Calculator.FSS.API.Common\EPR.Calculator.FSS.API.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
 	<None Update="Dockerfile">
 		<CopyToOutputDirectory>Never</CopyToOutputDirectory>
 	</None>
@@ -48,6 +52,9 @@
 		<SonarQubeSetting Include="sonar.exclusions">
 			<Value>Dockerfile</Value>
 		</SonarQubeSetting>
+	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Package\" />
 	</ItemGroup>
 
 </Project>

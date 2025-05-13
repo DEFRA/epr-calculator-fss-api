@@ -1,10 +1,12 @@
-using System.Configuration;
 using Azure.Storage.Blobs;
 using EPR.Calculator.API.Data;
+using EPR.Calculator.FSS.API;
+using EPR.Calculator.FSS.API.Common;
 using EPR.Calculator.FSS.API.Constants;
 using EPR.Calculator.FSS.API.HealthCheck;
 using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
+using System.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 var environmentName = builder.Environment.EnvironmentName?.ToLower() ?? string.Empty;
@@ -20,6 +22,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddFluentValidationClientsideAdapters();
+builder.Services.AddScoped<IBillingService, BillingService>();
+builder.Services.AddScoped<IBlobStorageService, BlobStorageService>();
 
 // Configure the database context.
 builder.Services.AddDbContext<ApplicationDBContext>(options =>
