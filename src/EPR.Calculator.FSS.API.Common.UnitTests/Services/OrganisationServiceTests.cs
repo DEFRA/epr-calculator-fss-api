@@ -1,14 +1,10 @@
-﻿using Castle.Core.Logging;
-using EPR.Calculator.API.Data;
-using EPR.Calculator.API.Data.DataModels;
+﻿namespace EPR.Calculator.FSS.API.Common.UnitTests.Services;
+
 using EPR.Calculator.FSS.API.Common.Data;
 using EPR.Calculator.FSS.API.Common.Data.Entities;
 using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
-
-namespace EPR.Calculator.FSS.API.Common.UnitTests.Services;
 
 [TestClass]
 public class OrganisationServiceTests
@@ -40,5 +36,106 @@ public class OrganisationServiceTests
         // Assert
         Assert.IsNotNull(result);
         Assert.AreEqual(0, result.Count);
+    }
+
+    [TestMethod]
+    public async Task GetOrganisationsDetails_ValidRequestWithData_ReturnsOrganisationDetails()
+    {
+        // Arrange
+        var expectedData = new List<AcceptedGrantedOrgDataResponseModel>
+        {
+            new ()
+            {
+                OrganisationId = 12345,
+                SubsidiaryId = null,
+                OrganisationName = "Example Organisation Ltd",
+                TradingName = "Example Trading Name",
+                CompaniesHouseNumber = "12345678",
+                HomeNationCode = "ENG",
+                ServiceOfNoticeAddrLine1 = "123 Example Street",
+                ServiceOfNoticeAddrLine2 = "Suite 456",
+                ServiceOfNoticeAddrCity = "London",
+                ServiceOfNoticeAddrCounty = "Greater London",
+                ServiceOfNoticeAddrCountry = "United Kingdom",
+                ServiceOfNoticeAddrPostcode = "E1 6AN",
+                ServiceOfNoticeAddrPhoneNumber = "+44 20 7946 0123",
+                SoleTraderFirstName = "John",
+                SoleTraderLastName = "Doe",
+                SoleTraderPhoneNumber = "+44 7911 123456",
+                SoleTraderEmail = "john.doe@example.com",
+                PrimaryContactPersonFirstName = "Jane",
+                PrimaryContactPersonLastName = "Smith",
+                PrimaryContactPersonPhoneNumber = "+44 7911 654321",
+                PrimaryContactPersonEmail = "jane.smith@example.com",
+            },
+            new ()
+            {
+                OrganisationId = 12345,
+                SubsidiaryId = "900001",
+                OrganisationName = "Happy Shopper",
+                TradingName = "Subsidiary Trading Name",
+            },
+        };
+
+        _mockSynapseDbContext
+            .Setup(ctx => ctx.RunSqlAsync<AcceptedGrantedOrgDataResponseModel>(It.IsAny<string>(), It.IsAny<SqlParameter[]>()))
+            .ReturnsAsync(expectedData);
+
+        // Act
+        var result = await _organisationService.GetOrganisationsDetails();
+
+        // Assert
+        Assert.IsNotNull(result);
+        Assert.AreEqual(2, result.Count);
+
+        var firstOrganisation = result.First();
+
+        Assert.AreEqual("12345", firstOrganisation.OrganisationId);
+        Assert.AreEqual("Example Organisation Ltd", firstOrganisation.OrganisationName);
+        Assert.AreEqual("Example Trading Name", firstOrganisation.OrganisationTradingName);
+        Assert.AreEqual("12345678", firstOrganisation.CompaniesHouseNumber);
+        Assert.AreEqual("ENG", firstOrganisation.HomeNationCode);
+        Assert.AreEqual("123 Example Street", firstOrganisation.ServiceOfNoticeAddrLine1);
+        Assert.AreEqual("Suite 456", firstOrganisation.ServiceOfNoticeAddrLine2);
+        Assert.AreEqual("London", firstOrganisation.ServiceOfNoticeAddrCity);
+        Assert.AreEqual("Greater London", firstOrganisation.ServiceOfNoticeAddrCounty);
+        Assert.AreEqual("United Kingdom", firstOrganisation.ServiceOfNoticeAddrCountry);
+        Assert.AreEqual("E1 6AN", firstOrganisation.ServiceOfNoticeAddrPostcode);
+        Assert.AreEqual("+44 20 7946 0123", firstOrganisation.ServiceOfNoticeAddrPhoneNumber);
+        Assert.AreEqual("John", firstOrganisation.SoleTraderFirstName);
+        Assert.AreEqual("Doe", firstOrganisation.SoleTraderLastName);
+        Assert.AreEqual("+44 7911 123456", firstOrganisation.SoleTraderPhoneNumber);
+        Assert.AreEqual("john.doe@example.com", firstOrganisation.SoleTraderEmail);
+        Assert.AreEqual("Jane", firstOrganisation.PrimaryContactPersonFirstName);
+        Assert.AreEqual("Smith", firstOrganisation.PrimaryContactPersonLastName);
+        Assert.AreEqual("+44 7911 654321", firstOrganisation.PrimaryContactPersonPhoneNumber);
+        Assert.AreEqual("jane.smith@example.com", firstOrganisation.PrimaryContactPersonEmail);
+
+        Assert.IsNotNull(firstOrganisation.SubsidiaryDetails);
+        //Assert.AreEqual(1, firstOrganisation.SubsidiaryDetails.Count);
+        //Assert.IsNotNull(firstOrganisation.SubsidiaryDetails);
+
+        //Assert.AreEqual("900001", firstOrganisation.SubsidiaryDetails[0].SubsidiaryId);
+        //Assert.AreEqual("Happy Shopper", firstOrganisation.SubsidiaryDetails[0].SubsidiaryName);
+        //Assert.AreEqual("Subsidiary Trading Name", firstOrganisation.SubsidiaryDetails[0].SubsidiaryTradingName);
+
+        _mockSynapseDbContext
+            .Verify(ctx => ctx.RunSqlAsync<AcceptedGrantedOrgDataResponseModel>(It.IsAny<string>(), It.IsAny<SqlParameter[]>()),
+                    Times.Once);
+    }
+
+    [TestMethod]
+    public async Task GetOrganisationsDetails_ExceptionThrown_OnError()
+    {
+        // Arrange
+        _mockSynapseDbContext
+            .Setup(ctx => ctx.RunSqlAsync<AcceptedGrantedOrgDataResponseModel>(It.IsAny<string>(), It.IsAny<SqlParameter[]>()))
+            .ThrowsAsync(new Exception("Database error"));
+
+        // Act & Assert
+        var exception = await Assert.ThrowsExceptionAsync<Exception>(() => _organisationService.GetOrganisationsDetails(It.IsAny<string>()));
+
+        // Assert
+        Assert.AreEqual("Database error", exception.Message);
     }
 }
