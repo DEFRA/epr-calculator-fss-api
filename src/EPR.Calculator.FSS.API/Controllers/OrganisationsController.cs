@@ -1,19 +1,13 @@
 ﻿namespace EPR.Calculator.FSS.API.Controllers;
 
+using System.Net;
 using EPR.Calculator.FSS.API.Common.Models;
 using EPR.Calculator.FSS.API.Common.Services;
-using EPR.Calculator.FSS.API.Common.Validators;
 using EPR.Calculator.FSS.API.Shared;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System.ComponentModel.DataAnnotations;
-using System.Net;
-using FluentValidation;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.Extensions.Options;
-using System.Reflection.Metadata;
 
 /// <summary>
 /// Controller for the API to retrieve Organization Details.
@@ -32,7 +26,7 @@ public class OrganisationsController : ControllerBase
         ILogger<OrganisationsController> logger)
     {
         _organisationService = organisationService;
-        _logger = logger;
+        this._logger = logger;
         _organisationSearchFilterValidator = organisationSearchFilterValidator;
     }
 
@@ -78,7 +72,7 @@ public class OrganisationsController : ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error Getting the Organisation details");
+            this._logger.LogError(e, "Error Getting the Organisation details");
             return HandleError.Handle(e);
         }
     }

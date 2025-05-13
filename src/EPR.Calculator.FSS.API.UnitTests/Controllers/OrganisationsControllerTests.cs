@@ -1,11 +1,13 @@
 ﻿namespace EPR.Calculator.FSS.API.UnitTests.Controllers
 {
     using System.Net;
+    using AutoFixture;
     using EPR.Calculator.API.Data;
     using EPR.Calculator.FSS.API.Common.Models;
     using EPR.Calculator.FSS.API.Common.Services;
     using EPR.Calculator.FSS.API.Controllers;
     using FluentAssertions;
+    using FluentValidation;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging.Abstractions;
@@ -18,11 +20,21 @@
         private OrganisationsController _organisationController = null!;
         private readonly NullLogger<OrganisationsController> _nullLogger = new();
 
-        [TestInitialize]
-        public void Setup()
+        private IFixture Fixture { get; init; }
+
+        private bool validationResult { get; set; }
+
+        private AbstractValidator<OrganisationSearchFilter> MockValidator { get; init; }
+
+        public OrganisationsControllerTests()
         {
-            _organisationServiceMock = new Mock<IOrganisationService>();
-            _organisationController = new OrganisationsController(_organisationServiceMock.Object, _nullLogger)
+            this.Fixture = new Fixture();
+            this._organisationServiceMock = new Mock<IOrganisationService>();
+            this.MockValidator = new Common.Validators.OrganisationSearchFilterValidator();
+            this._organisationController = new OrganisationsController(
+                _organisationServiceMock.Object,
+                this.MockValidator,
+                _nullLogger)
             {
                 ControllerContext = new ControllerContext
                 {
@@ -36,9 +48,11 @@
         {
             // Arrange
             var createdOrModifiedAfter = "2021-01-30";
-            _organisationServiceMock
+            this._organisationServiceMock
                 .Setup(service => service.GetOrganisationsDetails(It.IsAny<string>()))
-                .ReturnsAsync(new List<OrganisationDetails> { new OrganisationDetails { OrganisationId = "test", OrganisationName = "Test Org" } });
+                .ReturnsAsync(new List<OrganisationDetails>
+                        { new OrganisationDetails
+                            { OrganisationId = "test", OrganisationName = "Test Org" }, });
 
             // Act
             var result = await _organisationController.GetOrganisationsDetails(createdOrModifiedAfter) as ObjectResult;
@@ -50,17 +64,17 @@
         }
 
         [TestMethod]
-        public async Task GetOrganisationsDetails_ReturnsNoContent()
+        public async Task GetOrganisationsDetailsReturnsNoContent()
         {
             var myList = new List<OrganisationDetails>();
 
             // Arrange
-            _organisationServiceMock
+            this._organisationServiceMock
                 .Setup(service => service.GetOrganisationsDetails(It.IsAny<string>()))
                 .ReturnsAsync(myList);
 
             // Act
-            var result = await _organisationController.GetOrganisationsDetails(It.IsAny<string>()) as ObjectResult;
+            var result = await this._organisationController.GetOrganisationsDetails(It.IsAny<string>()) as ObjectResult;
 
             // Assert
             result.Should().BeNull();
@@ -88,19 +102,19 @@
             }*/
 
         [TestMethod]
-        public async Task GetOrganisationsDetails_ReturnsStatus400BadRequest()
+        public async Task GetOrganisationsDetailsReturnsStatus400BadRequest()
         {
             // Arrange
             var myList = new List<OrganisationDetails>();
             myList = null;
 
             // Arrange
-            _organisationServiceMock.Setup(x =>
+            this._organisationServiceMock.Setup(x =>
                 x.GetOrganisationsDetails(It.IsAny<string>()))
                 .ThrowsAsync(new HttpRequestException("Test exception", null, HttpStatusCode.BadRequest));
 
             // Act
-            var result = await _organisationController.GetOrganisationsDetails(null) as BadRequestResult;
+            var result = await this._organisationController.GetOrganisationsDetails(null) as BadRequestResult;
 
             // Assert
             result.Should().NotBeNull();
@@ -108,22 +122,39 @@
         }
 
         [TestMethod]
-        public async Task GetOrganisationsDetails_Status500InternalServerError()
+        public async Task GetOrganisationsDetailsStatus500InternalServerError()
         {
             // Arrange
-            var createdOrModifiedAfter = "2021-01-30";
+            var createdOrModifiedAfter = "2025-01-30";
 
-            _organisationServiceMock.Setup(x =>
+            this._organisationServiceMock.Setup(x =>
                 x.GetOrganisationsDetails(It.IsAny<string>()))
                 .ThrowsAsync(new HttpRequestException("Test exception", null, HttpStatusCode.InternalServerError));
 
             // Act
-            var result = await _organisationController.GetOrganisationsDetails(createdOrModifiedAfter) as ActionResult;
+            var result = await this._organisationController.GetOrganisationsDetails(createdOrModifiedAfter) as ActionResult;
 
             // Assert
             result.Should().BeOfType<StatusCodeResult>();
             var statusCodeResult = result as StatusCodeResult;
             statusCodeResult?.StatusCode.Should().Be(500);
+        }
+
+        [TestMethod]
+        public async Task GetOrganisationsDetailsStatusInvalidDate()
+        {
+            // Arrange
+            var createdOrModifiedAfter = "25-01-30";
+            this._organisationServiceMock.Setup(x =>
+                x.GetOrganisationsDetails(It.IsAny<string>()))
+                .ThrowsAsync(new HttpRequestException("Test exception", null, HttpStatusCode.BadRequest));
+
+            // Act
+            var result = await this._organisationController.GetOrganisationsDetails(createdOrModifiedAfter) as BadRequestResult;
+
+            // Assert
+            result.Should().NotBeNull();
+            result?.StatusCode.Should().Be(400);
         }
     }
 }

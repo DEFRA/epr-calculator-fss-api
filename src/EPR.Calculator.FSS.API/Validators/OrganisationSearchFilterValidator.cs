@@ -17,7 +17,7 @@ public class OrganisationSearchFilterValidator : AbstractValidator<OrganisationS
 
     private static bool BeAValidDate(string createdOrModifiedAfter)
     {
-        string[] formats = { "yyyy/MM/yyyy", "yyyy/MMM/dd" };
+        string[] formats = { "yyyy-MM-dd", "yyyy-MMM-dd" };
         var validDate = DateTime.TryParseExact(createdOrModifiedAfter, formats, CultureInfo.InvariantCulture, DateTimeStyles.None, out _);
         return validDate;
     }
