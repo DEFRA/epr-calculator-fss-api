@@ -62,7 +62,7 @@ public class OrganisationsController : ControllerBase
 
             if (organisationList.Count > 0)
             {
-                return Ok(new { organisationDetails = organisationList });
+                return Ok(organisationList);
             }
             else
             {

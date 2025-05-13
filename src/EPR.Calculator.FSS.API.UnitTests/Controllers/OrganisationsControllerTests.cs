@@ -46,7 +46,6 @@
         [TestMethod]
         public async Task GetOrganisationsDetails_ReturnsOk()
         {
-            // Arrange
             var createdOrModifiedAfter = "2021-01-30";
             this._organisationServiceMock
                 .Setup(service => service.GetOrganisationsDetails(It.IsAny<string>()))
