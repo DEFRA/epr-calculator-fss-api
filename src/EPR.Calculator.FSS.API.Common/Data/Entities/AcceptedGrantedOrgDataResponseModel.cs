@@ -1,6 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿namespace EPR.Calculator.FSS.API.Common.Data.Entities;
 
-namespace EPR.Calculator.FSS.API.Common.Data.Entities;
+using System.ComponentModel.DataAnnotations.Schema;
 
 public class AcceptedGrantedOrgDataResponseModel
 {
@@ -66,28 +66,4 @@ public class AcceptedGrantedOrgDataResponseModel
 
     [Column("primary_contact_person_email")]
     public string? PrimaryContactPersonEmail { get; set; }
-
-    [Column("FileName")]
-    public string? FileName { get; set; }
-
-    [Column("ReferenceNumber")]
-    public string? ReferenceNumber { get; set; }
-
-    [Column("IsDeleted")]
-    public string? IsDeleted { get; set; }
-
-    [Column("CreatedOn")]
-    public string? CreatedOn { get; set; }
-
-    [Column("LastUpdatedOn")]
-    public string? LastUpdatedOn { get; set; }
-
-    [Column("cfm_FileId")]
-    public string? CfmFileId { get; set; }
-
-    [Column("Regulator_Status")]
-    public string? RegulatorStatus { get; set; }
-
-    [Column("load_ts")]
-    public DateTime? LoadTs { get; set; }
 }

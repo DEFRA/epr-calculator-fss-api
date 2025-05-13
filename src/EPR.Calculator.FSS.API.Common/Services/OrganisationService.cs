@@ -22,8 +22,6 @@ public class OrganisationService : IOrganisationService
 
     public async Task<IReadOnlyCollection<OrganisationDetails>> GetOrganisationsDetails(string? createdOrModifiedAfter = null)
     {
-        var orgList = new List<OrganisationDetails>();
-
         try
         {
             const string sql = "EXECUTE [dbo].[GetLatestAcceptedGrantedOrgData] @createdOrModifiedAfter";
@@ -35,34 +33,69 @@ public class OrganisationService : IOrganisationService
 
             var dbResponse = await _synapseDbContext.RunSqlAsync<AcceptedGrantedOrgDataResponseModel>(sql, parameters);
 
-            var list = dbResponse
-                ?.Select(x => new OrganisationDetails
+            var groupedResults = dbResponse?
+                .Where(x => x.OrganisationId is not null)
+                .GroupBy(x => x.OrganisationId);
+
+            var resultList = new List<OrganisationDetails>();
+
+            if (groupedResults is not null)
+            {
+                foreach (var group in groupedResults)
                 {
-                    OrganisationId = x.OrganisationId?.ToString() ?? string.Empty,
-                    OrganisationName = x.OrganisationName,
-                    OrganisationTradingName = x.TradingName,
-                    CompaniesHouseNumber = x.CompaniesHouseNumber,
-                    HomeNationCode = x.HomeNationCode,
-                    ServiceOfNoticeAddrLine1 = x.ServiceOfNoticeAddrLine1,
-                    ServiceOfNoticeAddrLine2 = x.ServiceOfNoticeAddrLine2,
-                    ServiceOfNoticeAddrCity = x.ServiceOfNoticeAddrCity,
-                    ServiceOfNoticeAddrCounty = x.ServiceOfNoticeAddrCounty,
-                    ServiceOfNoticeAddrCountry = x.ServiceOfNoticeAddrCountry,
-                    ServiceOfNoticeAddrPostcode = x.ServiceOfNoticeAddrPostcode,
-                    ServiceOfNoticeAddrPhoneNumber = x.ServiceOfNoticeAddrPhoneNumber,
-                    SoleTraderFirstName = x.SoleTraderFirstName,
-                    SoleTraderLastName = x.SoleTraderLastName,
-                    SoleTraderPhoneNumber = x.SoleTraderPhoneNumber,
-                    SoleTraderEmail = x.SoleTraderEmail,
-                    PrimaryContactPersonFirstName = x.PrimaryContactPersonFirstName,
-                    PrimaryContactPersonLastName = x.PrimaryContactPersonLastName,
-                    PrimaryContactPersonPhoneNumber = x.PrimaryContactPersonPhoneNumber,
-                    PrimaryContactPersonEmail = x.PrimaryContactPersonEmail,
-                    //SubsidiaryDetails = x.SubsidiaryDetails
-                })
-                .ToList()
-                ?? new List<OrganisationDetails>();
-            return list.AsReadOnly();
+                    // Should have one item with no subsidiary
+                    var items = group.OrderBy(g => g.SubsidiaryId);
+
+                    // First one should have the parent with a null subsidiary id
+                    var parent = items
+                        .FirstOrDefault(x => x.SubsidiaryId is null);
+
+                    if (parent is null)
+                    {
+                        _logger.LogWarning("No parent item found for organisation {OrganisationId}", group.Key);
+                        continue;
+                    }
+
+                    var parentOrganisation = new OrganisationDetails
+                    {
+                        OrganisationId = parent.OrganisationId.ToString() ?? string.Empty,
+                        OrganisationName = parent.OrganisationName,
+                        OrganisationTradingName = parent.TradingName,
+                        CompaniesHouseNumber = parent.CompaniesHouseNumber,
+                        HomeNationCode = parent.HomeNationCode,
+                        ServiceOfNoticeAddrLine1 = parent.ServiceOfNoticeAddrLine1,
+                        ServiceOfNoticeAddrLine2 = parent.ServiceOfNoticeAddrLine2,
+                        ServiceOfNoticeAddrCity = parent.ServiceOfNoticeAddrCity,
+                        ServiceOfNoticeAddrCounty = parent.ServiceOfNoticeAddrCounty,
+                        ServiceOfNoticeAddrCountry = parent.ServiceOfNoticeAddrCountry,
+                        ServiceOfNoticeAddrPostcode = parent.ServiceOfNoticeAddrPostcode,
+                        ServiceOfNoticeAddrPhoneNumber = parent.ServiceOfNoticeAddrPhoneNumber,
+                        SoleTraderFirstName = parent.SoleTraderFirstName,
+                        SoleTraderLastName = parent.SoleTraderLastName,
+                        SoleTraderPhoneNumber = parent.SoleTraderPhoneNumber,
+                        SoleTraderEmail = parent.SoleTraderEmail,
+                        PrimaryContactPersonFirstName = parent.PrimaryContactPersonFirstName,
+                        PrimaryContactPersonLastName = parent.PrimaryContactPersonLastName,
+                        PrimaryContactPersonPhoneNumber = parent.PrimaryContactPersonPhoneNumber,
+                        PrimaryContactPersonEmail = parent.PrimaryContactPersonEmail,
+                        SubsidiaryDetails = new List<SubsidiaryDetails>(),
+                    };
+
+                    foreach (var item in items.Where(x => x.SubsidiaryId is not null))
+                    {
+                        parentOrganisation.SubsidiaryDetails.Add(new SubsidiaryDetails
+                        {
+                            SubsidiaryId = item.SubsidiaryId!,
+                            SubsidiaryName = item.OrganisationName,
+                            SubsidiaryTradingName = item.TradingName,
+                        });
+                    }
+
+                    resultList.Add(parentOrganisation);
+                }
+            }
+
+            return resultList.AsReadOnly();
         }
         catch (Exception ex)
         {
@@ -70,7 +103,5 @@ public class OrganisationService : IOrganisationService
 
             throw;
         }
-
-        return orgList;
     }
 }
