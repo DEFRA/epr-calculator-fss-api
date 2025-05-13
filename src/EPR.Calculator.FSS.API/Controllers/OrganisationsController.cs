@@ -13,7 +13,7 @@ using Microsoft.Extensions.Logging;
 /// Controller for the API to retrieve Organization Details.
 /// </summary>
 [ApiController]
-[Route("organisations-details")]
+[Route("v1/organisations-details")]
 public class OrganisationsController : ControllerBase
 {
     private readonly IOrganisationService _organisationService;
@@ -43,9 +43,9 @@ public class OrganisationsController : ControllerBase
             // validator for createdOrModifiedAfter - should be a valid date when not null
             // Optional date parameter in ISO 8601 format(YYYY - MM - DD).If no date is passed, all organization records are returned.
             // If a date is passed, only records created or modified on or after that date are returned.
-            OrganisationSearchFilter? orgSerach = new OrganisationSearchFilter();
-            orgSerach = new OrganisationSearchFilter() { CreatedOrModifiedAfter = createdOrModifiedAfter };
-            var result = this._organisationSearchFilterValidator.Validate(orgSerach);
+            OrganisationSearchFilter? orgSearch = new OrganisationSearchFilter();
+            orgSearch = new OrganisationSearchFilter() { CreatedOrModifiedAfter = createdOrModifiedAfter };
+            var result = this._organisationSearchFilterValidator.Validate(orgSearch);
             if (!result.IsValid)
             {
                 return HandleError.HandleErrorWithStatusCode(HttpStatusCode.BadRequest);
