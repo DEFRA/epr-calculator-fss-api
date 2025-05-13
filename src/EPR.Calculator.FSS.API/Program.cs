@@ -2,6 +2,7 @@ using Azure.Storage.Blobs;
 using EPR.Calculator.API.Data;
 using EPR.Calculator.FSS.API;
 using EPR.Calculator.FSS.API.Common;
+using EPR.Calculator.FSS.API.Common.Validators;
 using EPR.Calculator.FSS.API.Constants;
 using EPR.Calculator.FSS.API.HealthCheck;
 using FluentValidation.AspNetCore;
@@ -47,6 +48,8 @@ builder.Services.AddSingleton<BlobServiceClient>(provider =>
 
     return new BlobServiceClient(connectionString);
 });
+
+builder.Services.AddScoped<RunIdValidator, RunIdValidator>();
 
 var app = builder.Build();
 

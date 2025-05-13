@@ -16,12 +16,12 @@ namespace EPR.Calculator.FSS.API.Controllers
     public class BillingController(
         IBillingService billingService,
         TelemetryClient telemetryClient,
-        AbstractValidator<int> runIdValidator)
+        RunIdValidator runIdValidator)
         : Controller
     {
         private IBillingService BillingService { get; init; } = billingService;
 
-        private AbstractValidator<int> RunIdValidator { get; init; } = runIdValidator;
+        private RunIdValidator RunIdValidator { get; init; } = runIdValidator;
 
         private TelemetryClient TelemetryClient { get; init; } = telemetryClient;
 
