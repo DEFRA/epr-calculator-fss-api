@@ -66,6 +66,7 @@ namespace EPR.Calculator.FSS.API.UnitTests.Controllers
             this.MockBillingService.Setup(service => service.GetBillingData(runId))
                 .ReturnsAsync(billingsDetails);
             this.ValidationResult = false;
+            this.TestClass.ModelState.AddModelError("RunId", "Invalid RunId");
 
             // Act
             var result = await this.TestClass.GetBillingsDetails(runId);

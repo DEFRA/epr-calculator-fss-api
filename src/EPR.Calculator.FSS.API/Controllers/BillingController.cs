@@ -34,12 +34,11 @@ namespace EPR.Calculator.FSS.API.Controllers
         [Route("billingDetails")]
         public async Task<ActionResult<string>> GetBillingsDetails(int runId)
         {
-            var validationResult = this.RunIdValidator.Validate(runId);
-            if (!validationResult.IsValid)
-        {
+            if (!this.ModelState.IsValid)
+            {
                 this.TelemetryClient.TrackTrace($"RunId \"{runId}\"is invalid.");
                 return this.NotFound();
-        }
+            }
 
             try
             {

@@ -5,6 +5,7 @@ using EPR.Calculator.FSS.API.Common;
 using EPR.Calculator.FSS.API.Common.Validators;
 using EPR.Calculator.FSS.API.Constants;
 using EPR.Calculator.FSS.API.HealthCheck;
+using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using System.Configuration;
@@ -50,6 +51,11 @@ builder.Services.AddSingleton<BlobServiceClient>(provider =>
 });
 
 builder.Services.AddScoped<RunIdValidator, RunIdValidator>();
+
+// Configure validation.
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddFluentValidationClientsideAdapters();
+builder.Services.AddValidatorsFromAssemblyContaining<RunIdValidator>();
 
 var app = builder.Build();
 
