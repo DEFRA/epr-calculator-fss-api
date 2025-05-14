@@ -30,6 +30,9 @@ namespace EPR.Calculator.FSS.API.Controllers
         private static readonly CompositeFormat BillingDataNotFound
             = CompositeFormat.Parse(Resources.BillingDataNotFound);
 
+        private static readonly CompositeFormat BillingDataMiscError
+            = CompositeFormat.Parse(Resources.BillingDataMiscError);
+
         private IBillingService BillingService { get; init; } = billingService;
 
         private RunIdValidator RunIdValidator { get; init; } = runIdValidator;
@@ -77,6 +80,13 @@ namespace EPR.Calculator.FSS.API.Controllers
             }
             catch(Exception ex)
             {
+                this.TelemetryClient.TrackTrace(string.Format(
+                    CultureInfo.CurrentCulture,
+                    BillingDataMiscError,
+                    runId,
+                    DateTime.UtcNow,
+                    ex.Message));
+
                 return this.StatusCode(500);
             }
         }
