@@ -2,9 +2,9 @@
 {
     using System.Net;
     using AutoFixture;
-    using EPR.Calculator.API.Data;
     using EPR.Calculator.FSS.API.Common.Models;
     using EPR.Calculator.FSS.API.Common.Services;
+    using EPR.Calculator.FSS.API.Common.Validators;
     using EPR.Calculator.FSS.API.Controllers;
     using FluentAssertions;
     using FluentValidation;
@@ -22,18 +22,16 @@
 
         private IFixture Fixture { get; init; }
 
-        private bool validationResult { get; set; }
-
-        private AbstractValidator<OrganisationSearchFilter> MockValidator { get; init; }
+        private AbstractValidator<OrganisationSearchFilter> _mockValidator { get; init; }
 
         public OrganisationsControllerTests()
         {
             this.Fixture = new Fixture();
             this._organisationServiceMock = new Mock<IOrganisationService>();
-            this.MockValidator = new Common.Validators.OrganisationSearchFilterValidator();
+            this._mockValidator = new OrganisationSearchFilterValidator();
             this._organisationController = new OrganisationsController(
                 _organisationServiceMock.Object,
-                this.MockValidator,
+                _mockValidator,
                 _nullLogger)
             {
                 ControllerContext = new ControllerContext
@@ -50,8 +48,7 @@
             this._organisationServiceMock
                 .Setup(service => service.GetOrganisationsDetails(It.IsAny<string>()))
                 .ReturnsAsync(new List<OrganisationDetails>
-                        { new OrganisationDetails
-                            { OrganisationId = "test", OrganisationName = "Test Org" }, });
+                                { new OrganisationDetails { OrganisationId = "test", OrganisationName = "Test Org" }, });
 
             // Act
             var result = await _organisationController.GetOrganisationsDetails(createdOrModifiedAfter) as ObjectResult;
@@ -63,7 +60,7 @@
         }
 
         [TestMethod]
-        public async Task GetOrganisationsDetailsReturnsNoContent()
+        public async Task GetOrganisationsDetails_ReturnsNoContent()
         {
             var myList = new List<OrganisationDetails>();
 
@@ -140,7 +137,7 @@
         }
 
         [TestMethod]
-        public async Task GetOrganisationsDetailsStatusInvalidDate()
+        public async Task GetOrganisationsDetailsStatus400InvalidDate()
         {
             // Arrange
             var createdOrModifiedAfter = "25-01-30";

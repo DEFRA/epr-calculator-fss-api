@@ -25,9 +25,9 @@ public class OrganisationsController : ControllerBase
         AbstractValidator<OrganisationSearchFilter> organisationSearchFilterValidator,
         ILogger<OrganisationsController> logger)
     {
-        _organisationService = organisationService;
+        this._organisationService = organisationService;
         this._logger = logger;
-        _organisationSearchFilterValidator = organisationSearchFilterValidator;
+        this._organisationSearchFilterValidator = organisationSearchFilterValidator;
     }
 
     [HttpGet]
@@ -40,8 +40,8 @@ public class OrganisationsController : ControllerBase
     {
         if (createdOrModifiedAfter != null)
         {
-            // validator for createdOrModifiedAfter - should be a valid date when not null
-            // Optional date parameter in ISO 8601 format(YYYY - MM - DD).If no date is passed, all organization records are returned.
+            // Validator for createdOrModifiedAfter - should be a valid date when not null
+            // This is an optional date parameter in ISO 8601 format(YYYY - MM - DD). If no date is passed, all organization records are returned.
             // If a date is passed, only records created or modified on or after that date are returned.
             OrganisationSearchFilter? orgSearch = new OrganisationSearchFilter();
             orgSearch = new OrganisationSearchFilter() { CreatedOrModifiedAfter = createdOrModifiedAfter };
