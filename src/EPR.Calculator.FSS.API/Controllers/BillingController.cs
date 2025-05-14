@@ -70,18 +70,12 @@ namespace EPR.Calculator.FSS.API.Controllers
             }
             catch (Exception ex) when (ex is KeyNotFoundException || ex is FileNotFoundException)
             {
-                this.TelemetryClient.TrackTrace(ex.Message);
+                this.TelemetryClient.TrackException(ex);
                 return this.NotFound();
             }
             catch(Exception ex)
             {
-                this.TelemetryClient.TrackTrace(string.Format(
-                    CultureInfo.CurrentCulture,
-                    BillingDataMiscError,
-                    runId,
-                    DateTime.UtcNow,
-                    ex.Message));
-
+                this.TelemetryClient.TrackException(ex);
                 return this.StatusCode((int)HttpStatusCode.InternalServerError);
             }
         }
