@@ -2,11 +2,6 @@
 using EPR.Calculator.FSS.API.Common.Validators;
 using FluentAssertions;
 using FluentValidation.TestHelper;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EPR.Calculator.FSS.API.UnitTests.Validators;
 
