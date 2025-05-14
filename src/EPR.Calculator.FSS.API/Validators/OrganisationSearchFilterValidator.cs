@@ -1,8 +1,6 @@
-﻿using System;
-using System.Globalization;
+﻿using System.Globalization;
 using EPR.Calculator.FSS.API.Common.Models;
 using FluentValidation;
-using FluentValidation.Results;
 
 namespace EPR.Calculator.FSS.API.Common.Validators;
 
