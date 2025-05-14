@@ -40,13 +40,13 @@ public class OrganisationService : IOrganisationService
                .Where(x => x.OrganisationId is not null)
                .ToLookup(x => x.OrganisationId!.Value);
 
-            foreach (var key in organisationsLookup.Select(x => x.Key))
+            foreach (var organisationId in organisationsLookup.Select(x => x.Key))
             {
-                var parent = organisationsLookup[key].First();
+                var parent = organisationsLookup[organisationId].First();
 
-                var o = new OrganisationDetails
+                organisationsList.Add(new OrganisationDetails
                 {
-                    OrganisationId = parent.OrganisationId.ToString() ?? string.Empty,
+                    OrganisationId = organisationId.ToString(),
                     OrganisationName = parent.OrganisationName,
                     OrganisationTradingName = parent.TradingName,
                     CompaniesHouseNumber = parent.CompaniesHouseNumber,
@@ -66,7 +66,7 @@ public class OrganisationService : IOrganisationService
                     PrimaryContactPersonLastName = parent.PrimaryContactPersonLastName,
                     PrimaryContactPersonPhoneNumber = parent.PrimaryContactPersonPhoneNumber,
                     PrimaryContactPersonEmail = parent.PrimaryContactPersonEmail,
-                    SubsidiaryDetails = organisationsLookup[key]
+                    SubsidiaryDetails = organisationsLookup[organisationId]
                         .Where(x => x.SubsidiaryId is not null)
                         .Select(s => new SubsidiaryDetails
                         {
@@ -75,9 +75,7 @@ public class OrganisationService : IOrganisationService
                             SubsidiaryTradingName = s.TradingName,
                         })
                         .ToList(),
-                };
-
-                organisationsList.Add(o);
+                });
             }
         }
         catch (Exception ex)
