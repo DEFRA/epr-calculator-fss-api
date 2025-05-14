@@ -70,7 +70,7 @@ namespace EPR.Calculator.FSS.API.Common.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Billing data not found for runId {0} at {1}, error: {2}.
+        ///   Looks up a localized string similar to CalculatorBillingFileMetadata is not available for the calculator Id {0}.
         /// </summary>
         public static string BillingDataNotFound {
             get {
@@ -84,6 +84,15 @@ namespace EPR.Calculator.FSS.API.Common.Properties {
         public static string BillingDataRetrieved {
             get {
                 return ResourceManager.GetString("BillingDataRetrieved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} is not available for the calculator Id {1}.
+        /// </summary>
+        public static string BillingDataUnavaliable {
+            get {
+                return ResourceManager.GetString("BillingDataUnavaliable", resourceCulture);
             }
         }
         

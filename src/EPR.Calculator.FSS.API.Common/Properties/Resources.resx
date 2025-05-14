@@ -121,10 +121,13 @@
     <value>Error retrieving billing data for runId {0} at {1}, error: {2}</value>
   </data>
   <data name="BillingDataNotFound" xml:space="preserve">
-    <value>Billing data not found for runId {0} at {1}, error: {2}</value>
+    <value>CalculatorBillingFileMetadata is not available for the calculator Id {0}</value>
   </data>
   <data name="BillingDataRetrieved" xml:space="preserve">
     <value>Billing data retrieved for runId: {0} at {1}, length {2}.</value>
+  </data>
+  <data name="BillingDataUnavaliable" xml:space="preserve">
+    <value>{0} is not available for the calculator Id {1}</value>
   </data>
   <data name="RunIdIsEmpty" xml:space="preserve">
     <value>Run ID cannot be empty.</value>
