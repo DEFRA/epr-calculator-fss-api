@@ -4,6 +4,7 @@ using EPR.Calculator.FSS.API.Common.Validators;
 using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
+using System.Net;
 using System.Text;
 
 namespace EPR.Calculator.FSS.API.Controllers
@@ -81,7 +82,7 @@ namespace EPR.Calculator.FSS.API.Controllers
                     DateTime.UtcNow,
                     ex.Message));
 
-                return this.StatusCode(500);
+                return this.StatusCode((int)HttpStatusCode.InternalServerError);
             }
         }
     }

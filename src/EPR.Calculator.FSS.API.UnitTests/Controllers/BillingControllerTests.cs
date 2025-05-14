@@ -7,6 +7,7 @@ using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
+using System.Net;
 
 namespace EPR.Calculator.FSS.API.UnitTests.Controllers
 {
@@ -84,7 +85,7 @@ namespace EPR.Calculator.FSS.API.UnitTests.Controllers
         [TestMethod]
         [DataRow(typeof(KeyNotFoundException))]
         [DataRow(typeof(FileNotFoundException))]
-        public async Task CallGetBillingsDetails_Return404WhenServiceThrowsException(Type exceptionType)
+        public async Task CallGetBillingsDetails_Return404WhenBillingsNotFound(Type exceptionType)
         {
             // Arrange
             var runId = this.Fixture.Create<int>();
@@ -97,6 +98,34 @@ namespace EPR.Calculator.FSS.API.UnitTests.Controllers
 
             // Assert
             Assert.IsInstanceOfType(result.Result, typeof(NotFoundResult));
+        }
+
+        /// <summary>
+        /// Checks that the controller returns a 500 when the service throws an exception *other than
+        /// the ones that indicate the billings were not found.
+        /// </summary>
+        /// <param name="exceptionType">The type of exception to test.</param>
+        /// <returns>A <see cref="Task"/>.</returns>
+        [TestMethod]
+        [DataRow(typeof(Exception))]
+        [DataRow(typeof(ApplicationException))]
+        [DataRow(typeof(OutOfMemoryException))]
+        public async Task CallGetBillingsDetails_Return500WhenServiceThrowsException(Type exceptionType)
+        {
+            // Arrange
+            var runId = this.Fixture.Create<int>();
+            this.MockBillingService.Setup(service => service.GetBillingData(runId))
+                .Throws((Exception)Activator.CreateInstance(exceptionType)!);
+            this.ValidationResult = true;
+
+            // Act
+            var result = await this.TestClass.GetBillingsDetails(runId);
+
+            // Assert
+            Assert.IsInstanceOfType(result.Result, typeof(StatusCodeResult));
+            Assert.AreEqual(
+                (int)HttpStatusCode.InternalServerError,
+                (result.Result as StatusCodeResult).StatusCode);
         }
     }
 }
