@@ -1,8 +1,10 @@
 ﻿using EPR.Calculator.FSS.API.Common;
+using EPR.Calculator.FSS.API.Common.Properties;
 using EPR.Calculator.FSS.API.Common.Validators;
-using FluentValidation;
 using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Mvc;
+using System.Globalization;
+using System.Text;
 
 namespace EPR.Calculator.FSS.API.Controllers
 {
@@ -19,6 +21,15 @@ namespace EPR.Calculator.FSS.API.Controllers
         RunIdValidator runIdValidator)
         : Controller
     {
+        private static readonly CompositeFormat RunIdIsInvalid
+            = CompositeFormat.Parse(Resources.RunIdIsInvalid);
+
+        private static readonly CompositeFormat BillingDataRetrieved
+            = CompositeFormat.Parse(Resources.BillingDataRetrieved);
+
+        private static readonly CompositeFormat BillingDataNotFound
+            = CompositeFormat.Parse(Resources.BillingDataNotFound);
+
         private IBillingService BillingService { get; init; } = billingService;
 
         private RunIdValidator RunIdValidator { get; init; } = runIdValidator;
@@ -36,7 +47,7 @@ namespace EPR.Calculator.FSS.API.Controllers
         {
             if (!this.ModelState.IsValid)
             {
-                this.TelemetryClient.TrackTrace($"RunId \"{runId}\"is invalid.");
+                this.TelemetryClient.TrackTrace(string.Format(CultureInfo.CurrentCulture, RunIdIsInvalid, runId));
                 return this.NotFound();
             }
 
@@ -44,18 +55,29 @@ namespace EPR.Calculator.FSS.API.Controllers
             {
                 var billingData = await this.BillingService.GetBillingData(runId);
 
-                this.TelemetryClient.TrackTrace($"Billing data retrieved for runId: {runId} " +
-                    $"at {DateTime.Now}, " +
-                    $"length {billingData.Length}.");
+                this.TelemetryClient.TrackTrace(string.Format(
+                    CultureInfo.CurrentCulture,
+                    BillingDataRetrieved,
+                    runId,
+                    DateTime.UtcNow,
+                    billingData.Length));
 
                 return billingData;
             }
             catch (Exception ex) when (ex is KeyNotFoundException || ex is FileNotFoundException)
-        {
-                this.TelemetryClient.TrackTrace($"Billing data not found for runId \"{runId}\" " +
-                    $"at {DateTime.Now}, " +
-                    $"error: {ex.Message}.");
+            {
+                this.TelemetryClient.TrackTrace(string.Format(
+                    CultureInfo.CurrentCulture,
+                    BillingDataNotFound,
+                    runId,
+                    DateTime.UtcNow,
+                    ex.Message));
+
                 return this.NotFound();
+            }
+            catch(Exception ex)
+            {
+                return this.StatusCode(500);
             }
         }
     }
