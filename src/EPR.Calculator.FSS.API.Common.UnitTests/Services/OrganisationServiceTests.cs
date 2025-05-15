@@ -258,10 +258,10 @@ public class OrganisationServiceTests
         // Arrange
         _mockSynapseDbContext
             .Setup(ctx => ctx.RunSqlAsync<AcceptedGrantedOrgDataResponseModel>(It.IsAny<string>(), It.IsAny<SqlParameter[]>()))
-            .ThrowsAsync(new Exception("Database error"));
+            .ThrowsAsync(new InvalidOperationException("Database error"));
 
         // Act & Assert
-        var exception = await Assert.ThrowsExceptionAsync<Exception>(() => _organisationService.GetOrganisationsDetails(It.IsAny<string>()));
+        var exception = await Assert.ThrowsExceptionAsync<InvalidOperationException>(() => _organisationService.GetOrganisationsDetails(It.IsAny<string>()));
 
         // Assert
         Assert.AreEqual("Database error", exception.Message);

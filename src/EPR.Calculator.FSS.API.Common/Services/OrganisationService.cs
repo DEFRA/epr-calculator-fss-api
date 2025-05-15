@@ -8,14 +8,16 @@ using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 
 public class OrganisationService : IOrganisationService
 {
     private readonly SynapseDbContext _synapseDbContext;
     private readonly ILogger<OrganisationService> _logger;
 
-    public OrganisationService(SynapseDbContext synapseDbContext,
-                               ILogger<OrganisationService> logger)
+    public OrganisationService(
+        SynapseDbContext synapseDbContext,
+        ILogger<OrganisationService> logger)
     {
         _synapseDbContext = synapseDbContext;
         _logger = logger;
@@ -46,7 +48,7 @@ public class OrganisationService : IOrganisationService
 
                 organisationsList.Add(new OrganisationDetails
                 {
-                    OrganisationId = organisationId.ToString(),
+                    OrganisationId = organisationId.ToString(CultureInfo.InvariantCulture),
                     OrganisationName = parent.OrganisationName,
                     OrganisationTradingName = parent.TradingName,
                     CompaniesHouseNumber = parent.CompaniesHouseNumber,
