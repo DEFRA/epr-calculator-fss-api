@@ -1,6 +1,5 @@
 ﻿namespace EPR.Calculator.FSS.API.UnitTests.Controllers
 {
-    using System.Net;
     using AutoFixture;
     using EPR.Calculator.FSS.API.Common.Models;
     using EPR.Calculator.FSS.API.Common.Services;
@@ -12,17 +11,15 @@
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging.Abstractions;
     using Moq;
+    using System.Net;
 
     [TestClass]
     public class OrganisationsControllerTests
     {
+        private readonly NullLogger<OrganisationsController> _nullLogger = new();
         private Mock<IOrganisationService> _organisationServiceMock = null!;
         private OrganisationsController _organisationController = null!;
-        private readonly NullLogger<OrganisationsController> _nullLogger = new();
-
-        private IFixture Fixture { get; init; }
-
-        private AbstractValidator<OrganisationSearchFilter> _mockValidator { get; init; }
+        private OrganisationSearchFilterValidator _mockValidator;
 
         public OrganisationsControllerTests()
         {
@@ -40,6 +37,8 @@
                 },
             };
         }
+
+        private IFixture Fixture { get; init; }
 
         [TestMethod]
         public async Task GetOrganisationsDetails_ReturnsOk()

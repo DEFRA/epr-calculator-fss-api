@@ -1,13 +1,14 @@
 ﻿namespace EPR.Calculator.FSS.API.Controllers;
 
-using System.Net;
 using EPR.Calculator.FSS.API.Common.Models;
 using EPR.Calculator.FSS.API.Common.Services;
+using EPR.Calculator.FSS.API.Common.Validators;
 using EPR.Calculator.FSS.API.Shared;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System.Net;
 
 /// <summary>
 /// Controller for the API to retrieve Organization Details.
@@ -18,11 +19,11 @@ public class OrganisationsController : ControllerBase
 {
     private readonly IOrganisationService _organisationService;
     private readonly ILogger<OrganisationsController> _logger;
-    private AbstractValidator<OrganisationSearchFilter> _organisationSearchFilterValidator;
+    private OrganisationSearchFilterValidator _organisationSearchFilterValidator;
 
     public OrganisationsController(
         IOrganisationService organisationService,
-        AbstractValidator<OrganisationSearchFilter> organisationSearchFilterValidator,
+        OrganisationSearchFilterValidator organisationSearchFilterValidator,
         ILogger<OrganisationsController> logger)
     {
         this._organisationService = organisationService;
@@ -66,7 +67,7 @@ public class OrganisationsController : ControllerBase
             }
             else
             {
-                //TODO: Confirm what this should return - possibly 404
+                // TODO: Confirm what this should return - possibly 404
                 return NoContent();
             }
         }
