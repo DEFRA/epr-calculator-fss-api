@@ -157,9 +157,11 @@ public class OrganisationServiceTests
         Assert.IsNotNull(secondOrganisation.SubsidiaryDetails);
         Assert.AreEqual(0, secondOrganisation.SubsidiaryDetails.Count);
 
-        _mockSynapseDbContext
-            .Verify(ctx => ctx.RunSqlAsync<AcceptedGrantedOrgDataResponseModel>(It.IsAny<string>(), It.IsAny<SqlParameter[]>()),
-                    Times.Once);
+        _mockSynapseDbContext.Verify(
+            ctx => ctx.RunSqlAsync<AcceptedGrantedOrgDataResponseModel>(
+                It.IsAny<string>(),
+                It.IsAny<SqlParameter[]>()),
+            Times.Once);
     }
 
     [TestMethod]
@@ -243,9 +245,11 @@ public class OrganisationServiceTests
         Assert.AreEqual("Happy Shopper", firstOrganisation.SubsidiaryDetails[0].SubsidiaryName);
         Assert.AreEqual("Subsidiary Trading Name", firstOrganisation.SubsidiaryDetails[0].SubsidiaryTradingName);
 
-        _mockSynapseDbContext
-            .Verify(ctx => ctx.RunSqlAsync<AcceptedGrantedOrgDataResponseModel>(It.IsAny<string>(), It.IsAny<SqlParameter[]>()),
-                    Times.Once);
+        _mockSynapseDbContext.Verify(
+            ctx => ctx.RunSqlAsync<AcceptedGrantedOrgDataResponseModel>(
+                It.IsAny<string>(),
+                It.IsAny<SqlParameter[]>()),
+            Times.Once);
     }
 
     [TestMethod]

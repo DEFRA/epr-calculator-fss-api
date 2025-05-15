@@ -25,7 +25,7 @@ public class OrganisationsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetOrganisationsDetails([FromQuery]string? createdOrModifiedAfter)
     {
-        //TODO: Add validator for createdOrModifiedAfter - should be a valid date when not null
+        // TODO: Add validator for createdOrModifiedAfter - should be a valid date when not null
 
         var organisationList = await _organisationService.GetOrganisationsDetails(createdOrModifiedAfter);
         if (organisationList.Count > 0)
@@ -34,7 +34,7 @@ public class OrganisationsController : ControllerBase
         }
         else
         {
-            //TODO: Confirm what this should return - possibly 404
+            // TODO: Confirm what this should return - possibly 404
             return NoContent();
         }
     }
