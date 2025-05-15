@@ -43,26 +43,26 @@ namespace EPR.Calculator.FSS.API.Controllers
         /// <summary>
         /// API endpoint to retrieve billing details for a given runId.
         /// </summary>
-        /// <param name="runId">The run ID to retrieve the billings details for.</param>
+        /// <param name="calculatorRunId">The run ID to retrieve the billings details for.</param>
         /// <returns>The billings details as a string.</returns>
         [HttpGet]
         [Route("billingDetails")]
-        public async Task<ActionResult<string>> GetBillingsDetails(int runId)
+        public async Task<ActionResult<string>> GetBillingsDetails(int calculatorRunId)
         {
             if (!this.ModelState.IsValid)
             {
-                this.TelemetryClient.TrackTrace(string.Format(CultureInfo.CurrentCulture, RunIdIsInvalid, runId));
+                this.TelemetryClient.TrackTrace(string.Format(CultureInfo.CurrentCulture, RunIdIsInvalid, calculatorRunId));
                 return this.NotFound();
             }
 
             try
             {
-                var billingData = await this.BillingService.GetBillingData(runId);
+                var billingData = await this.BillingService.GetBillingData(calculatorRunId);
 
                 this.TelemetryClient.TrackTrace(string.Format(
                     CultureInfo.CurrentCulture,
                     BillingDataRetrieved,
-                    runId,
+                    calculatorRunId,
                     DateTime.UtcNow,
                     billingData.Length));
 
