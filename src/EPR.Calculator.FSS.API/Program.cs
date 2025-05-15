@@ -3,6 +3,7 @@ using EPR.Calculator.API.Data;
 using EPR.Calculator.FSS.API;
 using EPR.Calculator.FSS.API.Common;
 using EPR.Calculator.FSS.API.Common.Data;
+using EPR.Calculator.FSS.API.Common.Models;
 using EPR.Calculator.FSS.API.Common.Services;
 using EPR.Calculator.FSS.API.Common.Validators;
 using EPR.Calculator.FSS.API.Constants;
@@ -59,6 +60,7 @@ builder.Services.AddSingleton<BlobServiceClient>(provider =>
     return new BlobServiceClient(connectionString);
 });
 
+builder.Services.AddScoped<OrganisationSearchFilterValidator, OrganisationSearchFilterValidator>();
 builder.Services.AddScoped<RunIdValidator, RunIdValidator>();
 
 // Configure validation.
