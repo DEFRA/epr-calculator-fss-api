@@ -4,7 +4,6 @@ using EPR.Calculator.FSS.API.Common.Models;
 using EPR.Calculator.FSS.API.Common.Services;
 using EPR.Calculator.FSS.API.Shared;
 using EPR.Calculator.FSS.API.Validators;
-using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
