@@ -1,10 +1,20 @@
 ﻿using EPR.Calculator.API.Data;
 using EPR.Calculator.FSS.API.Common;
+using EPR.Calculator.FSS.API.Common.Properties;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
+using System.Text;
+
 namespace EPR.Calculator.FSS.API
 {
     public class BillingService : IBillingService
     {
+        private static readonly CompositeFormat BillingDataNotFound
+            = CompositeFormat.Parse(Resources.BillingDataNotFound);
+
+        private static readonly CompositeFormat BillingDataUnavaliable
+            = CompositeFormat.Parse(Resources.BillingDataUnavaliable);
+
         private readonly IBlobStorageService storageService;
         private readonly ApplicationDBContext context;
 
@@ -23,13 +33,20 @@ namespace EPR.Calculator.FSS.API
                 SingleOrDefaultAsync(x => x.CalculatorRunId == calcRunId);
             if (calculatorBillingFileMetadata == null)
             {
-                throw new KeyNotFoundException($"CalculatorBillingFileMetadata is not available for the calculator Id {calcRunId}");
+                throw new KeyNotFoundException(string.Format(
+                    CultureInfo.CurrentCulture,
+                    BillingDataNotFound,
+                    calcRunId));
             }
 
             var fileName = calculatorBillingFileMetadata.BillingJsonFileName;
             if (string.IsNullOrWhiteSpace(fileName))
             {
-                var errorMessage = $"{nameof(calculatorBillingFileMetadata.BillingJsonFileName)} is not available for the calculator Id {calcRunId}";
+                var errorMessage = string.Format(
+                    CultureInfo.CurrentCulture,
+                    BillingDataUnavaliable,
+                    nameof(calculatorBillingFileMetadata.BillingJsonFileName),
+                    calcRunId);
                 throw new KeyNotFoundException(errorMessage);
             }
 
