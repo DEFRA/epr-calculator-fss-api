@@ -1,8 +1,8 @@
 ﻿namespace EPR.Calculator.FSS.API.Common.Validators;
 
-using System.Globalization;
 using EPR.Calculator.FSS.API.Common.Models;
 using FluentValidation;
+using System.Globalization;
 
 public class OrganisationSearchFilterValidator : AbstractValidator<OrganisationSearchFilter>
 {
