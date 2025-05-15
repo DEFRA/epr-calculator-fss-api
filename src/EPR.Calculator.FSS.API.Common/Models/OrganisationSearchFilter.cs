@@ -1,10 +1,9 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace EPR.Calculator.FSS.API.Common.Models
+namespace EPR.Calculator.FSS.API.Common.Models;
+
+[ExcludeFromCodeCoverage]
+public class OrganisationSearchFilter
 {
-    [ExcludeFromCodeCoverage]
-    public class OrganisationSearchFilter
-    {
-        public string? CreatedOrModifiedAfter { get; set; }
-    }
+    public string? CreatedOrModifiedAfter { get; set; }
 }
