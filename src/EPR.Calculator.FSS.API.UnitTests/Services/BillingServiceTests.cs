@@ -1,4 +1,4 @@
-namespace EPR.Calculator.FSS.API.UnitTests
+﻿namespace EPR.Calculator.FSS.API.UnitTests
 {
     using AutoFixture;
     using EPR.Calculator.API.Data;
