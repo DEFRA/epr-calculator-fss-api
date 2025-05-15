@@ -1,5 +1,5 @@
 ﻿using EPR.Calculator.FSS.API.Common.Models;
-using EPR.Calculator.FSS.API.Common.Validators;
+using EPR.Calculator.FSS.API.Validators;
 using FluentAssertions;
 using FluentValidation.TestHelper;
 
@@ -22,8 +22,7 @@ public class OrganisationSearchFilterValidatorTests
     public void OrganisationSearchFilterValidator_Valid_Date_Parameter_Value(string createdOrModifiedAfter)
     {
         // Arrange
-        OrganisationSearchFilter? orgSearch = new OrganisationSearchFilter();
-        orgSearch = new OrganisationSearchFilter() { CreatedOrModifiedAfter = createdOrModifiedAfter };
+        var orgSearch = new OrganisationSearchFilter { CreatedOrModifiedAfter = createdOrModifiedAfter };
 
         // Act
         var result = _organisationSearchFilterValidatorTest?.TestValidate<OrganisationSearchFilter>(orgSearch);
@@ -39,8 +38,7 @@ public class OrganisationSearchFilterValidatorTests
     public void OrganisationSearchFilterValidator_Invalid_Date_Parameter_Value(string createdOrModifiedAfter)
     {
         // Arrange
-        OrganisationSearchFilter? orgSearch = new OrganisationSearchFilter();
-        orgSearch = new OrganisationSearchFilter() { CreatedOrModifiedAfter = createdOrModifiedAfter };
+        var orgSearch = new OrganisationSearchFilter { CreatedOrModifiedAfter = createdOrModifiedAfter };
 
         // Act
         var result = _organisationSearchFilterValidatorTest?.TestValidate<OrganisationSearchFilter>(orgSearch);

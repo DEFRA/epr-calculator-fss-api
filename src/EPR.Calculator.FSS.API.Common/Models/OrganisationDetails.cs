@@ -1,5 +1,4 @@
-﻿
-namespace EPR.Calculator.FSS.API.Common.Models;
+﻿namespace EPR.Calculator.FSS.API.Common.Models;
 
 public class OrganisationDetails
 {

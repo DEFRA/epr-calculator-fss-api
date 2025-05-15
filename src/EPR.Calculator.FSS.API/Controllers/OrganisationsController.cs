@@ -2,8 +2,8 @@
 
 using EPR.Calculator.FSS.API.Common.Models;
 using EPR.Calculator.FSS.API.Common.Services;
-using EPR.Calculator.FSS.API.Common.Validators;
 using EPR.Calculator.FSS.API.Shared;
+using EPR.Calculator.FSS.API.Validators;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -45,7 +45,7 @@ public class OrganisationsController : ControllerBase
             // This is an optional date parameter in ISO 8601 format(YYYY - MM - DD). If no date is passed, all organization records are returned.
             // If a date is passed, only records created or modified on or after that date are returned.
             OrganisationSearchFilter? orgSearch = new OrganisationSearchFilter();
-            orgSearch = new OrganisationSearchFilter() { CreatedOrModifiedAfter = createdOrModifiedAfter };
+            orgSearch = new OrganisationSearchFilter { CreatedOrModifiedAfter = createdOrModifiedAfter };
             var result = this._organisationSearchFilterValidator.Validate(orgSearch);
             if (!result.IsValid)
             {
@@ -63,11 +63,11 @@ public class OrganisationsController : ControllerBase
 
             if (organisationList.Count > 0)
             {
-                return Ok(organisationList);
+                return Ok(new OrganisationsDetailsResponse { OrganisationsDetails = [.. organisationList] });
             }
             else
             {
-            //TODO: Confirm what this should return - possibly 404
+                // TODO: Confirm what this should return - possibly 404
                 return NoContent();
             }
         }

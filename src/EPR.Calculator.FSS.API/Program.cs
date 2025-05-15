@@ -8,6 +8,7 @@ using EPR.Calculator.FSS.API.Common.Services;
 using EPR.Calculator.FSS.API.Common.Validators;
 using EPR.Calculator.FSS.API.Constants;
 using EPR.Calculator.FSS.API.HealthCheck;
+using EPR.Calculator.FSS.API.Validators;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;

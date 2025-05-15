@@ -1,4 +1,4 @@
-﻿namespace EPR.Calculator.FSS.API.Common.Validators;
+﻿namespace EPR.Calculator.FSS.API.Validators;
 
 using EPR.Calculator.FSS.API.Common.Models;
 using FluentValidation;

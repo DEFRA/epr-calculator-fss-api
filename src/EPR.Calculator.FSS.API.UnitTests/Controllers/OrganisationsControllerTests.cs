@@ -3,10 +3,9 @@
     using AutoFixture;
     using EPR.Calculator.FSS.API.Common.Models;
     using EPR.Calculator.FSS.API.Common.Services;
-    using EPR.Calculator.FSS.API.Common.Validators;
     using EPR.Calculator.FSS.API.Controllers;
+    using EPR.Calculator.FSS.API.Validators;
     using FluentAssertions;
-    using FluentValidation;
     using FluentValidation.Results;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
@@ -55,7 +54,13 @@
             this._organisationServiceMock
                .Setup(service => service.GetOrganisationsDetails(It.IsAny<string>()))
                .ReturnsAsync(new List<OrganisationDetails>
-                               { new OrganisationDetails { OrganisationId = "test", OrganisationName = "Test Org" }, });
+                                {
+                                    new OrganisationDetails
+                                    {
+                                        OrganisationId = "12345",
+                                        OrganisationName = "Test Org"
+                                    },
+                                });
 
             // Act
             var result = await _organisationController.GetOrganisationsDetails(createdOrModifiedAfter) as ObjectResult;
@@ -63,7 +68,13 @@
             // Assert
             result.Should().NotBeNull();
             result?.StatusCode.Should().Be((int)HttpStatusCode.OK);
-            result?.Value.Should().BeOfType<List<OrganisationDetails>>();
+            result?.Value.Should().BeOfType<OrganisationsDetailsResponse>();
+
+            var response = result.Value as OrganisationsDetailsResponse;
+            response.OrganisationsDetails.Should().NotBeNullOrEmpty();
+            response.OrganisationsDetails.Count().Should().Be(1);
+            response.OrganisationsDetails[0].OrganisationId.Should().Be("12345");
+            response.OrganisationsDetails[0].OrganisationName.Should().Be("Test Org");
         }
 
         [TestMethod]
