@@ -5,6 +5,7 @@ using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
 using System.Net;
+using System.Net.Mime;
 using System.Text;
 
 namespace EPR.Calculator.FSS.API.Controllers
@@ -47,12 +48,12 @@ namespace EPR.Calculator.FSS.API.Controllers
         /// <returns>The billings details as a string.</returns>
         [HttpGet]
         [Route("billingDetails")]
-        public async Task<ActionResult<string>> GetBillingsDetails(int calculatorRunId)
+        public async Task<IResult> GetBillingsDetails(int calculatorRunId)
         {
             if (!this.ModelState.IsValid)
             {
                 this.TelemetryClient.TrackTrace(string.Format(CultureInfo.CurrentCulture, RunIdIsInvalid, calculatorRunId));
-                return this.NotFound();
+                return Results.BadRequest();
             }
 
             try
@@ -66,17 +67,17 @@ namespace EPR.Calculator.FSS.API.Controllers
                     DateTime.UtcNow,
                     billingData.Length));
 
-                return billingData;
+                return Results.Content(billingData, MediaTypeNames.Application.Json);
             }
             catch (Exception ex) when (ex is KeyNotFoundException || ex is FileNotFoundException)
             {
                 this.TelemetryClient.TrackException(ex);
-                return this.NotFound();
+                return Results.NotFound();
             }
             catch(Exception ex)
             {
                 this.TelemetryClient.TrackException(ex);
-                return this.StatusCode((int)HttpStatusCode.InternalServerError);
+                return Results.StatusCode((int)HttpStatusCode.InternalServerError);
             }
         }
     }
