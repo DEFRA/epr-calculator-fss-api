@@ -2,7 +2,7 @@
 
 using EPR.Calculator.FSS.API.Common.Models;
 using EPR.Calculator.FSS.API.Common.Services;
-using EPR.Calculator.FSS.API.Shared;
+using EPR.Calculator.FSS.API.Helpers;
 using EPR.Calculator.FSS.API.Validators;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -18,7 +18,7 @@ public class OrganisationsController : ControllerBase
 {
     private readonly IOrganisationService _organisationService;
     private readonly ILogger<OrganisationsController> _logger;
-    private OrganisationSearchFilterValidator _organisationSearchFilterValidator;
+    private readonly OrganisationSearchFilterValidator _organisationSearchFilterValidator;
 
     public OrganisationsController(
         IOrganisationService organisationService,

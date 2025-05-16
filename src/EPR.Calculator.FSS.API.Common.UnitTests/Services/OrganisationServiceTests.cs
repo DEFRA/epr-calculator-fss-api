@@ -127,8 +127,6 @@ public class OrganisationServiceTests
         Assert.AreEqual("Smith", firstOrganisation.PrimaryContactPersonLastName);
         Assert.AreEqual("+44 7911 654321", firstOrganisation.PrimaryContactPersonPhoneNumber);
         Assert.AreEqual("jane.smith@example.com", firstOrganisation.PrimaryContactPersonEmail);
-
-        Assert.IsNotNull(firstOrganisation.SubsidiaryDetails);
         Assert.AreEqual(0, firstOrganisation.SubsidiaryDetails.Count);
 
         var secondOrganisation = result.Skip(1).First();
@@ -153,8 +151,6 @@ public class OrganisationServiceTests
         Assert.AreEqual("Smitherson", secondOrganisation.PrimaryContactPersonLastName);
         Assert.AreEqual("+44 7911 123123", secondOrganisation.PrimaryContactPersonPhoneNumber);
         Assert.AreEqual("j.smitherson@example.com", secondOrganisation.PrimaryContactPersonEmail);
-
-        Assert.IsNotNull(secondOrganisation.SubsidiaryDetails);
         Assert.AreEqual(0, secondOrganisation.SubsidiaryDetails.Count);
 
         _mockSynapseDbContext.Verify(
@@ -237,10 +233,7 @@ public class OrganisationServiceTests
         Assert.AreEqual("+44 7911 654321", firstOrganisation.PrimaryContactPersonPhoneNumber);
         Assert.AreEqual("jane.smith@example.com", firstOrganisation.PrimaryContactPersonEmail);
 
-        Assert.IsNotNull(firstOrganisation.SubsidiaryDetails);
         Assert.AreEqual(1, firstOrganisation.SubsidiaryDetails.Count);
-        Assert.IsNotNull(firstOrganisation.SubsidiaryDetails);
-
         Assert.AreEqual("900001", firstOrganisation.SubsidiaryDetails[0].SubsidiaryId);
         Assert.AreEqual("Happy Shopper", firstOrganisation.SubsidiaryDetails[0].SubsidiaryName);
         Assert.AreEqual("Subsidiary Trading Name", firstOrganisation.SubsidiaryDetails[0].SubsidiaryTradingName);
@@ -261,7 +254,7 @@ public class OrganisationServiceTests
             .ThrowsAsync(new InvalidOperationException("Database error"));
 
         // Act & Assert
-        var exception = await Assert.ThrowsExceptionAsync<InvalidOperationException>(() => _organisationService.GetOrganisationsDetails(It.IsAny<string>()));
+        var exception = await Assert.ThrowsExactlyAsync<InvalidOperationException>(() => _organisationService.GetOrganisationsDetails(It.IsAny<string>()));
 
         // Assert
         Assert.AreEqual("Database error", exception.Message);

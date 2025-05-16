@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
-namespace EPR.Calculator.FSS.API.Shared;
+namespace EPR.Calculator.FSS.API.Helpers;
 
 public static class HandleError
 {

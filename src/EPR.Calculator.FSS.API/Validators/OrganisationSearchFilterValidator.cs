@@ -19,9 +19,4 @@ public class OrganisationSearchFilterValidator : AbstractValidator<OrganisationS
         var validDate = DateTime.TryParseExact(createdOrModifiedAfter, formats, CultureInfo.InvariantCulture, DateTimeStyles.None, out _);
         return validDate;
     }
-
-    /*public static IRuleBuilderOptions<T, string> MustBeDateTimeOfFormat<T>(this IRuleBuilder<T, string> ruleBuilder, string format)
-    {
-        return ruleBuilder.Must(x => DateTime.TryParseExact(x, format, CultureInfo.InvariantCulture, DateTimeStyles.None, out _));
-    }*/
 }

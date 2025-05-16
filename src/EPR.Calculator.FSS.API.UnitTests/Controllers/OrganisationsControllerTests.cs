@@ -72,7 +72,7 @@
 
             var response = result.Value as OrganisationsDetailsResponse;
             response.OrganisationsDetails.Should().NotBeNullOrEmpty();
-            response.OrganisationsDetails.Count().Should().Be(1);
+            response.OrganisationsDetails.Count.Should().Be(1);
             response.OrganisationsDetails[0].OrganisationId.Should().Be("12345");
             response.OrganisationsDetails[0].OrganisationName.Should().Be("Test Org");
         }
@@ -80,12 +80,12 @@
         [TestMethod]
         public async Task GetOrganisationsDetails_ReturnsNoContent()
         {
-            var myList = new List<OrganisationDetails>();
+            var organisationDetailsList = new List<OrganisationDetails>();
 
             // Arrange
             this._organisationServiceMock
                 .Setup(service => service.GetOrganisationsDetails(It.IsAny<string>()))
-                .ReturnsAsync(myList);
+                .ReturnsAsync(organisationDetailsList);
 
             // Act
             var result = await this._organisationController.GetOrganisationsDetails(It.IsAny<string>()) as ObjectResult;
