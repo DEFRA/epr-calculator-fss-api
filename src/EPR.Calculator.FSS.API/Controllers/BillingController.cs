@@ -5,6 +5,7 @@ using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
 using System.Net;
+using System.Net.Mime;
 using System.Text;
 
 namespace EPR.Calculator.FSS.API.Controllers
@@ -66,12 +67,12 @@ namespace EPR.Calculator.FSS.API.Controllers
                     DateTime.UtcNow,
                     billingData.Length));
 
-                return Results.Content(billingData, "application/json");
+                return Results.Content(billingData, MediaTypeNames.Application.Json);
             }
             catch (Exception ex) when (ex is KeyNotFoundException || ex is FileNotFoundException)
             {
                 this.TelemetryClient.TrackException(ex);
-                return Results.BadRequest();
+                return Results.NotFound();
             }
             catch(Exception ex)
             {

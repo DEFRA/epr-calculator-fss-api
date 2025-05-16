@@ -101,7 +101,7 @@ namespace EPR.Calculator.FSS.API.UnitTests.Controllers
             var result = await this.TestClass.GetBillingsDetails(runId);
 
             // Assert
-            Assert.IsInstanceOfType<BadRequest>(result);
+            Assert.IsInstanceOfType<NotFound>(result);
         }
 
         /// <summary>
