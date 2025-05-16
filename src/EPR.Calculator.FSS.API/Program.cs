@@ -2,9 +2,13 @@
 using EPR.Calculator.API.Data;
 using EPR.Calculator.FSS.API;
 using EPR.Calculator.FSS.API.Common;
+using EPR.Calculator.FSS.API.Common.Data;
+using EPR.Calculator.FSS.API.Common.Models;
+using EPR.Calculator.FSS.API.Common.Services;
 using EPR.Calculator.FSS.API.Common.Validators;
 using EPR.Calculator.FSS.API.Constants;
 using EPR.Calculator.FSS.API.HealthCheck;
+using EPR.Calculator.FSS.API.Validators;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.ResponseCompression;
@@ -28,12 +32,19 @@ builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddFluentValidationClientsideAdapters();
 builder.Services.AddScoped<IBillingService, BillingService>();
 builder.Services.AddScoped<IBlobStorageService, BlobStorageService>();
+builder.Services.AddScoped<IOrganisationService, OrganisationService>();
 
 // Configure the database context.
-builder.Services.AddDbContext<ApplicationDBContext>(options =>
+builder.Services.AddDbContext<ApplicationDBContextWrapper>(options =>
 {
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection"));
+});
+
+builder.Services.AddDbContext<SynapseDbContext>(options =>
+{
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("SynapseDatabase"));
 });
 
 // Configure blob storage settings.
@@ -52,6 +63,7 @@ builder.Services.AddSingleton<BlobServiceClient>(provider =>
     return new BlobServiceClient(connectionString);
 });
 
+builder.Services.AddScoped<OrganisationSearchFilterValidator, OrganisationSearchFilterValidator>();
 builder.Services.AddScoped<RunIdValidator, RunIdValidator>();
 
 // Configure validation.
