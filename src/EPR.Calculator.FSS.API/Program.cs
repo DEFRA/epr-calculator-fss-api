@@ -11,8 +11,10 @@ using EPR.Calculator.FSS.API.HealthCheck;
 using EPR.Calculator.FSS.API.Validators;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using System.Configuration;
+using System.IO.Compression;
 
 var builder = WebApplication.CreateBuilder(args);
 var environmentName = builder.Environment.EnvironmentName?.ToLower() ?? string.Empty;
@@ -69,6 +71,17 @@ builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddFluentValidationClientsideAdapters();
 builder.Services.AddValidatorsFromAssemblyContaining<RunIdValidator>();
 
+// Add compression support for billing data.
+builder.Services.AddResponseCompression(options =>
+{
+    options.EnableForHttps = true;
+    options.Providers.Add<GzipCompressionProvider>();
+});
+builder.Services.Configure<GzipCompressionProviderOptions>(options =>
+{
+    options.Level = CompressionLevel.SmallestSize;
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -81,6 +94,8 @@ if (app.Environment.IsDevelopment() || environmentName == EPR.Calculator.FSS.API
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseResponseCompression();
 
 app.MapControllers();
 
