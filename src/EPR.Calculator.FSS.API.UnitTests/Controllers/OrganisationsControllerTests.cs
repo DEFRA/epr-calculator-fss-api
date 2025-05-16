@@ -1,155 +1,154 @@
-﻿namespace EPR.Calculator.FSS.API.UnitTests.Controllers
+﻿namespace EPR.Calculator.FSS.API.UnitTests.Controllers;
+
+using AutoFixture;
+using EPR.Calculator.FSS.API.Common.Models;
+using EPR.Calculator.FSS.API.Common.Services;
+using EPR.Calculator.FSS.API.Controllers;
+using EPR.Calculator.FSS.API.Validators;
+using FluentAssertions;
+using FluentValidation.Results;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging.Abstractions;
+using Moq;
+using System.Net;
+
+[TestClass]
+public class OrganisationsControllerTests
 {
-    using AutoFixture;
-    using EPR.Calculator.FSS.API.Common.Models;
-    using EPR.Calculator.FSS.API.Common.Services;
-    using EPR.Calculator.FSS.API.Controllers;
-    using EPR.Calculator.FSS.API.Validators;
-    using FluentAssertions;
-    using FluentValidation.Results;
-    using Microsoft.AspNetCore.Http;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.Extensions.Logging.Abstractions;
-    using Moq;
-    using System.Net;
+    private readonly NullLogger<OrganisationsController> _nullLogger = new();
+    private readonly Mock<ValidationFailure> _validationFailureMock;
+    private readonly Mock<ValidationResult> _validationResultMock;
+    private Mock<OrganisationSearchFilterValidator> validatorMock = null!;
+    private Mock<IOrganisationService> _organisationServiceMock = null!;
+    private OrganisationsController _organisationController = null!;
+    private OrganisationSearchFilterValidator _mockValidator;
 
-    [TestClass]
-    public class OrganisationsControllerTests
+    public OrganisationsControllerTests()
     {
-        private readonly NullLogger<OrganisationsController> _nullLogger = new();
-        private readonly Mock<ValidationFailure> _validationFailureMock;
-        private readonly Mock<ValidationResult> _validationResultMock;
-        private Mock<OrganisationSearchFilterValidator> validatorMock = null!;
-        private Mock<IOrganisationService> _organisationServiceMock = null!;
-        private OrganisationsController _organisationController = null!;
-        private OrganisationSearchFilterValidator _mockValidator;
-
-        public OrganisationsControllerTests()
+        this.Fixture = new Fixture();
+        this._organisationServiceMock = new Mock<IOrganisationService>();
+        this._mockValidator = new OrganisationSearchFilterValidator();
+        this._organisationController = new OrganisationsController(
+            _organisationServiceMock.Object,
+            _mockValidator,
+            _nullLogger)
         {
-            this.Fixture = new Fixture();
-            this._organisationServiceMock = new Mock<IOrganisationService>();
-            this._mockValidator = new OrganisationSearchFilterValidator();
-            this._organisationController = new OrganisationsController(
-                _organisationServiceMock.Object,
-                _mockValidator,
-                _nullLogger)
+            ControllerContext = new ControllerContext
             {
-                ControllerContext = new ControllerContext
-                {
-                    HttpContext = new DefaultHttpContext(),
-                },
-            };
-            validatorMock = new Mock<OrganisationSearchFilterValidator>();
-            _validationFailureMock = new Mock<ValidationFailure>();
-            _validationResultMock = new Mock<ValidationResult>();
-        }
+                HttpContext = new DefaultHttpContext(),
+            },
+        };
+        validatorMock = new Mock<OrganisationSearchFilterValidator>();
+        _validationFailureMock = new Mock<ValidationFailure>();
+        _validationResultMock = new Mock<ValidationResult>();
+    }
 
-        private IFixture Fixture { get; init; }
+    private IFixture Fixture { get; init; }
 
-        [TestMethod]
-        public async Task GetOrganisationsDetails_ReturnsOk()
-        {
-            // Arrange
-            var createdOrModifiedAfter = "2021-01-30";
-            this._organisationServiceMock
-               .Setup(service => service.GetOrganisationsDetails(It.IsAny<string>()))
-               .ReturnsAsync(new List<OrganisationDetails>
+    [TestMethod]
+    public async Task GetOrganisationsDetails_ReturnsOk()
+    {
+        // Arrange
+        var createdOrModifiedAfter = "2021-01-30";
+        this._organisationServiceMock
+           .Setup(service => service.GetOrganisationsDetails(It.IsAny<string>()))
+           .ReturnsAsync(new List<OrganisationDetails>
+                            {
+                                new OrganisationDetails
                                 {
-                                    new OrganisationDetails
-                                    {
-                                        OrganisationId = "12345",
-                                        OrganisationName = "Test Org"
-                                    },
-                                });
+                                    OrganisationId = "12345",
+                                    OrganisationName = "Test Org"
+                                },
+                            });
 
-            // Act
-            var result = await _organisationController.GetOrganisationsDetails(createdOrModifiedAfter) as ObjectResult;
+        // Act
+        var result = await _organisationController.GetOrganisationsDetails(createdOrModifiedAfter) as ObjectResult;
 
-            // Assert
-            result.Should().NotBeNull();
-            result?.StatusCode.Should().Be((int)HttpStatusCode.OK);
-            result?.Value.Should().BeOfType<OrganisationsDetailsResponse>();
+        // Assert
+        result.Should().NotBeNull();
+        result?.StatusCode.Should().Be((int)HttpStatusCode.OK);
+        result?.Value.Should().BeOfType<OrganisationsDetailsResponse>();
 
-            var response = result.Value as OrganisationsDetailsResponse;
-            response.OrganisationsDetails.Should().NotBeNullOrEmpty();
-            response.OrganisationsDetails.Count.Should().Be(1);
-            response.OrganisationsDetails[0].OrganisationId.Should().Be("12345");
-            response.OrganisationsDetails[0].OrganisationName.Should().Be("Test Org");
-        }
+        var response = result.Value as OrganisationsDetailsResponse;
+        response.OrganisationsDetails.Should().NotBeNullOrEmpty();
+        response.OrganisationsDetails.Count.Should().Be(1);
+        response.OrganisationsDetails[0].OrganisationId.Should().Be("12345");
+        response.OrganisationsDetails[0].OrganisationName.Should().Be("Test Org");
+    }
 
-        [TestMethod]
-        public async Task GetOrganisationsDetails_ReturnsNoContent()
-        {
-            var organisationDetailsList = new List<OrganisationDetails>();
+    [TestMethod]
+    public async Task GetOrganisationsDetails_ReturnsNoContent()
+    {
+        var organisationDetailsList = new List<OrganisationDetails>();
 
-            // Arrange
-            this._organisationServiceMock
-                .Setup(service => service.GetOrganisationsDetails(It.IsAny<string>()))
-                .ReturnsAsync(organisationDetailsList);
+        // Arrange
+        this._organisationServiceMock
+            .Setup(service => service.GetOrganisationsDetails(It.IsAny<string>()))
+            .ReturnsAsync(organisationDetailsList);
 
-            // Act
-            var result = await this._organisationController.GetOrganisationsDetails(It.IsAny<string>()) as ObjectResult;
+        // Act
+        var result = await this._organisationController.GetOrganisationsDetails(It.IsAny<string>()) as ObjectResult;
 
-            // Assert
-            result.Should().BeNull();
-            result?.StatusCode.Should().Be((int)HttpStatusCode.NoContent);
-            result?.Value.Should().BeOfType<List<OrganisationDetails>>();
-        }
+        // Assert
+        result.Should().BeNull();
+        result?.StatusCode.Should().Be((int)HttpStatusCode.NoContent);
+        result?.Value.Should().BeOfType<List<OrganisationDetails>>();
+    }
 
-        [TestMethod]
-        public async Task GetOrganisationsDetailsReturnsStatus400BadRequest()
-        {
-            // Arrange
-            var myList = new List<OrganisationDetails>();
-            myList = null;
+    [TestMethod]
+    public async Task GetOrganisationsDetailsReturnsStatus400BadRequest()
+    {
+        // Arrange
+        var myList = new List<OrganisationDetails>();
+        myList = null;
 
-            // Arrange
-            this._organisationServiceMock.Setup(x =>
-                x.GetOrganisationsDetails(It.IsAny<string>()))
-                .ThrowsAsync(new HttpRequestException("Test exception", null, HttpStatusCode.BadRequest));
+        // Arrange
+        this._organisationServiceMock.Setup(x =>
+            x.GetOrganisationsDetails(It.IsAny<string>()))
+            .ThrowsAsync(new HttpRequestException("Test exception", null, HttpStatusCode.BadRequest));
 
-            // Act
-            var result = await this._organisationController.GetOrganisationsDetails(null) as BadRequestResult;
+        // Act
+        var result = await this._organisationController.GetOrganisationsDetails(null) as BadRequestResult;
 
-            // Assert
-            result.Should().NotBeNull();
-            result?.StatusCode.Should().Be(400);
-        }
+        // Assert
+        result.Should().NotBeNull();
+        result?.StatusCode.Should().Be(400);
+    }
 
-        [TestMethod]
-        public async Task GetOrganisationsDetailsStatus500InternalServerError()
-        {
-            // Arrange
-            var createdOrModifiedAfter = "2025-01-30";
+    [TestMethod]
+    public async Task GetOrganisationsDetailsStatus500InternalServerError()
+    {
+        // Arrange
+        var createdOrModifiedAfter = "2025-01-30";
 
-            this._organisationServiceMock.Setup(x =>
-                x.GetOrganisationsDetails(It.IsAny<string>()))
-                .ThrowsAsync(new HttpRequestException("Test exception", null, HttpStatusCode.InternalServerError));
+        this._organisationServiceMock.Setup(x =>
+            x.GetOrganisationsDetails(It.IsAny<string>()))
+            .ThrowsAsync(new HttpRequestException("Test exception", null, HttpStatusCode.InternalServerError));
 
-            // Act
-            var result = await this._organisationController.GetOrganisationsDetails(createdOrModifiedAfter) as ActionResult;
+        // Act
+        var result = await this._organisationController.GetOrganisationsDetails(createdOrModifiedAfter) as ActionResult;
 
-            // Assert
-            result.Should().BeOfType<StatusCodeResult>();
-            var statusCodeResult = result as StatusCodeResult;
-            statusCodeResult?.StatusCode.Should().Be(500);
-        }
+        // Assert
+        result.Should().BeOfType<StatusCodeResult>();
+        var statusCodeResult = result as StatusCodeResult;
+        statusCodeResult?.StatusCode.Should().Be(500);
+    }
 
-        [TestMethod]
-        public async Task GetOrganisationsDetailsStatus400InvalidDate()
-        {
-            // Arrange
-            var createdOrModifiedAfter = "25-01-30";
-            this._organisationServiceMock.Setup(x =>
-                x.GetOrganisationsDetails(It.IsAny<string>()))
-                .ThrowsAsync(new HttpRequestException("Test exception", null, HttpStatusCode.BadRequest));
+    [TestMethod]
+    public async Task GetOrganisationsDetailsStatus400InvalidDate()
+    {
+        // Arrange
+        var createdOrModifiedAfter = "25-01-30";
+        this._organisationServiceMock.Setup(x =>
+            x.GetOrganisationsDetails(It.IsAny<string>()))
+            .ThrowsAsync(new HttpRequestException("Test exception", null, HttpStatusCode.BadRequest));
 
-            // Act
-            var result = await this._organisationController.GetOrganisationsDetails(createdOrModifiedAfter) as BadRequestResult;
+        // Act
+        var result = await this._organisationController.GetOrganisationsDetails(createdOrModifiedAfter) as BadRequestResult;
 
-            // Assert
-            result.Should().NotBeNull();
-            result?.StatusCode.Should().Be(400);
-        }
+        // Assert
+        result.Should().NotBeNull();
+        result?.StatusCode.Should().Be(400);
     }
 }
