@@ -13,7 +13,6 @@ using System.Net;
 /// Controller for the API to retrieve Organization Details.
 /// </summary>
 [ApiController]
-[Route("v1/organisations-details")]
 public class OrganisationsController : ControllerBase
 {
     private readonly IOrganisationService _organisationService;
@@ -31,6 +30,7 @@ public class OrganisationsController : ControllerBase
     }
 
     [HttpGet]
+    [Route("api/v1/organisations-details")]
     [Consumes("application/json")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
