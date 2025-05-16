@@ -36,9 +36,9 @@ public class OrganisationService : IOrganisationService
                 new SqlParameter("@createdOrModifiedAfter", SqlDbType.NVarChar) { Value = createdOrModifiedAfter },
             };
 
-            var dbResponse = await _synapseDbContext.RunSqlAsync<AcceptedGrantedOrgDataResponseModel>(sql, parameters);
+            var acceptedGrantedOrgDataResponse = await _synapseDbContext.RunSqlAsync<AcceptedGrantedOrgDataResponseModel>(sql, parameters);
 
-            var organisationsLookup = dbResponse
+            var organisationsLookup = acceptedGrantedOrgDataResponse
                .Where(x => x.OrganisationId is not null)
                .ToLookup(x => x.OrganisationId!.Value);
 

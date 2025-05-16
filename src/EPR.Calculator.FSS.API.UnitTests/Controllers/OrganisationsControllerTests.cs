@@ -100,8 +100,8 @@ public class OrganisationsControllerTests
     public async Task GetOrganisationsDetailsReturnsStatus400BadRequest()
     {
         // Arrange
-        var myList = new List<OrganisationDetails>();
-        myList = null;
+        var organisationDetailsList = new List<OrganisationDetails>();
+        organisationDetailsList = null;
 
         // Arrange
         this._organisationServiceMock.Setup(x =>
