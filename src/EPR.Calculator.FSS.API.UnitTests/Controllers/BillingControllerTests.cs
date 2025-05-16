@@ -5,6 +5,8 @@ using EPR.Calculator.FSS.API.Common.Validators;
 using EPR.Calculator.FSS.API.Controllers;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Extensibility;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using System.Net;
@@ -55,11 +57,13 @@ namespace EPR.Calculator.FSS.API.UnitTests.Controllers
             var result = await this.TestClass.GetBillingsDetails(runId);
 
             // Assert
-            Assert.AreEqual(billingsDetails, result.Value);
+            Assert.IsInstanceOfType<ContentHttpResult>(result);
+            var castedResult = (ContentHttpResult)result;
+            Assert.AreEqual(billingsDetails, castedResult.ResponseContent);
         }
 
         [TestMethod]
-        public async Task CallGetBillingsDetails_Returns404WhenValidationFails()
+        public async Task CallGetBillingsDetails_Returns400WhenValidationFails()
         {
             // Arrange
             var runId = this.Fixture.Create<int>();
@@ -73,7 +77,7 @@ namespace EPR.Calculator.FSS.API.UnitTests.Controllers
             var result = await this.TestClass.GetBillingsDetails(runId);
 
             // Assert
-            Assert.IsInstanceOfType(result.Result, typeof(NotFoundResult));
+            Assert.IsInstanceOfType<BadRequest>(result);
         }
 
         /// <summary>
@@ -85,7 +89,7 @@ namespace EPR.Calculator.FSS.API.UnitTests.Controllers
         [TestMethod]
         [DataRow(typeof(KeyNotFoundException))]
         [DataRow(typeof(FileNotFoundException))]
-        public async Task CallGetBillingsDetails_Return404WhenBillingsNotFound(Type exceptionType)
+        public async Task CallGetBillingsDetails_Return400WhenBillingsNotFound(Type exceptionType)
         {
             // Arrange
             var runId = this.Fixture.Create<int>();
@@ -97,7 +101,7 @@ namespace EPR.Calculator.FSS.API.UnitTests.Controllers
             var result = await this.TestClass.GetBillingsDetails(runId);
 
             // Assert
-            Assert.IsInstanceOfType(result.Result, typeof(NotFoundResult));
+            Assert.IsInstanceOfType<BadRequest>(result);
         }
 
         /// <summary>
@@ -122,10 +126,11 @@ namespace EPR.Calculator.FSS.API.UnitTests.Controllers
             var result = await this.TestClass.GetBillingsDetails(runId);
 
             // Assert
-            Assert.IsInstanceOfType(result.Result, typeof(StatusCodeResult));
+            Assert.IsInstanceOfType<StatusCodeHttpResult>(result);
+            var castedResult = (StatusCodeHttpResult)result;
             Assert.AreEqual(
                 (int)HttpStatusCode.InternalServerError,
-                (result.Result as StatusCodeResult).StatusCode);
+                castedResult.StatusCode);
         }
     }
 }

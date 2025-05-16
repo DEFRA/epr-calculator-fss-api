@@ -47,12 +47,12 @@ namespace EPR.Calculator.FSS.API.Controllers
         /// <returns>The billings details as a string.</returns>
         [HttpGet]
         [Route("billingDetails")]
-        public async Task<ActionResult<string>> GetBillingsDetails(int calculatorRunId)
+        public async Task<IResult> GetBillingsDetails(int calculatorRunId)
         {
             if (!this.ModelState.IsValid)
             {
                 this.TelemetryClient.TrackTrace(string.Format(CultureInfo.CurrentCulture, RunIdIsInvalid, calculatorRunId));
-                return this.NotFound();
+                return Results.BadRequest();
             }
 
             try
@@ -66,17 +66,17 @@ namespace EPR.Calculator.FSS.API.Controllers
                     DateTime.UtcNow,
                     billingData.Length));
 
-                return billingData;
+                return Results.Content(billingData, "application/json");
             }
             catch (Exception ex) when (ex is KeyNotFoundException || ex is FileNotFoundException)
             {
                 this.TelemetryClient.TrackException(ex);
-                return this.NotFound();
+                return Results.BadRequest();
             }
             catch(Exception ex)
             {
                 this.TelemetryClient.TrackException(ex);
-                return this.StatusCode((int)HttpStatusCode.InternalServerError);
+                return Results.StatusCode((int)HttpStatusCode.InternalServerError);
             }
         }
     }
