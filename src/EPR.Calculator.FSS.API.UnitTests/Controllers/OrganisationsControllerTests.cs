@@ -155,13 +155,14 @@ public class OrganisationsControllerTests
     public async Task GetOrganisationsDetailsStatus404NotFound()
     {
         // Arrange
+        var organisationDetailsList = new List<OrganisationDetails>();
         var createdOrModifiedAfter = "2025-01-30";
-        this._organisationServiceMock.Setup(x =>
-            x.GetOrganisationsDetails(It.IsAny<string>()))
-            .ThrowsAsync(new HttpRequestException("NotFound exception", null, HttpStatusCode.NotFound));
 
+        this._organisationServiceMock
+        .Setup(service => service.GetOrganisationsDetails(It.IsAny<string>()))
+        .ReturnsAsync(new List<OrganisationDetails>());
         // Act
-        var result = await this._organisationController.GetOrganisationsDetails(createdOrModifiedAfter) as NotFoundResult;
+        var result = await this._organisationController.GetOrganisationsDetails(createdOrModifiedAfter) as NotFoundObjectResult;
 
         // Assert
         result.Should().NotBeNull();
