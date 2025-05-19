@@ -1,5 +1,6 @@
 ﻿namespace EPR.Calculator.FSS.API.Controllers;
 
+using Azure;
 using EPR.Calculator.FSS.API.Common.Models;
 using EPR.Calculator.FSS.API.Common.Services;
 using EPR.Calculator.FSS.API.Helpers;
@@ -7,7 +8,9 @@ using EPR.Calculator.FSS.API.Validators;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.SqlServer.Server;
 using System.Net;
+using System.Security.Cryptography;
 
 /// <summary>
 /// Controller for the API to retrieve Organization Details.
@@ -15,6 +18,7 @@ using System.Net;
 [ApiController]
 public class OrganisationsController : ControllerBase
 {
+    private const string ErrorMessage = "Error Getting the Organisation details";
     private readonly IOrganisationService _organisationService;
     private readonly ILogger<OrganisationsController> _logger;
     private readonly OrganisationSearchFilterValidator _organisationSearchFilterValidator;
@@ -34,7 +38,7 @@ public class OrganisationsController : ControllerBase
     [Consumes("application/json")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetOrganisationsDetails([FromQuery] string? createdOrModifiedAfter)
@@ -49,7 +53,14 @@ public class OrganisationsController : ControllerBase
             var result = this._organisationSearchFilterValidator.Validate(orgSearch);
             if (!result.IsValid)
             {
-                return HandleError.HandleErrorWithStatusCode(HttpStatusCode.BadRequest);
+                return BadRequest(new ApiError
+                {
+                    Error = "Bad Request",
+                    Message = "The request was malformed or invalid.",
+                    StatusCode = 400,
+                    ErrorCode = "invalid_request",
+                    Description = "The request did not conform to the required format."
+                });
             }
         }
 
@@ -67,12 +78,19 @@ public class OrganisationsController : ControllerBase
             }
             else
             {
-                return NotFound();
+                return NotFound(new ApiError
+                {
+                    Error = "Not Found",
+                    Message = "The requested resource could not be found.",
+                    StatusCode = 404,
+                    ErrorCode = "resource_not_found",
+                    Description = "The resource you requested does not exist."
+                });
             }
         }
         catch (Exception e)
         {
-            this._logger.LogError(e, "Error Getting the Organisation details");
+            this._logger.LogError(e, message: ErrorMessage);
             return HandleError.Handle(e);
         }
     }

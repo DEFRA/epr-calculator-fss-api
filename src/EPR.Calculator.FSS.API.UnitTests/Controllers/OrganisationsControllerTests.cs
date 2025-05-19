@@ -1,6 +1,7 @@
 ﻿namespace EPR.Calculator.FSS.API.UnitTests.Controllers;
 
 using AutoFixture;
+using Azure;
 using EPR.Calculator.FSS.API.Common.Models;
 using EPR.Calculator.FSS.API.Common.Services;
 using EPR.Calculator.FSS.API.Controllers;
@@ -80,20 +81,18 @@ public class OrganisationsControllerTests
     [TestMethod]
     public async Task GetOrganisationsDetails_ReturnsNoContent()
     {
-        var organisationDetailsList = new List<OrganisationDetails>();
-
         // Arrange
-        this._organisationServiceMock
-            .Setup(service => service.GetOrganisationsDetails(It.IsAny<string>()))
-            .ReturnsAsync(organisationDetailsList);
+        var organisationDetailsList = new List<OrganisationDetails>();
+        this._organisationServiceMock.Setup(x =>
+            x.GetOrganisationsDetails(It.IsAny<string>()))
+            .ThrowsAsync(new HttpRequestException("Exception", null, HttpStatusCode.NotFound));
 
         // Act
-        var result = await this._organisationController.GetOrganisationsDetails(It.IsAny<string>()) as ObjectResult;
+        var result = await this._organisationController.GetOrganisationsDetails(It.IsAny<string>()) as NotFoundResult;
 
         // Assert
-        result.Should().BeNull();
-        result?.StatusCode.Should().Be((int)HttpStatusCode.NoContent);
-        result?.Value.Should().BeOfType<List<OrganisationDetails>>();
+        result.Should().NotBeNull();
+        result?.StatusCode.Should().Be((int)HttpStatusCode.NotFound);
     }
 
     [TestMethod]
@@ -124,7 +123,7 @@ public class OrganisationsControllerTests
 
         this._organisationServiceMock.Setup(x =>
             x.GetOrganisationsDetails(It.IsAny<string>()))
-            .ThrowsAsync(new HttpRequestException("Test exception", null, HttpStatusCode.InternalServerError));
+            .ThrowsAsync(new HttpRequestException("InternalServerError exception", null, HttpStatusCode.InternalServerError));
 
         // Act
         var result = await this._organisationController.GetOrganisationsDetails(createdOrModifiedAfter) as ActionResult;
@@ -145,21 +144,21 @@ public class OrganisationsControllerTests
             .ThrowsAsync(new HttpRequestException("Test exception", null, HttpStatusCode.BadRequest));
 
         // Act
-        var result = await this._organisationController.GetOrganisationsDetails(createdOrModifiedAfter) as BadRequestResult;
+        var result = await this._organisationController.GetOrganisationsDetails(createdOrModifiedAfter) as BadRequestObjectResult; // as BadRequestResult;
 
         // Assert
         result.Should().NotBeNull();
-        result?.StatusCode.Should().Be(400);
+        Assert.AreEqual(StatusCodes.Status400BadRequest, result.StatusCode);
     }
 
     [TestMethod]
-    public async Task GetOrganisationsDetailsStatus400InvalidDate1()
+    public async Task GetOrganisationsDetailsStatus404NotFound()
     {
         // Arrange
         var createdOrModifiedAfter = "2025-01-30";
         this._organisationServiceMock.Setup(x =>
             x.GetOrganisationsDetails(It.IsAny<string>()))
-            .ThrowsAsync(new HttpRequestException("Test exception", null, HttpStatusCode.NotFound));
+            .ThrowsAsync(new HttpRequestException("NotFound exception", null, HttpStatusCode.NotFound));
 
         // Act
         var result = await this._organisationController.GetOrganisationsDetails(createdOrModifiedAfter) as NotFoundResult;
