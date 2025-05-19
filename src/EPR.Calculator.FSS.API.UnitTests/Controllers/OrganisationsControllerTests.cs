@@ -151,4 +151,21 @@ public class OrganisationsControllerTests
         result.Should().NotBeNull();
         result?.StatusCode.Should().Be(400);
     }
+
+    [TestMethod]
+    public async Task GetOrganisationsDetailsStatus400InvalidDate1()
+    {
+        // Arrange
+        var createdOrModifiedAfter = "2025-01-30";
+        this._organisationServiceMock.Setup(x =>
+            x.GetOrganisationsDetails(It.IsAny<string>()))
+            .ThrowsAsync(new HttpRequestException("Test exception", null, HttpStatusCode.NotFound));
+
+        // Act
+        var result = await this._organisationController.GetOrganisationsDetails(createdOrModifiedAfter) as NotFoundResult;
+
+        // Assert
+        result.Should().NotBeNull();
+        result?.StatusCode.Should().Be(404);
+    }
 }

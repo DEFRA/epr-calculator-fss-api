@@ -35,6 +35,7 @@ public class OrganisationsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetOrganisationsDetails([FromQuery] string? createdOrModifiedAfter)
     {
@@ -66,8 +67,7 @@ public class OrganisationsController : ControllerBase
             }
             else
             {
-                // TODO: Confirm what this should return - possibly 404
-                return NoContent();
+                return NotFound();
             }
         }
         catch (Exception e)
