@@ -35,7 +35,7 @@ builder.Services.AddScoped<IBlobStorageService, BlobStorageService>();
 builder.Services.AddScoped<IOrganisationService, OrganisationService>();
 
 // Configure the database context.
-builder.Services.AddDbContext<ApplicationDBContextWrapper>(options =>
+builder.Services.AddDbContext<ApplicationDBContext>(options =>
 {
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection"));

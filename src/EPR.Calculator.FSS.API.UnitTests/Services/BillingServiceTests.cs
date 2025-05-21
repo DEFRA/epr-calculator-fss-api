@@ -16,18 +16,18 @@
     {
         private BillingService _testClass;
         private Mock<IBlobStorageService> _storageService;
-        private ApplicationDBContextWrapper _context;
+        private ApplicationDBContext _context;
 
         [TestInitialize]
         public void SetUp()
         {
             var fixture = new Fixture();
             _storageService = new Mock<IBlobStorageService>();
-            var dbContextOptions = new DbContextOptionsBuilder<ApplicationDBContextWrapper>()
+            var dbContextOptions = new DbContextOptionsBuilder<ApplicationDBContext>()
                 .UseInMemoryDatabase(databaseName: "PayCal")
                 .ConfigureWarnings(x => x.Ignore(InMemoryEventId.TransactionIgnoredWarning))
                 .Options;
-            _context = new ApplicationDBContextWrapper(dbContextOptions);
+            _context = new ApplicationDBContext(dbContextOptions);
             _context.Database.EnsureCreated();
             _testClass = new BillingService(_storageService.Object, _context);
         }
