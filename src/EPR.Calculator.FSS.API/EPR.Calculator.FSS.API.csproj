@@ -19,7 +19,7 @@
 
   <ItemGroup>
     <PackageReference Include="Azure.Storage.Blobs" Version="12.24.0" />
-    <PackageReference Include="EPR.Calculator.API.Data" Version="1.0.4" />
+    <PackageReference Include="EPR.Calculator.API.Data" Version="1.0.9" />
     <PackageReference Include="FluentValidation" Version="12.0.0" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.23.0" />
