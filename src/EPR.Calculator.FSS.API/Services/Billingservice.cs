@@ -20,7 +20,7 @@ namespace EPR.Calculator.FSS.API
 
         public BillingService(
             IBlobStorageService storageService,
-            ApplicationDBContextWrapper context)
+            ApplicationDBContext context)
         {
             this.storageService = storageService;
             this.context = context;
