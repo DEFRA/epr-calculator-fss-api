@@ -52,7 +52,7 @@ variables:
     - name: env
       value: PRE1
     - template: vars/${{ parameters.envToDeploy }}.yaml
-   - ${{ elseif eq(parameters.envToDeploy, 'preprod2') }}:
+  - ${{ elseif eq(parameters.envToDeploy, 'preprod2') }}:
     - name: env
       value: PRE2
     - template: vars/${{ parameters.envToDeploy }}.yaml
