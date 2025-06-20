@@ -47,22 +47,6 @@ namespace EPR.Calculator.FSS.API.UnitTests.Services
         }
 
         [TestMethod]
-        public async Task IsBlobExistsAsync_ShouldReturnTrue_WhenFileExists()
-        {
-            using CancellationTokenSource cancellationTokenSource = new();
-            var fileName = "test.txt";
-            var blobUri = "https://example.com/test.txt";
-
-            this.mockBlobClient.Setup(x => x.ExistsAsync(cancellationTokenSource.Token)).ReturnsAsync(Response.FromValue(true, null!));
-            this.mockBlobClient.Setup(x => x.Uri).Returns(new Uri(blobUri));
-            blobUri = string.Empty;
-
-            bool result = await this.blobStorageService.IsBlobExistsAsync(fileName);
-
-            Assert.IsTrue(result);
-        }
-
-        [TestMethod]
         public async Task GetFileContents_WhenFileExists_ReturnsContents()
         {
             using CancellationTokenSource cancellationTokenSource = new();

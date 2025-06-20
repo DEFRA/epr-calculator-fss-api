@@ -1,9 +1,7 @@
 ﻿using Azure.Storage.Blobs;
-using EPR.Calculator.API.Data;
 using EPR.Calculator.FSS.API;
 using EPR.Calculator.FSS.API.Common;
 using EPR.Calculator.FSS.API.Common.Data;
-using EPR.Calculator.FSS.API.Common.Models;
 using EPR.Calculator.FSS.API.Common.Services;
 using EPR.Calculator.FSS.API.Common.Validators;
 using EPR.Calculator.FSS.API.Constants;
@@ -17,7 +15,12 @@ using System.Configuration;
 using System.IO.Compression;
 
 var builder = WebApplication.CreateBuilder(args);
-var environmentName = builder.Environment.EnvironmentName?.ToLower() ?? string.Empty;
+
+// Add User Secrets in Development
+if (builder.Environment.IsDevelopment())
+{
+    builder.Configuration.AddUserSecrets<Program>();
+}
 
 // Add services to the container.
 
@@ -35,12 +38,6 @@ builder.Services.AddScoped<IBlobStorageService, BlobStorageService>();
 builder.Services.AddScoped<IOrganisationService, OrganisationService>();
 
 // Configure the database context.
-builder.Services.AddDbContext<ApplicationDBContext>(options =>
-{
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection"));
-});
-
 builder.Services.AddDbContext<SynapseDbContext>(options =>
 {
     options.UseSqlServer(
@@ -85,7 +82,7 @@ builder.Services.Configure<GzipCompressionProviderOptions>(options =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment() || environmentName == EPR.Calculator.FSS.API.Constants.Environment.Local.ToLower())
+if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
