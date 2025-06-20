@@ -28,9 +28,6 @@ namespace EPR.Calculator.FSS.API.Controllers
         private static readonly CompositeFormat BillingDataRetrieved
             = CompositeFormat.Parse(Resources.BillingDataRetrieved);
 
-        private static readonly CompositeFormat BillingDataNotFound
-            = CompositeFormat.Parse(Resources.BillingDataNotFound);
-
         private static readonly CompositeFormat BillingDataMiscError
             = CompositeFormat.Parse(Resources.BillingDataMiscError);
 
@@ -76,7 +73,7 @@ namespace EPR.Calculator.FSS.API.Controllers
 
                 return Content(billingData, MediaTypeNames.Application.Json);
             }
-            catch (Exception ex) when (ex is KeyNotFoundException || ex is FileNotFoundException)
+            catch (Exception ex) when (ex is FileNotFoundException)
             {
                 this.TelemetryClient.TrackException(ex);
 

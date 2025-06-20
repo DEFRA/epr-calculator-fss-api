@@ -14,13 +14,14 @@
     {
         private BillingService _testClass;
         private Mock<IBlobStorageService> _storageServiceMock;
+        private IFixture _fixture = null!;
 
         [TestInitialize]
         public void SetUp()
         {
-            var fixture = new Fixture();
-            _storageServiceMock = new Mock<IBlobStorageService>();
-            _testClass = new BillingService(_storageServiceMock.Object);
+             _fixture = new Fixture();
+             _storageServiceMock = new Mock<IBlobStorageService>();
+             _testClass = new BillingService(_storageServiceMock.Object);
         }
 
         [TestMethod]
@@ -36,20 +37,29 @@
         [TestMethod]
         public void Expect_FileNotFoundException_WhenJsonFile_NotExists()
         {
+            // Arrange
+            var runId = _fixture.Create<int>();
+            var fileName = $"{runId}billing.json";
+
             var instance = new BillingService(_storageServiceMock.Object);
-            _storageServiceMock.Setup(x => x.GetFileContents(It.IsAny<string>())).Throws<FileNotFoundException>();
+            _storageServiceMock.Setup(x => x.GetFileContents(fileName)).Throws<FileNotFoundException>();
 
             Assert.ThrowsExceptionAsync<FileNotFoundException>(
-                () => instance.GetBillingData(calcRunId: 1)).Wait();
+                () => instance.GetBillingData(runId)).Wait();
         }
 
         [TestMethod]
         public void Expect_FileContents()
         {
-            var instance = new BillingService(_storageServiceMock.Object);
-            _storageServiceMock.Setup(x => x.GetFileContents(It.IsAny<string>())).ReturnsAsync("Some content");
+            // Arrange
+            var runId = _fixture.Create<int>();
+            var fileName = $"{runId}billing.json";
 
-            var result = instance.GetBillingData(calcRunId: 1);
+            var instance = new BillingService(_storageServiceMock.Object);
+            _storageServiceMock.Setup(x => x.GetFileContents(fileName)).ReturnsAsync("Some content");
+
+            // Act
+            var result = instance.GetBillingData(runId);
             result.Wait();
 
             var content = result.Result;
@@ -59,7 +69,7 @@
             {
                 content.Should().NotBeNullOrEmpty();
                 content.Should().Be("Some content");
-                _storageServiceMock.Verify(n => n.GetFileContents(It.IsAny<string>()), Times.Once);
+                _storageServiceMock.Verify(n => n.GetFileContents(fileName), Times.Once);
             }
         }
     }

@@ -1,17 +1,14 @@
 ﻿using EPR.Calculator.FSS.API.Common;
-using EPR.Calculator.FSS.API.Common.Properties;
 using EPR.Calculator.FSS.API.Constants;
+using System.Globalization;
 using System.Text;
 
 namespace EPR.Calculator.FSS.API
 {
     public class BillingService : IBillingService
     {
-        private static readonly CompositeFormat BillingDataNotFound
-            = CompositeFormat.Parse(Resources.BillingDataNotFound);
-
-        private static readonly CompositeFormat BillingDataUnavaliable
-            = CompositeFormat.Parse(Resources.BillingDataUnavaliable);
+        private static readonly CompositeFormat BillingFileName
+            = CompositeFormat.Parse(BillingConstants.BillFileName);
 
         private readonly IBlobStorageService storageService;
 
@@ -23,8 +20,9 @@ namespace EPR.Calculator.FSS.API
 
         public async Task<string> GetBillingData(int calcRunId)
         {
-            var fileName = $"{calcRunId}{BillingConstants.BillFileNameEndSuffix}.json";
-            var content = await this.storageService.GetFileContents(fileName);
+            // Use the cached CompositeFormat and IFormatProvider for formatting
+            string fileName = string.Format(CultureInfo.CurrentCulture, BillingConstants.BillFileName, calcRunId);
+            string content = await this.storageService.GetFileContents(fileName);
 
             return content;
         }

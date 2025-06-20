@@ -2,6 +2,6 @@
 {
     public static class BillingConstants
     {
-        public const string BillFileNameEndSuffix = "billing";
+        public const string BillFileName = "{0}billing.json";
     }
 }

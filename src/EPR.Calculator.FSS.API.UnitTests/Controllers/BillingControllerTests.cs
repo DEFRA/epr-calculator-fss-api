@@ -102,7 +102,6 @@ namespace EPR.Calculator.FSS.API.UnitTests.Controllers
         /// <param name="exceptionType">The type of exception to test.</param>
         /// <returns>A <see cref="Task"/>.</returns>
         [TestMethod]
-        [DataRow(typeof(KeyNotFoundException))]
         [DataRow(typeof(FileNotFoundException))]
         public async Task CallGetBillingsDetails_Return400WhenBillingsNotFound(Type exceptionType)
         {
