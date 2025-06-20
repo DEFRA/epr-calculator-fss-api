@@ -14,7 +14,8 @@ namespace EPR.Calculator.FSS.API.Common.Validators
         public RunIdValidator()
         {
             this.RuleFor(runId => runId)
-                .NotEmpty()
+                .Cascade(CascadeMode.Stop)
+                .NotNull()
                 .WithMessage(Resources.RunIdIsEmpty)
                 .GreaterThan(0)
                 .WithMessage(Resources.RunIdIsZero);

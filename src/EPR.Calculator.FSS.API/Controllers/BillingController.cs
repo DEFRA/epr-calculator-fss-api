@@ -1,10 +1,9 @@
 ﻿using EPR.Calculator.FSS.API.Common;
 using EPR.Calculator.FSS.API.Common.Properties;
-using EPR.Calculator.FSS.API.Common.Validators;
+using FluentValidation;
 using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
-using System.Net;
 using System.Net.Mime;
 using System.Text;
 
@@ -20,7 +19,7 @@ namespace EPR.Calculator.FSS.API.Controllers
     public class BillingController(
         IBillingService billingService,
         TelemetryClient telemetryClient,
-        RunIdValidator runIdValidator)
+        IValidator<int> runIdValidator)
         : Controller
     {
         private static readonly CompositeFormat RunIdIsInvalid
@@ -37,7 +36,7 @@ namespace EPR.Calculator.FSS.API.Controllers
 
         private IBillingService BillingService { get; init; } = billingService;
 
-        private RunIdValidator RunIdValidator { get; init; } = runIdValidator;
+        private IValidator<int> RunIdValidator { get; init; } = runIdValidator;
 
         private TelemetryClient TelemetryClient { get; init; } = telemetryClient;
 
@@ -48,16 +47,24 @@ namespace EPR.Calculator.FSS.API.Controllers
         /// <returns>The billings details as a string.</returns>
         [HttpGet]
         [Route("billingDetails")]
-        public async Task<IResult> GetBillingsDetails(int calculatorRunId)
+        public async Task<IActionResult> GetBillingsDetails(int calculatorRunId)
         {
-            if (!this.ModelState.IsValid)
-            {
-                this.TelemetryClient.TrackTrace(string.Format(CultureInfo.CurrentCulture, RunIdIsInvalid, calculatorRunId));
-                return Results.BadRequest();
-            }
-
             try
             {
+                var validatorResult = RunIdValidator.Validate(calculatorRunId);
+
+                if (!validatorResult.IsValid)
+                {
+                    this.TelemetryClient.TrackTrace(string.Format(CultureInfo.CurrentCulture, RunIdIsInvalid, calculatorRunId));
+
+                    return BadRequest(new ProblemDetails
+                    {
+                        Title = "Validation Error",
+                        Detail = string.Join("; ", validatorResult.Errors.Select(e => e.ErrorMessage)),
+                        Status = StatusCodes.Status400BadRequest
+                    });
+                }
+
                 var billingData = await this.BillingService.GetBillingData(calculatorRunId);
 
                 this.TelemetryClient.TrackTrace(string.Format(
@@ -67,17 +74,23 @@ namespace EPR.Calculator.FSS.API.Controllers
                     DateTime.UtcNow,
                     billingData.Length));
 
-                return Results.Content(billingData, MediaTypeNames.Application.Json);
+                return Content(billingData, MediaTypeNames.Application.Json);
             }
             catch (Exception ex) when (ex is KeyNotFoundException || ex is FileNotFoundException)
             {
                 this.TelemetryClient.TrackException(ex);
-                return Results.NotFound();
+
+                return NotFound(new ProblemDetails
+                {
+                    Title = "The requested resource could not be found.",
+                    Detail = "The resource you requested does not exist.",
+                    Status = StatusCodes.Status404NotFound
+                });
             }
             catch(Exception ex)
             {
                 this.TelemetryClient.TrackException(ex);
-                return Results.StatusCode((int)HttpStatusCode.InternalServerError);
+                return StatusCode(StatusCodes.Status500InternalServerError, ex);
             }
         }
     }
