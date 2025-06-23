@@ -44,7 +44,7 @@ namespace EPR.Calculator.FSS.API.Controllers
         /// <returns>The billings details as a string.</returns>
         [HttpGet]
         [Route("billingDetails")]
-        public async Task<IActionResult> GetBillingsDetails(int calculatorRunId)
+        public async Task<IActionResult> GetBillingsDetails([FromQuery] int calculatorRunId)
         {
             try
             {
