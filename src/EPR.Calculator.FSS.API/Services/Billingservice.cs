@@ -21,7 +21,7 @@ namespace EPR.Calculator.FSS.API
         public async Task<string> GetBillingData(int calcRunId)
         {
             // Use the cached CompositeFormat and IFormatProvider for formatting
-            string fileName = string.Format(CultureInfo.CurrentCulture, BillingConstants.BillFileName, calcRunId);
+            string fileName = string.Format(CultureInfo.CurrentCulture, BillingFileName, calcRunId);
             string content = await this.storageService.GetFileContents(fileName);
 
             return content;
