@@ -36,13 +36,6 @@ namespace EPR.Calculator.FSS.API
             return content;
         }
 
-        public async Task<bool> IsBlobExistsAsync(string fileName)
-        {
-            BlobClient blobClient = this.GetBlobFileClient(fileName);
-
-            return await blobClient.ExistsAsync();
-        }
-
         private BlobClient GetBlobFileClient(string fileName)
         {
             BlobClient? blobClient = this.containerClient.GetBlobClient(fileName);
