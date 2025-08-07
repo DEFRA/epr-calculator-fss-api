@@ -1,6 +1,6 @@
 variables:
   azureSubscription: 'AZD-RWD-TST1'
-  docker.imageName: 'eprprncommonbackend'
+  docker.imageName: 'eprcalculatorfssapi'
   acr.azureContainerRegistryName: 'tstrwdinfac1401'
-  acr.repositoryName: 'eprprncommonbackendrepository'
+  acr.repositoryName: 'eprcalculatorfssapirepository'
   serviceName: 'tstrwdwebwa1426'    
