@@ -246,6 +246,116 @@ public class OrganisationServiceTests
     }
 
     [TestMethod]
+    public async Task GetOrganisationsDetailsValidRequestWithTwoOrganisationsSkipsOneWhenNoParent()
+    {
+        // Arrange
+        var expectedData = new List<AcceptedGrantedOrgDataResponseModel>
+        {
+            new ()
+            {
+                OrganisationId = 12345,
+                SubsidiaryId = "000111",
+                OrganisationName = "Example Organisation Ltd",
+                TradingName = "Example Trading Name",
+                CompaniesHouseNumber = "12345678",
+                HomeNationCode = "ENG",
+                ServiceOfNoticeAddrLine1 = "123 Example Street",
+                ServiceOfNoticeAddrLine2 = "Suite 456",
+                ServiceOfNoticeAddrCity = "London",
+                ServiceOfNoticeAddrCounty = "Greater London",
+                ServiceOfNoticeAddrCountry = "United Kingdom",
+                ServiceOfNoticeAddrPostcode = "E1 6AN",
+                ServiceOfNoticeAddrPhoneNumber = "+44 20 7946 0123",
+                SoleTraderFirstName = "John",
+                SoleTraderLastName = "Doe",
+                SoleTraderPhoneNumber = "+44 7911 123456",
+                SoleTraderEmail = "john.doe@example.com",
+                PrimaryContactPersonFirstName = "Jane",
+                PrimaryContactPersonLastName = "Smith",
+                PrimaryContactPersonPhoneNumber = "+44 7911 654321",
+                PrimaryContactPersonEmail = "jane.smith@example.com",
+            },
+            new ()
+            {
+                OrganisationId = 67890,
+                SubsidiaryId = null,
+                OrganisationName = "Example Organisation Ltd 2",
+                TradingName = "Trading Name 2",
+                CompaniesHouseNumber = "00012345",
+                HomeNationCode = "NI",
+                ServiceOfNoticeAddrLine1 = "123 West Street",
+                ServiceOfNoticeAddrLine2 = "Room 0",
+                ServiceOfNoticeAddrCity = "Belfast",
+                ServiceOfNoticeAddrCounty = "Greater Belfast",
+                ServiceOfNoticeAddrCountry = "United Kingdom",
+                ServiceOfNoticeAddrPostcode = "BT1 1AA,",
+                ServiceOfNoticeAddrPhoneNumber = "+44 028 7946 0123",
+                SoleTraderFirstName = "Bob",
+                SoleTraderLastName = "Darling",
+                SoleTraderPhoneNumber = "+44 7911 999999",
+                SoleTraderEmail = "bob.darling@example.com",
+                PrimaryContactPersonFirstName = "Janine",
+                PrimaryContactPersonLastName = "Smitherson",
+                PrimaryContactPersonPhoneNumber = "+44 7911 123123",
+                PrimaryContactPersonEmail = "j.smitherson@example.com",
+            },
+            new ()
+            {
+                OrganisationId = 67890,
+                SubsidiaryId = "900001",
+                OrganisationName = "Happy Shopper",
+                TradingName = "Subsidiary Trading Name",
+            },
+        };
+
+        _mockSynapseDbContext
+            .Setup(ctx => ctx.RunSqlAsync<AcceptedGrantedOrgDataResponseModel>(It.IsAny<string>(), It.IsAny<SqlParameter[]>()))
+            .ReturnsAsync(expectedData);
+
+        // Act
+        var result = await _organisationService.GetOrganisationsDetails();
+
+        // Assert
+        Assert.IsNotNull(result);
+        Assert.AreEqual(1, result.Count);
+
+        Models.OrganisationDetails organisationDetails = result.First();
+        var firstOrganisation = organisationDetails;
+
+        Assert.AreEqual("67890", firstOrganisation.OrganisationId);
+        Assert.AreEqual("Example Organisation Ltd 2", firstOrganisation.OrganisationName);
+        Assert.AreEqual("Trading Name 2", firstOrganisation.OrganisationTradingName);
+        Assert.AreEqual("00012345", firstOrganisation.CompaniesHouseNumber);
+        Assert.AreEqual("NI", firstOrganisation.HomeNationCode);
+        Assert.AreEqual("123 West Street", firstOrganisation.ServiceOfNoticeAddrLine1);
+        Assert.AreEqual("Room 0", firstOrganisation.ServiceOfNoticeAddrLine2);
+        Assert.AreEqual("Belfast", firstOrganisation.ServiceOfNoticeAddrCity);
+        Assert.AreEqual("Greater Belfast", firstOrganisation.ServiceOfNoticeAddrCounty);
+        Assert.AreEqual("United Kingdom", firstOrganisation.ServiceOfNoticeAddrCountry);
+        Assert.AreEqual("BT1 1AA,", firstOrganisation.ServiceOfNoticeAddrPostcode);
+        Assert.AreEqual("+44 028 7946 0123", firstOrganisation.ServiceOfNoticeAddrPhoneNumber);
+        Assert.AreEqual("Bob", firstOrganisation.SoleTraderFirstName);
+        Assert.AreEqual("Darling", firstOrganisation.SoleTraderLastName);
+        Assert.AreEqual("+44 7911 999999", firstOrganisation.SoleTraderPhoneNumber);
+        Assert.AreEqual("bob.darling@example.com", firstOrganisation.SoleTraderEmail);
+        Assert.AreEqual("Janine", firstOrganisation.PrimaryContactPersonFirstName);
+        Assert.AreEqual("Smitherson", firstOrganisation.PrimaryContactPersonLastName);
+        Assert.AreEqual("+44 7911 123123", firstOrganisation.PrimaryContactPersonPhoneNumber);
+        Assert.AreEqual("j.smitherson@example.com", firstOrganisation.PrimaryContactPersonEmail);
+
+        Assert.AreEqual(1, firstOrganisation.SubsidiaryDetails.Count);
+        Assert.AreEqual("900001", firstOrganisation.SubsidiaryDetails[0].SubsidiaryId);
+        Assert.AreEqual("Happy Shopper", firstOrganisation.SubsidiaryDetails[0].SubsidiaryName);
+        Assert.AreEqual("Subsidiary Trading Name", firstOrganisation.SubsidiaryDetails[0].SubsidiaryTradingName);
+
+        _mockSynapseDbContext.Verify(
+            ctx => ctx.RunSqlAsync<AcceptedGrantedOrgDataResponseModel>(
+                It.IsAny<string>(),
+                It.IsAny<SqlParameter[]>()),
+            Times.Once);
+    }
+
+    [TestMethod]
     public async Task GetOrganisationsDetails_ExceptionThrown_OnError()
     {
         // Arrange
