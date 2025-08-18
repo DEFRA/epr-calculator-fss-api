@@ -1,5 +1,2 @@
-/src/EPR.Calculator.FSS.API.UnitTests/appsettings.Test.json
-src/EPR.Calculator.FSS.API.UnitTests/appsettings.Test.json
-./src/EPR.Calculator.FSS.API.UnitTests/appsettings.Test.json
-src/EPR.Calculator.FSS.API.UnitTests/appsettings.Test.json:azure-database-connection-string-account-key:3
-src/EPR.Calculator.FSS.API.UnitTests/appsettings.Test.json:azure-database-connection-string-account-key
+4d67ad074a9751e6568e8144ed9343890fd4765a:src/EPR.Calculator.FSS.API.UnitTests/appsettings.Test.json:azure-database-connection-string-account-key:3
+2ab2107f6603816ac1d59b2fbf25897c0bcdf237:src/EPR.Calculator.FSS.API/Configs/BlobStorageSettings.cs:azure-database-connection-string-account-key:29
