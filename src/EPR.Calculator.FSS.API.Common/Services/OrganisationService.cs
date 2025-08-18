@@ -75,6 +75,7 @@ public class OrganisationService : IOrganisationService
                             SubsidiaryId = s.SubsidiaryId!,
                             SubsidiaryName = s.OrganisationName,
                             SubsidiaryTradingName = s.TradingName,
+                            OrganisationId = s.OrganisationId?.ToString(CultureInfo.InvariantCulture)
                         })
                         .ToList(),
                 });

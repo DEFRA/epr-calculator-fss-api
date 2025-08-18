@@ -1,4 +1,6 @@
-﻿namespace EPR.Calculator.FSS.API.Common.Models;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace EPR.Calculator.FSS.API.Common.Models;
 
 public class OrganisationDetails
 {
