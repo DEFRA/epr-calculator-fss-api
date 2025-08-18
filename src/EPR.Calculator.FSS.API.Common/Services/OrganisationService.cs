@@ -44,7 +44,14 @@ public class OrganisationService : IOrganisationService
 
             foreach (var organisationId in organisationsLookup.Select(x => x.Key))
             {
-                var parent = organisationsLookup[organisationId].First();
+                var parent = organisationsLookup[organisationId]
+                    .FirstOrDefault(o => string.IsNullOrWhiteSpace(o.SubsidiaryId));
+
+                if (parent is null)
+                {
+                    _logger.LogWarning("Parent organisation not found for organisation_id {OrganisationId}. Skipping this organisation.", organisationId);
+                    continue;
+                }
 
                 organisationsList.Add(new OrganisationDetails
                 {
