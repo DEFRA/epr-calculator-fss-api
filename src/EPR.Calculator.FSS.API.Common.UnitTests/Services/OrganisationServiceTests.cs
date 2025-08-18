@@ -246,7 +246,7 @@ public class OrganisationServiceTests
     }
 
     [TestMethod]
-    public async Task GetOrganisationsDetails_ValidRequestWithTwoOrganisations_SkipsOne_When_NoParent()
+    public async Task GetOrganisationsDetailsValidRequestWithTwoOrganisationsSkipsOneWhenNoParent()
     {
         // Arrange
         var expectedData = new List<AcceptedGrantedOrgDataResponseModel>

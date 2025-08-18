@@ -10,6 +10,8 @@ using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 
+#pragma warning disable CA1848 // Use the LoggerMessage delegates
+
 public class OrganisationService : IOrganisationService
 {
     private readonly SynapseDbContext _synapseDbContext;
