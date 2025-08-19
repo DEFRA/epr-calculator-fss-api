@@ -10,6 +10,8 @@ using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 
+#pragma warning disable CA1848 // Use the LoggerMessage delegates
+
 public class OrganisationService : IOrganisationService
 {
     private readonly SynapseDbContext _synapseDbContext;
@@ -44,7 +46,14 @@ public class OrganisationService : IOrganisationService
 
             foreach (var organisationId in organisationsLookup.Select(x => x.Key))
             {
-                var parent = organisationsLookup[organisationId].First();
+                var parent = organisationsLookup[organisationId]
+                    .FirstOrDefault(o => string.IsNullOrWhiteSpace(o.SubsidiaryId));
+
+                if (parent is null)
+                {
+                    _logger.LogWarning("Parent organisation not found for organisation_id {OrganisationId}. Skipping this organisation.", organisationId);
+                    continue;
+                }
 
                 organisationsList.Add(new OrganisationDetails
                 {
