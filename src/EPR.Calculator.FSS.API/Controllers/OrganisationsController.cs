@@ -86,7 +86,7 @@ public class OrganisationsController : ControllerBase
         }
         catch (Exception e)
         {
-            this._logger.LogError(e, message: ErrorMessage);
+            this._logger.LogErrorMessage(e.Message, e);
             return HandleError.Handle(e);
         }
     }

@@ -28,9 +28,6 @@ namespace EPR.Calculator.FSS.API.Controllers
         private static readonly CompositeFormat BillingDataRetrieved
             = CompositeFormat.Parse(Resources.BillingDataRetrieved);
 
-        private static readonly CompositeFormat BillingDataMiscError
-            = CompositeFormat.Parse(Resources.BillingDataMiscError);
-
         private IBillingService BillingService { get; init; } = billingService;
 
         private IValidator<int> RunIdValidator { get; init; } = runIdValidator;
