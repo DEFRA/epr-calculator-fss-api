@@ -1,9 +1,9 @@
 ﻿namespace EPR.Calculator.FSS.API.Controllers;
 
-using EPR.Calculator.FSS.API.Common.Models;
-using EPR.Calculator.FSS.API.Common.Services;
-using EPR.Calculator.FSS.API.Helpers;
-using EPR.Calculator.FSS.API.Validators;
+using API.Validators;
+using Common.Models;
+using Common.Services;
+using Helpers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -12,22 +12,13 @@ using Microsoft.Extensions.Logging;
 /// Controller for the API to retrieve Organization Details.
 /// </summary>
 [ApiController]
-public class OrganisationsController : ControllerBase
+public class OrganisationsController(
+    IOrganisationService organisationService,
+    OrganisationSearchFilterValidator organisationSearchFilterValidator,
+    ILogger<OrganisationsController> logger)
+    : ControllerBase
 {
     private const string ErrorMessage = "Error Getting the Organisation details";
-    private readonly IOrganisationService _organisationService;
-    private readonly ILogger<OrganisationsController> _logger;
-    private readonly OrganisationSearchFilterValidator _organisationSearchFilterValidator;
-
-    public OrganisationsController(
-        IOrganisationService organisationService,
-        OrganisationSearchFilterValidator organisationSearchFilterValidator,
-        ILogger<OrganisationsController> logger)
-    {
-        this._organisationService = organisationService;
-        this._logger = logger;
-        this._organisationSearchFilterValidator = organisationSearchFilterValidator;
-    }
 
     [HttpGet]
     [Route("api/v1/organisations-details")]
@@ -46,7 +37,7 @@ public class OrganisationsController : ControllerBase
             // If a date is passed, only records created or modified on or after that date are returned.
             OrganisationSearchFilter? orgSearch = new OrganisationSearchFilter();
             orgSearch = new OrganisationSearchFilter { CreatedOrModifiedAfter = createdOrModifiedAfter };
-            var result = this._organisationSearchFilterValidator.Validate(orgSearch);
+            var result = organisationSearchFilterValidator.Validate(orgSearch);
             if (!result.IsValid)
             {
                 return BadRequest(new ApiError
@@ -62,7 +53,7 @@ public class OrganisationsController : ControllerBase
 
         try
         {
-            var organisationList = await _organisationService.GetOrganisationsDetails(createdOrModifiedAfter);
+            var organisationList = await organisationService.GetOrganisationsDetails(createdOrModifiedAfter);
             if (organisationList == null)
             {
                 return HandleError.HandleErrorWithStatusCode(System.Net.HttpStatusCode.BadRequest);
@@ -86,7 +77,7 @@ public class OrganisationsController : ControllerBase
         }
         catch (Exception e)
         {
-            this._logger.LogErrorMessage(e.Message, e);
+            logger.LogErrorMessage(ErrorMessage, e);
             return HandleError.Handle(e);
         }
     }
