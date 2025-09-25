@@ -1,8 +1,8 @@
 ﻿namespace EPR.Calculator.FSS.API.UnitTests
 {
+    using API;
     using AutoFixture;
-    using EPR.Calculator.FSS.API;
-    using EPR.Calculator.FSS.API.Common;
+    using Common;
     using FluentAssertions;
     using FluentAssertions.Execution;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -44,7 +44,7 @@
             var instance = new BillingService(_storageServiceMock.Object);
             _storageServiceMock.Setup(x => x.GetFileContents(fileName)).Throws<FileNotFoundException>();
 
-            Assert.ThrowsExceptionAsync<FileNotFoundException>(
+            Assert.ThrowsExactlyAsync<FileNotFoundException>(
                 () => instance.GetBillingData(runId)).Wait();
         }
 

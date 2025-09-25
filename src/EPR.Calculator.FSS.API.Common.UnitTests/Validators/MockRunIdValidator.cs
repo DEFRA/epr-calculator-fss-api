@@ -8,18 +8,9 @@ namespace EPR.Calculator.FSS.API.Common.UnitTests.Validators
     /// Implementation of <see cref="AbstractValidator{T}"/> for unit testing purposes.
     /// </summary>
     /// <inheritdoc/>
-    public class MockRunIdValidator : RunIdValidator
+    public class MockRunIdValidator(Func<bool> returnValueGenerator) : RunIdValidator
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MockRunIdValidator"/> class.
-        /// </summary>
-        /// <param name="returnValueGenerator">
-        /// A function that returns true or false
-        /// - used as the return value when validating.
-        /// </param>
-        public MockRunIdValidator(Func<bool> returnValueGenerator) => this.ReturnValueGenerator = returnValueGenerator;
-
-        private Func<bool> ReturnValueGenerator { get; init; }
+        private Func<bool> ReturnValueGenerator { get; init; } = returnValueGenerator;
 
         /// <inheritdoc/>
         public override ValidationResult Validate(ValidationContext<int> context)

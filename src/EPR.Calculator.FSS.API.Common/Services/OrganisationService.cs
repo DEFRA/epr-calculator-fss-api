@@ -12,19 +12,11 @@ using System.Globalization;
 
 #pragma warning disable CA1848 // Use the LoggerMessage delegates
 
-public class OrganisationService : IOrganisationService
+public class OrganisationService(
+    SynapseDbContext synapseDbContext,
+    ILogger<OrganisationService> logger)
+    : IOrganisationService
 {
-    private readonly SynapseDbContext _synapseDbContext;
-    private readonly ILogger<OrganisationService> _logger;
-
-    public OrganisationService(
-        SynapseDbContext synapseDbContext,
-        ILogger<OrganisationService> logger)
-    {
-        _synapseDbContext = synapseDbContext;
-        _logger = logger;
-    }
-
     public async Task<IReadOnlyCollection<OrganisationDetails>> GetOrganisationsDetails(string? createdOrModifiedAfter = null)
     {
         var organisationsList = new List<OrganisationDetails>();
@@ -38,7 +30,7 @@ public class OrganisationService : IOrganisationService
                 new SqlParameter("@createdOrModifiedAfter", SqlDbType.NVarChar) { Value = createdOrModifiedAfter },
             };
 
-            var acceptedGrantedOrgDataResponse = await _synapseDbContext.RunSqlAsync<AcceptedGrantedOrgDataResponseModel>(sql, parameters);
+            var acceptedGrantedOrgDataResponse = await synapseDbContext.RunSqlAsync<AcceptedGrantedOrgDataResponseModel>(sql, parameters);
 
             var organisationsLookup = acceptedGrantedOrgDataResponse
                .Where(x => x.OrganisationId is not null)
@@ -51,7 +43,7 @@ public class OrganisationService : IOrganisationService
 
                 if (parent is null)
                 {
-                    _logger.LogWarning("Parent organisation not found for organisation_id {OrganisationId}. Skipping this organisation.", organisationId);
+                    logger.LogWarning("Parent organisation not found for organisation_id {OrganisationId}. Skipping this organisation.", organisationId);
                     continue;
                 }
 
@@ -91,7 +83,7 @@ public class OrganisationService : IOrganisationService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error occurred in GetOrganisationsDetails method. From: {CreatedOrModifiedAfter}", createdOrModifiedAfter);
+            logger.LogError(ex, "Error occurred in GetOrganisationsDetails method. From: {CreatedOrModifiedAfter}", createdOrModifiedAfter);
             throw;
         }
 
