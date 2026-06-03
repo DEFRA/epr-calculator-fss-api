@@ -1,4 +1,6 @@
-﻿namespace EPR.Calculator.FSS.API.Common.Models;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace EPR.Calculator.FSS.API.Common.Models;
 
 public class SubsidiaryDetails
 {
@@ -7,4 +9,6 @@ public class SubsidiaryDetails
     public string? SubsidiaryName { get; set; }
 
     public string? SubsidiaryTradingName { get; set; }
+
+    public string OrganisationId { get; set; }
 }

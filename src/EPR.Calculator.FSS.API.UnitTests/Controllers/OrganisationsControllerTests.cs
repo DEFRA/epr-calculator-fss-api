@@ -79,6 +79,52 @@ public class OrganisationsControllerTests
     }
 
     [TestMethod]
+    public async Task GetOrganisationsDetails_ReturnsOk1()
+    {
+        // Arrange
+        var createdOrModifiedAfter = "2021-01-30";
+
+        var subsidiaryDetails = new List<SubsidiaryDetails>
+                        {
+                            new SubsidiaryDetails
+                            {
+                                SubsidiaryId = "123456",
+                                SubsidiaryName = "Test Org Sub 1",
+                                SubsidiaryTradingName = "Test Org Sub 1 Traddomg",
+                                OrganisationId = "12345"
+                            }
+                        };
+
+        this._organisationServiceMock
+           .Setup(service => service.GetOrganisationsDetails(It.IsAny<string>()))
+           .ReturnsAsync(new List<OrganisationDetails>
+                            {
+                                new OrganisationDetails
+                                {
+                                    OrganisationId = "12345",
+                                    OrganisationName = "Test Org",
+                                    SubsidiaryDetails = subsidiaryDetails
+                                },
+                            });
+
+        // Act
+        var result = await _organisationController.GetOrganisationsDetails(createdOrModifiedAfter) as ObjectResult;
+
+        // Assert
+        result.Should().NotBeNull();
+        result?.StatusCode.Should().Be((int)HttpStatusCode.OK);
+        result?.Value.Should().BeOfType<OrganisationsDetailsResponse>();
+
+        var response = result.Value as OrganisationsDetailsResponse;
+        response.OrganisationsDetails.Should().NotBeNullOrEmpty();
+        response.OrganisationsDetails.Count.Should().Be(1);
+        response.OrganisationsDetails[0].OrganisationId.Should().Be("12345");
+        response.OrganisationsDetails[0].OrganisationName.Should().Be("Test Org");
+        response.OrganisationsDetails[0].SubsidiaryDetails.Count.Should().Be(1);
+        response.OrganisationsDetails[0].SubsidiaryDetails[0].OrganisationId.Should().Be("12345");
+    }
+
+    [TestMethod]
     public async Task GetOrganisationsDetails_ReturnsNoContent()
     {
         // Arrange
