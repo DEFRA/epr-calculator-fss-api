@@ -1,8 +1,8 @@
 ﻿using AutoFixture;
-using EPR.Calculator.FSS.API.Constants;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace EPR.Calculator.FSS.API.UnitTests.Constants
+using EPR.Calculator.FSS.API.Configs;
+
+namespace EPR.Calculator.FSS.API.UnitTests.Configs
 {
     [TestClass]
     public class BlobStorageSettingsTests

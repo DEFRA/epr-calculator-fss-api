@@ -1,13 +1,17 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace EPR.Calculator.FSS.API.Constants
+namespace EPR.Calculator.FSS.API.Configs
 {
     [ExcludeFromCodeCoverage]
     public class BlobStorageSettings
     {
+        public const string SectionName = "BlobStorage";
+
         public string ConnectionString { get; set; } = string.Empty;
 
         public string ContainerName { get; set; } = string.Empty;
+
+        public string TestOnlyContainerName { get; set; } = string.Empty;
 
         public string CsvFileName { get; set; } = string.Empty;
 

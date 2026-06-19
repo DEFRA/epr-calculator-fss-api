@@ -4,6 +4,7 @@ using EPR.Calculator.FSS.API.Common;
 using EPR.Calculator.FSS.API.Common.Data;
 using EPR.Calculator.FSS.API.Common.Services;
 using EPR.Calculator.FSS.API.Common.Validators;
+using EPR.Calculator.FSS.API.Configs;
 using EPR.Calculator.FSS.API.Constants;
 using EPR.Calculator.FSS.API.HealthCheck;
 using EPR.Calculator.FSS.API.Validators;
@@ -25,6 +26,7 @@ if (builder.Environment.IsDevelopment())
 // Add services to the container.
 
 builder.Services.AddControllers();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddApplicationInsightsTelemetry();
@@ -47,6 +49,9 @@ builder.Services.AddDbContext<SynapseDbContext>(options =>
 // Configure blob storage settings.
 builder.Services.Configure<BlobStorageSettings>(
     builder.Configuration.GetSection("BlobStorage"));
+
+builder.Services.Configure<FeatureSettings>(
+    builder.Configuration.GetSection(FeatureSettings.SectionName));
 
 builder.Services.AddSingleton<BlobServiceClient>(provider =>
 {

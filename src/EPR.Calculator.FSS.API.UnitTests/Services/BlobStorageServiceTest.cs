@@ -62,5 +62,31 @@ namespace EPR.Calculator.FSS.API.UnitTests.Services
             Assert.IsNotNull(result);
             Assert.AreEqual("test content", result);
         }
+
+        [TestMethod]
+        public async Task UploadFile_UploadsFile_WithCorrectContentType()
+        {
+            await using var stream = new MemoryStream("""{"field1":"value1"}"""u8.ToArray());
+
+            this.mockBlobClient
+                .Setup(x => x.UploadAsync(
+                    It.IsAny<Stream>(),
+                    It.IsAny<BlobUploadOptions>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Mock.Of<Response<BlobContentInfo>>());
+
+            await this.blobStorageService.UploadFile(
+                "test.json",
+                stream,
+                "application/json");
+
+            this.mockBlobClient.Verify(
+                x => x.UploadAsync(
+                    It.IsAny<Stream>(),
+                    It.Is<BlobUploadOptions>(o =>
+                        o.HttpHeaders!.ContentType == "application/json"),
+                    It.IsAny<CancellationToken>()),
+                Times.Once);
+        }
     }
 }
