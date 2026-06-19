@@ -35,7 +35,7 @@ public class OrganisationServiceTests
 
         // Assert
         Assert.IsNotNull(result);
-        Assert.AreEqual(0, result.Count);
+        Assert.IsEmpty(result);
     }
 
     [TestMethod]
@@ -103,7 +103,7 @@ public class OrganisationServiceTests
 
         // Assert
         Assert.IsNotNull(result);
-        Assert.AreEqual(2, result.Count);
+        Assert.HasCount(2, result);
 
         var firstOrganisation = result.First();
 
@@ -127,7 +127,7 @@ public class OrganisationServiceTests
         Assert.AreEqual("Smith", firstOrganisation.PrimaryContactPersonLastName);
         Assert.AreEqual("+44 7911 654321", firstOrganisation.PrimaryContactPersonPhoneNumber);
         Assert.AreEqual("jane.smith@example.com", firstOrganisation.PrimaryContactPersonEmail);
-        Assert.AreEqual(0, firstOrganisation.SubsidiaryDetails.Count);
+        Assert.IsEmpty(firstOrganisation.SubsidiaryDetails);
 
         var secondOrganisation = result.Skip(1).First();
 
@@ -151,7 +151,7 @@ public class OrganisationServiceTests
         Assert.AreEqual("Smitherson", secondOrganisation.PrimaryContactPersonLastName);
         Assert.AreEqual("+44 7911 123123", secondOrganisation.PrimaryContactPersonPhoneNumber);
         Assert.AreEqual("j.smitherson@example.com", secondOrganisation.PrimaryContactPersonEmail);
-        Assert.AreEqual(0, secondOrganisation.SubsidiaryDetails.Count);
+        Assert.IsEmpty(secondOrganisation.SubsidiaryDetails);
 
         _mockSynapseDbContext.Verify(
             ctx => ctx.RunSqlAsync<AcceptedGrantedOrgDataResponseModel>(
@@ -208,7 +208,7 @@ public class OrganisationServiceTests
 
         // Assert
         Assert.IsNotNull(result);
-        Assert.AreEqual(1, result.Count);
+        Assert.HasCount(1, result);
 
         var firstOrganisation = result.First();
 
@@ -233,7 +233,7 @@ public class OrganisationServiceTests
         Assert.AreEqual("+44 7911 654321", firstOrganisation.PrimaryContactPersonPhoneNumber);
         Assert.AreEqual("jane.smith@example.com", firstOrganisation.PrimaryContactPersonEmail);
 
-        Assert.AreEqual(1, firstOrganisation.SubsidiaryDetails.Count);
+        Assert.HasCount(1, firstOrganisation.SubsidiaryDetails);
         Assert.AreEqual("900001", firstOrganisation.SubsidiaryDetails[0].SubsidiaryId);
         Assert.AreEqual("Happy Shopper", firstOrganisation.SubsidiaryDetails[0].SubsidiaryName);
         Assert.AreEqual("Subsidiary Trading Name", firstOrganisation.SubsidiaryDetails[0].SubsidiaryTradingName);
@@ -317,7 +317,7 @@ public class OrganisationServiceTests
 
         // Assert
         Assert.IsNotNull(result);
-        Assert.AreEqual(1, result.Count);
+        Assert.HasCount(1, result);
 
         Models.OrganisationDetails organisationDetails = result.First();
         var firstOrganisation = organisationDetails;
@@ -343,7 +343,7 @@ public class OrganisationServiceTests
         Assert.AreEqual("+44 7911 123123", firstOrganisation.PrimaryContactPersonPhoneNumber);
         Assert.AreEqual("j.smitherson@example.com", firstOrganisation.PrimaryContactPersonEmail);
 
-        Assert.AreEqual(1, firstOrganisation.SubsidiaryDetails.Count);
+        Assert.HasCount(1, firstOrganisation.SubsidiaryDetails);
         Assert.AreEqual("900001", firstOrganisation.SubsidiaryDetails[0].SubsidiaryId);
         Assert.AreEqual("Happy Shopper", firstOrganisation.SubsidiaryDetails[0].SubsidiaryName);
         Assert.AreEqual("Subsidiary Trading Name", firstOrganisation.SubsidiaryDetails[0].SubsidiaryTradingName);

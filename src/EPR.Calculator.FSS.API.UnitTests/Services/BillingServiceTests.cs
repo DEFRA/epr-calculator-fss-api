@@ -38,6 +38,7 @@
         public void Expect_FileNotFoundException_WhenJsonFile_NotExists()
         {
             // Arrange
+            using CancellationTokenSource cancellationTokenSource = new();
             var runId = _fixture.Create<int>();
             var fileName = $"{runId}billing.json";
 
@@ -45,13 +46,14 @@
             _storageServiceMock.Setup(x => x.GetFileContents(fileName)).Throws<FileNotFoundException>();
 
             Assert.ThrowsExactlyAsync<FileNotFoundException>(
-                () => instance.GetBillingData(runId)).Wait();
+                () => instance.GetBillingData(runId)).Wait(cancellationTokenSource.Token);
         }
 
         [TestMethod]
         public void Expect_FileContents()
         {
             // Arrange
+            using CancellationTokenSource cancellationTokenSource = new();
             var runId = _fixture.Create<int>();
             var fileName = $"{runId}billing.json";
 
@@ -60,7 +62,7 @@
 
             // Act
             var result = instance.GetBillingData(runId);
-            result.Wait();
+            result.Wait(cancellationTokenSource.Token);
 
             var content = result.Result;
 
