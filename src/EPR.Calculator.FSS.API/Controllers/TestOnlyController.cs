@@ -14,7 +14,7 @@ namespace EPR.Calculator.FSS.API.Controllers
     /// </summary>
     /// <param name="blobStorageService">A service object that implements <see cref="IBlobStorageService"/>.</param>
     /// <param name="runIdValidator">A validator for the run ID.</param>
-    [Route("api/test-only")]
+    [Route("test-only/Billing")]
     public class TestOnlyController(
         IBlobStorageService blobStorageService,
         IValidator<int> runIdValidator)
