@@ -13,7 +13,7 @@ namespace EPR.Calculator.FSS.API.Controllers
     /// <summary>
     /// Controller for the API to retrieve billings files.
     /// </summary>
-    /// <param name="billingService">A service object that implements <see cref="IBillingService"/>.</param>
+    /// <param name="blobStorageService">A service object that implements <see cref="IBlobStorageService"/>.</param>
     /// <param name="telemetryClient">A <see cref="TelemetryClient"/>.</param>
     /// <param name="runIdValidator">A validator for the run ID.</param>
     [Route("api/[controller]")]

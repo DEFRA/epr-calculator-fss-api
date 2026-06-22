@@ -2,7 +2,6 @@
 using EPR.Calculator.FSS.API.Constants;
 using EPR.Calculator.FSS.API.Helpers;
 using FluentValidation;
-using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System.Diagnostics.CodeAnalysis;
@@ -13,8 +12,7 @@ namespace EPR.Calculator.FSS.API.Controllers
     /// <summary>
     /// Controller for the API to retrieve billings files.
     /// </summary>
-    /// <param name="billingService">A service object that implements <see cref="IBillingService"/>.</param>
-    /// <param name="telemetryClient">A <see cref="TelemetryClient"/>.</param>
+    /// <param name="blobStorageService">A service object that implements <see cref="IBlobStorageService"/>.</param>
     /// <param name="runIdValidator">A validator for the run ID.</param>
     [Route("api/test-only")]
     public class TestOnlyController(
