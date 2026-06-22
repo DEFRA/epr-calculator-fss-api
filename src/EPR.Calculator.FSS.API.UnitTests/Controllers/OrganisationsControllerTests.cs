@@ -1,7 +1,6 @@
 ﻿namespace EPR.Calculator.FSS.API.UnitTests.Controllers;
 
 using AutoFixture;
-using Azure;
 using EPR.Calculator.FSS.API.Common.Models;
 using EPR.Calculator.FSS.API.Common.Services;
 using EPR.Calculator.FSS.API.Controllers;

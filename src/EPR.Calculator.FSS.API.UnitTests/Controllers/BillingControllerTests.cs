@@ -2,6 +2,7 @@
 using AutoFixture.AutoMoq;
 using EPR.Calculator.FSS.API.Common;
 using EPR.Calculator.FSS.API.Controllers;
+using EPR.Calculator.FSS.API.Helpers;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using FluentValidation;
@@ -19,7 +20,7 @@ namespace EPR.Calculator.FSS.API.UnitTests.Controllers
     public class BillingControllerTests
     {
         private Mock<IValidator<int>> _mockRunIdValidator = new();
-        private Mock<IBillingService> _mockBillingService = new();
+        private Mock<IBlobStorageService> _mockBlobStorageService = new();
         private IFixture _fixture = null!;
         private BillingController _billingControllerUnderTest;
 
@@ -29,7 +30,7 @@ namespace EPR.Calculator.FSS.API.UnitTests.Controllers
             _fixture = new Fixture().Customize(new AutoMoqCustomization());
 
             _billingControllerUnderTest = new BillingController(
-                this._mockBillingService.Object,
+                this._mockBlobStorageService.Object,
                 new TelemetryClient(new TelemetryConfiguration
                 {
                     TelemetryChannel = new Microsoft.ApplicationInsights.Channel.InMemoryChannel(),
@@ -43,10 +44,13 @@ namespace EPR.Calculator.FSS.API.UnitTests.Controllers
         {
             // Arrange
             var runId = _fixture.Create<int>();
+            var expectedFileName = BillingFileNameHelper.Create(runId);
+
             _mockRunIdValidator.Setup(v => v.Validate(runId)).Returns(new ValidationResult());
 
             var billingsDetails = _fixture.Create<string>();
-            _mockBillingService.Setup(service => service.GetBillingData(runId))
+
+            _mockBlobStorageService.Setup(service => service.GetFileContents(expectedFileName))
                 .ReturnsAsync(billingsDetails);
 
             // Act
@@ -59,6 +63,9 @@ namespace EPR.Calculator.FSS.API.UnitTests.Controllers
                 var contentResult = result as ContentResult;
                 Assert.IsNotNull(contentResult);
                 Assert.AreEqual(billingsDetails, contentResult.Content);
+                _mockBlobStorageService.Verify(
+                    service => service.GetFileContents(expectedFileName),
+                    Times.Once);
             }
         }
 
@@ -67,6 +74,8 @@ namespace EPR.Calculator.FSS.API.UnitTests.Controllers
         {
             // Arrange
             var runId = _fixture.Create<int>();
+            var expectedFileName = BillingFileNameHelper.Create(runId);
+
             var billingsDetails = _fixture.Create<string>();
 
             var validationFailures = new List<ValidationFailure>
@@ -78,7 +87,7 @@ namespace EPR.Calculator.FSS.API.UnitTests.Controllers
             _mockRunIdValidator.Setup(v => v.Validate(runId))
                 .Returns(new ValidationResult(validationFailures));
 
-            _mockBillingService.Setup(service => service.GetBillingData(runId))
+            _mockBlobStorageService.Setup(service => service.GetFileContents(expectedFileName))
                 .ReturnsAsync(billingsDetails);
 
             // Act
@@ -91,7 +100,7 @@ namespace EPR.Calculator.FSS.API.UnitTests.Controllers
                 var problemDetails = badRequestResult.Value.Should().BeOfType<ProblemDetails>().Which;
                 problemDetails.Detail.Should().Be("RunId is invalid");
                 _mockRunIdValidator.Verify(v => v.Validate(runId), Times.Once());
-                _mockBillingService.Verify(service => service.GetBillingData(runId), Times.Never);
+                _mockBlobStorageService.Verify(service => service.GetFileContents(expectedFileName), Times.Never);
             }
         }
 
@@ -107,8 +116,10 @@ namespace EPR.Calculator.FSS.API.UnitTests.Controllers
         {
             // Arrange
             var runId = _fixture.Create<int>();
+            var expectedFileName = BillingFileNameHelper.Create(runId);
+
             _mockRunIdValidator.Setup(v => v.Validate(runId)).Returns(new ValidationResult());
-            _mockBillingService.Setup(service => service.GetBillingData(runId))
+            _mockBlobStorageService.Setup(service => service.GetFileContents(expectedFileName))
                 .Throws((Exception)Activator.CreateInstance(exceptionType)!);
 
             // Act
@@ -132,8 +143,10 @@ namespace EPR.Calculator.FSS.API.UnitTests.Controllers
         {
             // Arrange
             var runId = _fixture.Create<int>();
+            var expectedFileName = BillingFileNameHelper.Create(runId);
+
             _mockRunIdValidator.Setup(v => v.Validate(runId)).Returns(new ValidationResult());
-            _mockBillingService.Setup(service => service.GetBillingData(runId))
+            _mockBlobStorageService.Setup(service => service.GetFileContents(expectedFileName))
                 .Throws((Exception)Activator.CreateInstance(exceptionType)!);
 
             // Act

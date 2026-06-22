@@ -1,6 +1,7 @@
 ﻿using EPR.Calculator.FSS.API.Common;
 using EPR.Calculator.FSS.API.Constants;
 using EPR.Calculator.FSS.API.Controllers;
+using EPR.Calculator.FSS.API.Helpers;
 using FluentAssertions;
 using FluentValidation;
 using FluentValidation.Results;
@@ -8,7 +9,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Moq;
-using System.Globalization;
 using System.Net.Mime;
 
 namespace EPR.Calculator.FSS.API.UnitTests.Controllers;
@@ -51,10 +51,7 @@ public class TestOnlyControllerTests
             EnableBillingUploadEndpoint = true
         });
 
-        var expectedFileName = string.Format(
-            CultureInfo.CurrentCulture,
-            BillingConstants.BillFileName,
-            runId);
+        var expectedFileName = BillingFileNameHelper.Create(runId);
 
         // Act
         var result = await _controller.UploadBillingDetails(runId, features);

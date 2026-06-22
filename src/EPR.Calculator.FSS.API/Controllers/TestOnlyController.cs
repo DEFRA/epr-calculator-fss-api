@@ -1,12 +1,11 @@
 ﻿using EPR.Calculator.FSS.API.Common;
 using EPR.Calculator.FSS.API.Constants;
+using EPR.Calculator.FSS.API.Helpers;
 using FluentValidation;
 using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using System.Globalization;
 using System.Net.Mime;
-using System.Text;
 
 namespace EPR.Calculator.FSS.API.Controllers
 {
@@ -22,9 +21,6 @@ namespace EPR.Calculator.FSS.API.Controllers
         IValidator<int> runIdValidator)
         : Controller
     {
-        private static readonly CompositeFormat BillingFileUploaded =
-            CompositeFormat.Parse(BillingConstants.BillFileName);
-
         [HttpPost]
         [Route("billingDetails")]
         [Consumes(MediaTypeNames.Application.Json)]
@@ -64,7 +60,7 @@ namespace EPR.Calculator.FSS.API.Controllers
             }
 
             await blobStorageService.UploadFile(
-                fileName: string.Format(CultureInfo.CurrentCulture, BillingFileUploaded, calculatorRunId),
+                fileName: BillingFileNameHelper.Create(calculatorRunId),
                 Request.Body,
                 MediaTypeNames.Application.Json);
 

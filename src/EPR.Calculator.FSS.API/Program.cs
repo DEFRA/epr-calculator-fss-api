@@ -35,7 +35,6 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddFluentValidationClientsideAdapters();
-builder.Services.AddScoped<IBillingService, BillingService>();
 builder.Services.AddScoped<IBlobStorageService, BlobStorageService>();
 builder.Services.AddScoped<IOrganisationService, OrganisationService>();
 
