@@ -1,4 +1,6 @@
-﻿namespace EPR.Calculator.FSS.API.Common
+﻿using Microsoft.AspNetCore.Mvc;
+
+namespace EPR.Calculator.FSS.API
 {
     public interface IBlobStorageService
     {
@@ -7,7 +9,7 @@
         /// </summary>
         /// <param name="fileName">The name of the file to download.</param>
         /// <returns>A task that represents the asynchronous operation. The task result contains the download result.</returns>
-        public Task<string> GetFileContents(string fileName);
+        public Task<FileStreamResult> GetFileContents(string fileName);
 
         /// <summary>
         /// Stream a file into storage - test only behaviour.

@@ -2,7 +2,7 @@
 
 public class FeatureSettings
 {
-    public const string SectionName = "Features";
+    public const string SectionName = "Feature";
 
     public bool EnableBillingUploadEndpoint { get; set; }
 }

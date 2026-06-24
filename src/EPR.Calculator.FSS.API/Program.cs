@@ -1,6 +1,5 @@
 ﻿using Azure.Storage.Blobs;
 using EPR.Calculator.FSS.API;
-using EPR.Calculator.FSS.API.Common;
 using EPR.Calculator.FSS.API.Common.Data;
 using EPR.Calculator.FSS.API.Common.Services;
 using EPR.Calculator.FSS.API.Common.Validators;
@@ -83,6 +82,8 @@ builder.Services.Configure<GzipCompressionProviderOptions>(options =>
     options.Level = CompressionLevel.SmallestSize;
 });
 
+builder.Services.AddRequestDecompression();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -97,6 +98,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.UseResponseCompression();
+app.UseRequestDecompression();
 
 app.MapControllers();
 

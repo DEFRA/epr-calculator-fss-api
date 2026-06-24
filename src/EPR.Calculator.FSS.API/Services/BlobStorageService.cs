@@ -1,7 +1,7 @@
 ﻿using Azure.Storage.Blobs;
-using EPR.Calculator.FSS.API.Common;
 using EPR.Calculator.FSS.API.Configs;
 using EPR.Calculator.FSS.API.Constants;
+using Microsoft.AspNetCore.Mvc;
 using System.Configuration;
 
 namespace EPR.Calculator.FSS.API
@@ -29,7 +29,7 @@ namespace EPR.Calculator.FSS.API
             EnsureContainersExist();
         }
 
-        public async Task<string> GetFileContents(string fileName)
+        public async Task<FileStreamResult> GetFileContents(string fileName)
         {
             if (this.featureSettings.EnableBillingUploadEndpoint)
             {
@@ -37,8 +37,9 @@ namespace EPR.Calculator.FSS.API
 
                 if (await testBlobClient.ExistsAsync())
                 {
-                    var testDownload = await testBlobClient.DownloadContentAsync();
-                    return testDownload.Value.Content.ToString();
+                    var testDownload = await testBlobClient.OpenReadAsync(new Azure.Storage.Blobs.Models.BlobOpenReadOptions(false));
+                    var testProperties = await testBlobClient.GetPropertiesAsync();
+                    return new FileStreamResult(testDownload, testProperties.Value.ContentType);
                 }
             }
 
@@ -49,19 +50,20 @@ namespace EPR.Calculator.FSS.API
                 throw new FileNotFoundException(fileName);
             }
 
-            var downloadResult = await blobClient.DownloadContentAsync();
-            return downloadResult.Value.Content.ToString();
+            var downloadResult = await blobClient.OpenReadAsync(new Azure.Storage.Blobs.Models.BlobOpenReadOptions(false));
+            var properties = await blobClient.GetPropertiesAsync();
+            return new FileStreamResult(downloadResult, properties.Value.ContentType);
         }
 
         public async Task UploadFile(string fileName, Stream content, string contentType)
         {
             await testContainerClient.GetBlobClient(fileName).UploadAsync(
-                content,
-                new Azure.Storage.Blobs.Models.BlobUploadOptions
+                content: content,
+                options: new Azure.Storage.Blobs.Models.BlobUploadOptions
                 {
                     HttpHeaders = new Azure.Storage.Blobs.Models.BlobHttpHeaders
                     {
-                        ContentType = contentType
+                        ContentType = contentType,
                     }
                 });
         }

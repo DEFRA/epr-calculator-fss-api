@@ -46,7 +46,7 @@ public class TestOnlyControllerTests
         _controller.Request.ContentType = "application/json";
         _controller.Request.Body = new MemoryStream("""{"field1":"value1"}"""u8.ToArray());
 
-        var features = Options.Create(new FeatureSettings
+        var featureSettings = Options.Create(new FeatureSettings
         {
             EnableBillingUploadEndpoint = true
         });
@@ -54,7 +54,7 @@ public class TestOnlyControllerTests
         var expectedFileName = BillingFileNameHelper.Create(runId);
 
         // Act
-        var result = await _controller.UploadBillingDetails(runId, features);
+        var result = await _controller.UploadBillingDetails(runId, featureSettings);
 
         // Assert
         result.Should().BeOfType<OkResult>();
@@ -71,13 +71,13 @@ public class TestOnlyControllerTests
     public async Task UploadBillingDetails_WhenFeatureDisabled_ReturnsNotFound()
     {
         // Arrange
-        var features = Options.Create(new FeatureSettings
+        var featureSettings = Options.Create(new FeatureSettings
         {
             EnableBillingUploadEndpoint = false
         });
 
         // Act
-        var result = await _controller.UploadBillingDetails(123, features);
+        var result = await _controller.UploadBillingDetails(123, featureSettings);
 
         // Assert
         result.Should().BeOfType<NotFoundResult>();
@@ -105,13 +105,13 @@ public class TestOnlyControllerTests
 
         _controller.Request.ContentType = MediaTypeNames.Application.Json;
 
-        var features = Options.Create(new FeatureSettings
+        var featureSettings = Options.Create(new FeatureSettings
         {
             EnableBillingUploadEndpoint = true
         });
 
         // Act
-        var result = await _controller.UploadBillingDetails(runId, features);
+        var result = await _controller.UploadBillingDetails(runId, featureSettings);
 
         // Assert
         var badRequest = result.Should().BeOfType<BadRequestObjectResult>().Which;
@@ -139,13 +139,13 @@ public class TestOnlyControllerTests
 
         _controller.Request.ContentType = MediaTypeNames.Text.Plain;
 
-        var features = Options.Create(new FeatureSettings
+        var featureSettings = Options.Create(new FeatureSettings
         {
             EnableBillingUploadEndpoint = true
         });
 
         // Act
-        var result = await _controller.UploadBillingDetails(runId, features);
+        var result = await _controller.UploadBillingDetails(runId, featureSettings);
 
         // Assert
         var badRequest = result.Should().BeOfType<BadRequestObjectResult>().Which;

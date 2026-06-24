@@ -48,7 +48,7 @@ namespace EPR.Calculator.FSS.API.UnitTests.Controllers
 
             _mockRunIdValidator.Setup(v => v.Validate(runId)).Returns(new ValidationResult());
 
-            var billingsDetails = _fixture.Create<string>();
+            var billingsDetails = new FileStreamResult(new MemoryStream(), "application/json");
 
             _mockBlobStorageService.Setup(service => service.GetFileContents(expectedFileName))
                 .ReturnsAsync(billingsDetails);
@@ -59,10 +59,12 @@ namespace EPR.Calculator.FSS.API.UnitTests.Controllers
             // Assert
             using (new AssertionScope())
             {
-                Assert.IsInstanceOfType(result, typeof(ContentResult));
-                var contentResult = result as ContentResult;
-                Assert.IsNotNull(contentResult);
-                Assert.AreEqual(billingsDetails, contentResult.Content);
+                var fileResult = result.Should()
+                    .BeOfType<FileStreamResult>()
+                    .Which;
+
+                fileResult.Should().BeSameAs(billingsDetails);
+
                 _mockBlobStorageService.Verify(
                     service => service.GetFileContents(expectedFileName),
                     Times.Once);
@@ -76,16 +78,15 @@ namespace EPR.Calculator.FSS.API.UnitTests.Controllers
             var runId = _fixture.Create<int>();
             var expectedFileName = BillingFileNameHelper.Create(runId);
 
-            var billingsDetails = _fixture.Create<string>();
-
             var validationFailures = new List<ValidationFailure>
             {
                 new("RunId", "RunId is invalid")
             };
 
-            // Setup
             _mockRunIdValidator.Setup(v => v.Validate(runId))
                 .Returns(new ValidationResult(validationFailures));
+
+            var billingsDetails = new FileStreamResult(new MemoryStream(), "application/json");
 
             _mockBlobStorageService.Setup(service => service.GetFileContents(expectedFileName))
                 .ReturnsAsync(billingsDetails);

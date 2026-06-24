@@ -68,9 +68,9 @@ namespace EPR.Calculator.FSS.API.Controllers
                     BillingDataRetrieved,
                     calculatorRunId,
                     DateTime.UtcNow,
-                    billingData.Length));
+                    billingData.FileStream.Length));
 
-                return Content(billingData, MediaTypeNames.Application.Json);
+                return billingData;
             }
             catch (Exception ex) when (ex is FileNotFoundException)
             {

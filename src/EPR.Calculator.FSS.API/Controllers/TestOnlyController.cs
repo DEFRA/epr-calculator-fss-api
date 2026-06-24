@@ -1,5 +1,4 @@
-﻿using EPR.Calculator.FSS.API.Common;
-using EPR.Calculator.FSS.API.Constants;
+﻿using EPR.Calculator.FSS.API.Constants;
 using EPR.Calculator.FSS.API.Helpers;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
@@ -27,9 +26,9 @@ namespace EPR.Calculator.FSS.API.Controllers
         [RequestSizeLimit(150_000_000)]
         public async Task<IActionResult> UploadBillingDetails(
             [FromQuery] int calculatorRunId,
-            [FromServices] IOptions<FeatureSettings> features)
+            [FromServices] IOptions<FeatureSettings> featureSettings)
         {
-            if (!features.Value.EnableBillingUploadEndpoint)
+            if (!featureSettings.Value.EnableBillingUploadEndpoint)
             {
                 return NotFound();
             }
@@ -61,8 +60,8 @@ namespace EPR.Calculator.FSS.API.Controllers
 
             await blobStorageService.UploadFile(
                 fileName: BillingFileNameHelper.Create(calculatorRunId),
-                Request.Body,
-                MediaTypeNames.Application.Json);
+                content: Request.Body,
+                contentType: MediaTypeNames.Application.Json);
 
             return Ok();
         }
