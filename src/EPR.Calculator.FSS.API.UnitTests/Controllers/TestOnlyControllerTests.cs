@@ -1,4 +1,5 @@
 ﻿using EPR.Calculator.FSS.API.Common;
+using EPR.Calculator.FSS.API.Configs;
 using EPR.Calculator.FSS.API.Constants;
 using EPR.Calculator.FSS.API.Controllers;
 using EPR.Calculator.FSS.API.Helpers;
@@ -46,7 +47,7 @@ public class TestOnlyControllerTests
         _controller.Request.ContentType = "application/json";
         _controller.Request.Body = new MemoryStream("""{"field1":"value1"}"""u8.ToArray());
 
-        var featureSettings = Options.Create(new FeatureSettings
+        var featureManagementSettings = Options.Create(new FeatureManagementSettings
         {
             EnableBillingUploadEndpoint = true
         });
@@ -54,7 +55,7 @@ public class TestOnlyControllerTests
         var expectedFileName = BillingFileNameHelper.Create(runId);
 
         // Act
-        var result = await _controller.UploadBillingDetails(runId, featureSettings);
+        var result = await _controller.UploadBillingDetails(runId, featureManagementSettings);
 
         // Assert
         result.Should().BeOfType<OkResult>();
@@ -71,13 +72,13 @@ public class TestOnlyControllerTests
     public async Task UploadBillingDetails_WhenFeatureDisabled_ReturnsNotFound()
     {
         // Arrange
-        var featureSettings = Options.Create(new FeatureSettings
+        var featureManagementSettings = Options.Create(new FeatureManagementSettings
         {
             EnableBillingUploadEndpoint = false
         });
 
         // Act
-        var result = await _controller.UploadBillingDetails(123, featureSettings);
+        var result = await _controller.UploadBillingDetails(123, featureManagementSettings);
 
         // Assert
         result.Should().BeOfType<NotFoundResult>();
@@ -105,13 +106,13 @@ public class TestOnlyControllerTests
 
         _controller.Request.ContentType = MediaTypeNames.Application.Json;
 
-        var featureSettings = Options.Create(new FeatureSettings
+        var featureManagementSettings = Options.Create(new FeatureManagementSettings
         {
             EnableBillingUploadEndpoint = true
         });
 
         // Act
-        var result = await _controller.UploadBillingDetails(runId, featureSettings);
+        var result = await _controller.UploadBillingDetails(runId, featureManagementSettings);
 
         // Assert
         var badRequest = result.Should().BeOfType<BadRequestObjectResult>().Which;
@@ -139,13 +140,13 @@ public class TestOnlyControllerTests
 
         _controller.Request.ContentType = MediaTypeNames.Text.Plain;
 
-        var featureSettings = Options.Create(new FeatureSettings
+        var featureManagementSettings = Options.Create(new FeatureManagementSettings
         {
             EnableBillingUploadEndpoint = true
         });
 
         // Act
-        var result = await _controller.UploadBillingDetails(runId, featureSettings);
+        var result = await _controller.UploadBillingDetails(runId, featureManagementSettings);
 
         // Assert
         var badRequest = result.Should().BeOfType<BadRequestObjectResult>().Which;

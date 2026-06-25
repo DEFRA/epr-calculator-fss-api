@@ -48,8 +48,8 @@ builder.Services.AddDbContext<SynapseDbContext>(options =>
 builder.Services.Configure<BlobStorageSettings>(
     builder.Configuration.GetSection("BlobStorage"));
 
-builder.Services.Configure<FeatureSettings>(
-    builder.Configuration.GetSection(FeatureSettings.SectionName));
+builder.Services.Configure<FeatureManagementSettings>(
+    builder.Configuration.GetSection(FeatureManagementSettings.SectionName));
 
 builder.Services.AddSingleton<BlobServiceClient>(provider =>
 {

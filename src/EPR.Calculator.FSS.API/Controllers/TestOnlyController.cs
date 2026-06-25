@@ -1,4 +1,4 @@
-﻿using EPR.Calculator.FSS.API.Constants;
+﻿using EPR.Calculator.FSS.API.Configs;
 using EPR.Calculator.FSS.API.Helpers;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
@@ -26,9 +26,9 @@ namespace EPR.Calculator.FSS.API.Controllers
         [RequestSizeLimit(150_000_000)]
         public async Task<IActionResult> UploadBillingDetails(
             [FromQuery] int calculatorRunId,
-            [FromServices] IOptions<FeatureSettings> featureSettings)
+            [FromServices] IOptions<FeatureManagementSettings> featureManagementSettings)
         {
-            if (!featureSettings.Value.EnableBillingUploadEndpoint)
+            if (!featureManagementSettings.Value.EnableBillingUploadEndpoint)
             {
                 return NotFound();
             }

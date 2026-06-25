@@ -125,7 +125,7 @@ namespace EPR.Calculator.FSS.API.UnitTests.Services
         public async Task GetFileContents_WhenBillingUploadEndpointEnabled_ReturnsTestContainerFile()
         {
             var config = ConfigurationItems.GetConfigurationValues();
-            config["Feature:EnableBillingUploadEndpoint"] = "true";
+            config["FeatureManagement:EnableBillingUploadEndpoint"] = "true";
             var service = new BlobStorageService(this.mockBlobServiceClient.Object, config);
 
             using CancellationTokenSource cancellationTokenSource = new();

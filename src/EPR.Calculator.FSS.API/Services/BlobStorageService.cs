@@ -1,6 +1,5 @@
 ﻿using Azure.Storage.Blobs;
 using EPR.Calculator.FSS.API.Configs;
-using EPR.Calculator.FSS.API.Constants;
 using Microsoft.AspNetCore.Mvc;
 using System.Configuration;
 
@@ -8,14 +7,14 @@ namespace EPR.Calculator.FSS.API
 {
     public class BlobStorageService : IBlobStorageService
     {
-        private readonly FeatureSettings featureSettings;
+        private readonly FeatureManagementSettings featureManagementSettings;
         private readonly BlobContainerClient containerClient;
         private readonly BlobContainerClient testContainerClient;
 
         public BlobStorageService(BlobServiceClient blobServiceClient, IConfiguration configuration)
         {
-            this.featureSettings = configuration.GetSection(FeatureSettings.SectionName).Get<FeatureSettings>() ??
-                throw new ConfigurationErrorsException("Feature settings are missing in configuration.");
+            this.featureManagementSettings = configuration.GetSection(FeatureManagementSettings.SectionName).Get<FeatureManagementSettings>() ??
+                throw new ConfigurationErrorsException("FeatureManagement settings are missing in configuration.");
 
             var settings = configuration.GetSection(BlobStorageSettings.SectionName).Get<BlobStorageSettings>() ??
                 throw new ConfigurationErrorsException("BlobStorage settings are missing in configuration.");
@@ -31,7 +30,7 @@ namespace EPR.Calculator.FSS.API
 
         public async Task<FileStreamResult> GetFileContents(string fileName)
         {
-            if (this.featureSettings.EnableBillingUploadEndpoint)
+            if (this.featureManagementSettings.EnableBillingUploadEndpoint)
             {
                 var testBlobClient = testContainerClient.GetBlobClient(fileName);
 
