@@ -28,32 +28,37 @@ public class OrganisationsController(
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetOrganisationsDetails([FromQuery] string? createdOrModifiedAfter)
+    public async Task<IActionResult> GetOrganisationsDetails([FromQuery] string? createdOrModifiedAfter, [FromQuery] string? financialYear)
     {
-        if (createdOrModifiedAfter != null)
+        var filter = new OrganisationSearchFilter
         {
-            // Validator for createdOrModifiedAfter - should be a valid date when not null.
-            // This is an optional date parameter in ISO 8601 format(YYYY - MM - DD). If no date is passed, all organization records are returned.
-            // If a date is passed, only records created or modified on or after that date are returned.
-            OrganisationSearchFilter? orgSearch = new OrganisationSearchFilter();
-            orgSearch = new OrganisationSearchFilter { CreatedOrModifiedAfter = createdOrModifiedAfter };
-            var result = organisationSearchFilterValidator.Validate(orgSearch);
-            if (!result.IsValid)
+            CreatedOrModifiedAfter = createdOrModifiedAfter,
+            FinancialYear = financialYear,
+        };
+
+        // createdOrModifiedAfter is an optional date parameter in ISO 8601 format(YYYY - MM - DD)
+        // financialYear is an optional date parameter in format YYYY-YY
+        var validation = organisationSearchFilterValidator.Validate(filter);
+
+        if (!validation.IsValid)
+        {
+            return BadRequest(new ApiError
             {
-                return BadRequest(new ApiError
-                {
-                    Error = "Bad Request",
-                    Message = "The request was malformed or invalid.",
-                    StatusCode = 400,
-                    ErrorCode = "invalid_request",
-                    Description = "The request did not conform to the required format."
-                });
-            }
+                Error = "Bad Request",
+                Message = $"The request was malformed or invalid - {string.Join(", ",  validation.Errors)}",
+                StatusCode = 400,
+                ErrorCode = "invalid_request",
+                Description = "The request did not conform to the required format."
+            });
         }
 
         try
         {
-            var organisationList = await organisationService.GetOrganisationsDetails(cancellationToken: HttpContext.RequestAborted, createdOrModifiedAfter);
+            var organisationList = await organisationService.GetOrganisationsDetails(
+                cancellationToken: HttpContext.RequestAborted,
+                createdOrModifiedAfter: createdOrModifiedAfter,
+                relativeYear: TryParseFinancialYear(financialYear));
+
             if (organisationList == null)
             {
                 return HandleError.HandleErrorWithStatusCode(System.Net.HttpStatusCode.BadRequest);
@@ -80,5 +85,21 @@ public class OrganisationsController(
             logger.LogErrorMessage(ErrorMessage, e);
             return HandleError.Handle(e);
         }
+    }
+
+    private static int? TryParseFinancialYear(string? financialYear)
+    {
+        if (string.IsNullOrWhiteSpace(financialYear))
+        {
+            return null;
+        }
+
+        var parts = financialYear.Split('-');
+        if (parts.Length != 2)
+        {
+            return null;
+        }
+
+        return int.TryParse(parts[0], out var year) ? year : null;
     }
 }

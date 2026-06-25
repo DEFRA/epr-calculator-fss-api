@@ -17,17 +17,18 @@ public class OrganisationService(
     ILogger<OrganisationService> logger)
     : IOrganisationService
 {
-    public async Task<IReadOnlyCollection<OrganisationDetails>> GetOrganisationsDetails(CancellationToken cancellationToken, string? createdOrModifiedAfter = null)
+    public async Task<IReadOnlyCollection<OrganisationDetails>> GetOrganisationsDetails(CancellationToken cancellationToken, string? createdOrModifiedAfter = null, int? relativeYear = null)
     {
         var organisationsList = new List<OrganisationDetails>();
 
         try
         {
-            const string sql = "EXECUTE [dbo].[GetLatestAcceptedGrantedOrgData] @createdOrModifiedAfter";
+            const string sql = "EXECUTE [dbo].[GetLatestAcceptedGrantedOrgData] @createdOrModifiedAfter @relativeYear";
 
             var parameters = new[]
             {
                 new SqlParameter("@createdOrModifiedAfter", SqlDbType.NVarChar) { Value = createdOrModifiedAfter },
+                new SqlParameter("@relativeYear", SqlDbType.NVarChar) { Value = relativeYear },
             };
 
             var acceptedGrantedOrgDataResponse = await synapseDbContext.RunSqlAsync<AcceptedGrantedOrgDataResponseModel>(sql, cancellationToken, parameters);

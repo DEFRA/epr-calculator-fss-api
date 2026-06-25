@@ -22,16 +22,14 @@ public class OrganisationsControllerTests
     private Mock<OrganisationSearchFilterValidator> validatorMock = null!;
     private Mock<IOrganisationService> _organisationServiceMock = null!;
     private OrganisationsController _organisationController = null!;
-    private OrganisationSearchFilterValidator _mockValidator;
 
     public OrganisationsControllerTests()
     {
         this.Fixture = new Fixture();
         this._organisationServiceMock = new Mock<IOrganisationService>();
-        this._mockValidator = new OrganisationSearchFilterValidator();
         this._organisationController = new OrganisationsController(
             _organisationServiceMock.Object,
-            _mockValidator,
+            new OrganisationSearchFilterValidator(),
             _nullLogger)
         {
             ControllerContext = new ControllerContext
@@ -47,12 +45,15 @@ public class OrganisationsControllerTests
     private IFixture Fixture { get; init; }
 
     [TestMethod]
-    public async Task GetOrganisationsDetails_ReturnsOk()
+    [DataRow("2025-01-30", "2025-26")]
+    [DataRow(null, "2025-26")]
+    [DataRow("2025-01-30", null)]
+    [DataRow(null, null)]
+    public async Task GetOrganisationsDetails_WithValidParams(string? createdOrModifiedAfter, string? financialYear)
     {
         // Arrange
-        var createdOrModifiedAfter = "2021-01-30";
         this._organisationServiceMock
-           .Setup(service => service.GetOrganisationsDetails(It.IsAny<CancellationToken>(), It.IsAny<string>()))
+           .Setup(service => service.GetOrganisationsDetails(It.IsAny<CancellationToken>(), It.IsAny<string?>(), It.IsAny<int?>()))
            .ReturnsAsync(new List<OrganisationDetails>
                             {
                                 new OrganisationDetails
@@ -63,7 +64,9 @@ public class OrganisationsControllerTests
                             });
 
         // Act
-        var result = await _organisationController.GetOrganisationsDetails(createdOrModifiedAfter) as ObjectResult;
+        var result = await _organisationController.GetOrganisationsDetails(
+            createdOrModifiedAfter: createdOrModifiedAfter,
+            financialYear: financialYear) as ObjectResult;
 
         // Assert
         result.Should().NotBeNull();
@@ -78,16 +81,17 @@ public class OrganisationsControllerTests
     }
 
     [TestMethod]
-    public async Task GetOrganisationsDetails_ReturnsNoContent()
+    public async Task GetOrganisationsDetails_Empty()
     {
         // Arrange
-        var organisationDetailsList = new List<OrganisationDetails>();
-        this._organisationServiceMock.Setup(x =>
-            x.GetOrganisationsDetails(It.IsAny<CancellationToken>(), It.IsAny<string>()))
-            .ThrowsAsync(new HttpRequestException("Exception", null, HttpStatusCode.NotFound));
+        this._organisationServiceMock
+           .Setup(service => service.GetOrganisationsDetails(It.IsAny<CancellationToken>(), It.IsAny<string?>(), It.IsAny<int?>()))
+           .ReturnsAsync(new List<OrganisationDetails>());
 
         // Act
-        var result = await this._organisationController.GetOrganisationsDetails(It.IsAny<string>()) as NotFoundResult;
+        var result = await _organisationController.GetOrganisationsDetails(
+            createdOrModifiedAfter: "2021-01-30",
+            financialYear: "2021-22") as ObjectResult;
 
         // Assert
         result.Should().NotBeNull();
@@ -95,37 +99,16 @@ public class OrganisationsControllerTests
     }
 
     [TestMethod]
-    public async Task GetOrganisationsDetailsReturnsStatus400BadRequest()
+    public async Task GetOrganisationsDetails_Error()
     {
-        // Arrange
-        var organisationDetailsList = new List<OrganisationDetails>();
-        organisationDetailsList = null;
-
-        // Arrange
-        this._organisationServiceMock.Setup(x =>
-            x.GetOrganisationsDetails(It.IsAny<CancellationToken>(), It.IsAny<string>()))
-            .ThrowsAsync(new HttpRequestException("Test exception", null, HttpStatusCode.BadRequest));
-
-        // Act
-        var result = await this._organisationController.GetOrganisationsDetails(null) as BadRequestResult;
-
-        // Assert
-        result.Should().NotBeNull();
-        result?.StatusCode.Should().Be(400);
-    }
-
-    [TestMethod]
-    public async Task GetOrganisationsDetailsStatus500InternalServerError()
-    {
-        // Arrange
-        var createdOrModifiedAfter = "2025-01-30";
-
-        this._organisationServiceMock.Setup(x =>
-            x.GetOrganisationsDetails(It.IsAny<CancellationToken>(), It.IsAny<string>()))
+        this._organisationServiceMock
+            .Setup(x => x.GetOrganisationsDetails(It.IsAny<CancellationToken>(), It.IsAny<string?>(), It.IsAny<int?>()))
             .ThrowsAsync(new HttpRequestException("InternalServerError exception", null, HttpStatusCode.InternalServerError));
 
         // Act
-        var result = await this._organisationController.GetOrganisationsDetails(createdOrModifiedAfter) as ActionResult;
+        var result = await this._organisationController.GetOrganisationsDetails(
+            createdOrModifiedAfter: null,
+            financialYear: null) as ActionResult;
 
         // Assert
         result.Should().BeOfType<StatusCodeResult>();
@@ -134,16 +117,15 @@ public class OrganisationsControllerTests
     }
 
     [TestMethod]
-    public async Task GetOrganisationsDetailsStatus400InvalidDate()
+    [DataRow("bad")]
+    [DataRow("1-1-1")]
+    [DataRow("01-01-2025")]
+    [DataRow("40-13-2025")]
+    public async Task GetOrganisationsDetails_InvalidCreatedOrModifiedAfter(string createdOrModifiedAfter)
     {
-        // Arrange
-        var createdOrModifiedAfter = "25-01-30";
-        this._organisationServiceMock.Setup(x =>
-            x.GetOrganisationsDetails(It.IsAny<CancellationToken>(), It.IsAny<string>()))
-            .ThrowsAsync(new HttpRequestException("Test exception", null, HttpStatusCode.BadRequest));
-
-        // Act
-        var result = await this._organisationController.GetOrganisationsDetails(createdOrModifiedAfter) as BadRequestObjectResult; // as BadRequestResult;
+        var result = await this._organisationController.GetOrganisationsDetails(
+            createdOrModifiedAfter: createdOrModifiedAfter,
+            financialYear: null) as BadRequestObjectResult;
 
         // Assert
         result.Should().NotBeNull();
@@ -151,20 +133,19 @@ public class OrganisationsControllerTests
     }
 
     [TestMethod]
-    public async Task GetOrganisationsDetailsStatus404NotFound()
+    [DataRow("bad")]
+    [DataRow("24-25")]
+    [DataRow("2025-2026")]
+    [DataRow("2025-27")]
+    [DataRow("2025")]
+    public async Task GetOrganisationsDetails_InvalidFinancialYear(string financialYear)
     {
-        // Arrange
-        var organisationDetailsList = new List<OrganisationDetails>();
-        var createdOrModifiedAfter = "2025-01-30";
-
-        this._organisationServiceMock
-        .Setup(service => service.GetOrganisationsDetails(It.IsAny<CancellationToken>(), It.IsAny<string>()))
-        .ReturnsAsync(new List<OrganisationDetails>());
-        // Act
-        var result = await this._organisationController.GetOrganisationsDetails(createdOrModifiedAfter) as NotFoundObjectResult;
+        var result = await this._organisationController.GetOrganisationsDetails(
+            createdOrModifiedAfter: null,
+            financialYear: "bad") as BadRequestObjectResult;
 
         // Assert
         result.Should().NotBeNull();
-        result?.StatusCode.Should().Be(404);
+        Assert.AreEqual(StatusCodes.Status400BadRequest, result.StatusCode);
     }
 }
