@@ -8,10 +8,10 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace EPR.Calculator.FSS.API.Common.Properties {
+namespace EPR.Calculator.FSS.API.Properties {
     using System;
-    
-    
+
+
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -23,15 +23,15 @@ namespace EPR.Calculator.FSS.API.Common.Properties {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Resources {
-        
+
         private static global::System.Resources.ResourceManager resourceMan;
-        
+
         private static global::System.Globalization.CultureInfo resourceCulture;
-        
+
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         internal Resources() {
         }
-        
+
         /// <summary>
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
@@ -39,13 +39,13 @@ namespace EPR.Calculator.FSS.API.Common.Properties {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("EPR.Calculator.FSS.API.Common.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("EPR.Calculator.FSS.API.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
             }
         }
-        
+
         /// <summary>
         ///   Overrides the current thread's CurrentUICulture property for all
         ///   resource lookups using this strongly typed resource class.
@@ -59,7 +59,7 @@ namespace EPR.Calculator.FSS.API.Common.Properties {
                 resourceCulture = value;
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Error retrieving billing data for runId {0} at {1}, error: {2}.
         /// </summary>
@@ -68,7 +68,7 @@ namespace EPR.Calculator.FSS.API.Common.Properties {
                 return ResourceManager.GetString("BillingDataMiscError", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Billing data retrieved for runId: {0} at {1}, length {2}..
         /// </summary>
@@ -77,7 +77,7 @@ namespace EPR.Calculator.FSS.API.Common.Properties {
                 return ResourceManager.GetString("BillingDataRetrieved", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Run ID cannot be empty..
         /// </summary>
@@ -86,7 +86,7 @@ namespace EPR.Calculator.FSS.API.Common.Properties {
                 return ResourceManager.GetString("RunIdIsEmpty", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to $&quot;RunId &quot;{0}&quot;is invalid.&quot;.
         /// </summary>
@@ -95,7 +95,7 @@ namespace EPR.Calculator.FSS.API.Common.Properties {
                 return ResourceManager.GetString("RunIdIsInvalid", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Run ID must be greater than 0..
         /// </summary>

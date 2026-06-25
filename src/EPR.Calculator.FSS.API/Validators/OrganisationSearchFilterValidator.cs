@@ -1,6 +1,6 @@
 ﻿namespace EPR.Calculator.FSS.API.Validators;
 
-using EPR.Calculator.FSS.API.Common.Models;
+using EPR.Calculator.FSS.API.Models;
 using FluentValidation;
 using System.Globalization;
 

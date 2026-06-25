@@ -1,11 +1,9 @@
-﻿using EPR.Calculator.FSS.API.Common;
-using EPR.Calculator.FSS.API.Common.Properties;
-using EPR.Calculator.FSS.API.Helpers;
+﻿using EPR.Calculator.FSS.API.Helpers;
+using EPR.Calculator.FSS.API.Properties;
 using FluentValidation;
 using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
-using System.Net.Mime;
 using System.Text;
 
 namespace EPR.Calculator.FSS.API.Controllers

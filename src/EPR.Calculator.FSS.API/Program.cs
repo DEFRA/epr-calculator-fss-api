@@ -1,10 +1,9 @@
 ﻿using Azure.Storage.Blobs;
 using EPR.Calculator.FSS.API;
-using EPR.Calculator.FSS.API.Common.Data;
-using EPR.Calculator.FSS.API.Common.Services;
-using EPR.Calculator.FSS.API.Common.Validators;
 using EPR.Calculator.FSS.API.Configs;
+using EPR.Calculator.FSS.API.Data;
 using EPR.Calculator.FSS.API.HealthCheck;
+using EPR.Calculator.FSS.API.Services;
 using EPR.Calculator.FSS.API.Validators;
 using FluentValidation;
 using FluentValidation.AspNetCore;

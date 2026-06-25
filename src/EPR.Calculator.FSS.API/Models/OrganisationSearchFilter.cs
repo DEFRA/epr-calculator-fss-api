@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace EPR.Calculator.FSS.API.Common.Models;
+namespace EPR.Calculator.FSS.API.Models;
 
 [ExcludeFromCodeCoverage]
 public class OrganisationSearchFilter

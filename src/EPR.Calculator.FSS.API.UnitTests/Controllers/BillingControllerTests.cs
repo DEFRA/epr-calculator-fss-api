@@ -1,6 +1,6 @@
 ﻿using AutoFixture;
 using AutoFixture.AutoMoq;
-using EPR.Calculator.FSS.API.Common;
+using EPR.Calculator.FSS.API;
 using EPR.Calculator.FSS.API.Controllers;
 using EPR.Calculator.FSS.API.Helpers;
 using FluentAssertions;

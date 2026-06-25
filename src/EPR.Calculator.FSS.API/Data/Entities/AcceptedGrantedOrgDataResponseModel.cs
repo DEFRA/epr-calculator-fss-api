@@ -1,4 +1,4 @@
-﻿namespace EPR.Calculator.FSS.API.Common.Data.Entities;
+﻿namespace EPR.Calculator.FSS.API.Data.Entities;
 
 using System.ComponentModel.DataAnnotations.Schema;
 

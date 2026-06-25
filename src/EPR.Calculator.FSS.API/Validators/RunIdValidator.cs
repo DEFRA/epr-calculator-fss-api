@@ -1,7 +1,7 @@
-﻿using EPR.Calculator.FSS.API.Common.Properties;
+﻿using EPR.Calculator.FSS.API.Properties;
 using FluentValidation;
 
-namespace EPR.Calculator.FSS.API.Common.Validators
+namespace EPR.Calculator.FSS.API.Validators
 {
     /// <summary>
     /// Validator for Run IDs.

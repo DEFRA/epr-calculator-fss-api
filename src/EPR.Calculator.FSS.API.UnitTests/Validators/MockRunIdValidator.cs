@@ -1,8 +1,8 @@
-﻿using EPR.Calculator.FSS.API.Common.Validators;
+﻿using EPR.Calculator.FSS.API.Validators;
 using FluentValidation;
 using FluentValidation.Results;
 
-namespace EPR.Calculator.FSS.API.Common.UnitTests.Validators
+namespace EPR.Calculator.FSS.API.UnitTests.Validators
 {
     /// <summary>
     /// Implementation of <see cref="AbstractValidator{T}"/> for unit testing purposes.

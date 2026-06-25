@@ -1,9 +1,9 @@
 ﻿namespace EPR.Calculator.FSS.API;
 
-using EPR.Calculator.FSS.API.Common.Data;
-using EPR.Calculator.FSS.API.Common.Data.Entities;
-using EPR.Calculator.FSS.API.Common.Models;
-using EPR.Calculator.FSS.API.Common.Services;
+using EPR.Calculator.FSS.API.Data;
+using EPR.Calculator.FSS.API.Data.Entities;
+using EPR.Calculator.FSS.API.Models;
+using EPR.Calculator.FSS.API.Services;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
@@ -17,7 +17,7 @@ public class OrganisationService(
     ILogger<OrganisationService> logger)
     : IOrganisationService
 {
-    public async Task<IReadOnlyCollection<OrganisationDetails>> GetOrganisationsDetails(string? createdOrModifiedAfter = null)
+    public async Task<IReadOnlyCollection<OrganisationDetails>> GetOrganisationsDetails(CancellationToken cancellationToken, string? createdOrModifiedAfter = null)
     {
         var organisationsList = new List<OrganisationDetails>();
 
@@ -30,7 +30,7 @@ public class OrganisationService(
                 new SqlParameter("@createdOrModifiedAfter", SqlDbType.NVarChar) { Value = createdOrModifiedAfter },
             };
 
-            var acceptedGrantedOrgDataResponse = await synapseDbContext.RunSqlAsync<AcceptedGrantedOrgDataResponseModel>(sql, parameters);
+            var acceptedGrantedOrgDataResponse = await synapseDbContext.RunSqlAsync<AcceptedGrantedOrgDataResponseModel>(sql, cancellationToken, parameters);
 
             var organisationsLookup = acceptedGrantedOrgDataResponse
                .Where(x => x.OrganisationId is not null)

@@ -1,7 +1,7 @@
 ﻿using AutoFixture;
-using EPR.Calculator.FSS.API.Common.Validators;
+using EPR.Calculator.FSS.API.Validators;
 
-namespace EPR.Calculator.FSS.API.Common.UnitTests.Validators
+namespace EPR.Calculator.FSS.API.UnitTests.Validators
 {
     /// <summary>
     /// Unit tests for the <see cref="RunIdValidator"/> class.

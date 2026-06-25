@@ -1,8 +1,8 @@
 ﻿namespace EPR.Calculator.FSS.API.Controllers;
 
 using API.Validators;
-using Common.Models;
-using Common.Services;
+using EPR.Calculator.FSS.API.Models;
+using EPR.Calculator.FSS.API.Services;
 using Helpers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -53,7 +53,7 @@ public class OrganisationsController(
 
         try
         {
-            var organisationList = await organisationService.GetOrganisationsDetails(createdOrModifiedAfter);
+            var organisationList = await organisationService.GetOrganisationsDetails(cancellationToken: HttpContext.RequestAborted, createdOrModifiedAfter);
             if (organisationList == null)
             {
                 return HandleError.HandleErrorWithStatusCode(System.Net.HttpStatusCode.BadRequest);

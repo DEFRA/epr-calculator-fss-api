@@ -1,7 +1,7 @@
-﻿namespace EPR.Calculator.FSS.API.Common.UnitTests.Services;
+﻿namespace EPR.Calculator.FSS.API.UnitTests.Services;
 
-using EPR.Calculator.FSS.API.Common.Data;
-using EPR.Calculator.FSS.API.Common.Data.Entities;
+using EPR.Calculator.FSS.API.Data;
+using EPR.Calculator.FSS.API.Data.Entities;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -27,11 +27,11 @@ public class OrganisationServiceTests
         // Arrange
         var emptyData = new List<AcceptedGrantedOrgDataResponseModel>();
         _mockSynapseDbContext
-            .Setup(ctx => ctx.RunSqlAsync<AcceptedGrantedOrgDataResponseModel>(It.IsAny<string>(), It.IsAny<SqlParameter[]>()))
+            .Setup(ctx => ctx.RunSqlAsync<AcceptedGrantedOrgDataResponseModel>(It.IsAny<string>(), It.IsAny<CancellationToken>(), It.IsAny<SqlParameter[]>()))
             .ReturnsAsync(emptyData);
 
         // Act
-        var result = await _organisationService.GetOrganisationsDetails();
+        var result = await _organisationService.GetOrganisationsDetails(CancellationToken.None);
 
         // Assert
         Assert.IsNotNull(result);
@@ -95,11 +95,11 @@ public class OrganisationServiceTests
         };
 
         _mockSynapseDbContext
-            .Setup(ctx => ctx.RunSqlAsync<AcceptedGrantedOrgDataResponseModel>(It.IsAny<string>(), It.IsAny<SqlParameter[]>()))
+            .Setup(ctx => ctx.RunSqlAsync<AcceptedGrantedOrgDataResponseModel>(It.IsAny<string>(), It.IsAny<CancellationToken>(), It.IsAny<SqlParameter[]>()))
             .ReturnsAsync(expectedData);
 
         // Act
-        var result = await _organisationService.GetOrganisationsDetails();
+        var result = await _organisationService.GetOrganisationsDetails(CancellationToken.None);
 
         // Assert
         Assert.IsNotNull(result);
@@ -156,6 +156,7 @@ public class OrganisationServiceTests
         _mockSynapseDbContext.Verify(
             ctx => ctx.RunSqlAsync<AcceptedGrantedOrgDataResponseModel>(
                 It.IsAny<string>(),
+                It.IsAny<CancellationToken>(),
                 It.IsAny<SqlParameter[]>()),
             Times.Once);
     }
@@ -200,11 +201,11 @@ public class OrganisationServiceTests
         };
 
         _mockSynapseDbContext
-            .Setup(ctx => ctx.RunSqlAsync<AcceptedGrantedOrgDataResponseModel>(It.IsAny<string>(), It.IsAny<SqlParameter[]>()))
+            .Setup(ctx => ctx.RunSqlAsync<AcceptedGrantedOrgDataResponseModel>(It.IsAny<string>(), It.IsAny<CancellationToken>(), It.IsAny<SqlParameter[]>()))
             .ReturnsAsync(expectedData);
 
         // Act
-        var result = await _organisationService.GetOrganisationsDetails();
+        var result = await _organisationService.GetOrganisationsDetails(CancellationToken.None);
 
         // Assert
         Assert.IsNotNull(result);
@@ -241,6 +242,7 @@ public class OrganisationServiceTests
         _mockSynapseDbContext.Verify(
             ctx => ctx.RunSqlAsync<AcceptedGrantedOrgDataResponseModel>(
                 It.IsAny<string>(),
+                It.IsAny<CancellationToken>(),
                 It.IsAny<SqlParameter[]>()),
             Times.Once);
     }
@@ -309,11 +311,11 @@ public class OrganisationServiceTests
         };
 
         _mockSynapseDbContext
-            .Setup(ctx => ctx.RunSqlAsync<AcceptedGrantedOrgDataResponseModel>(It.IsAny<string>(), It.IsAny<SqlParameter[]>()))
+            .Setup(ctx => ctx.RunSqlAsync<AcceptedGrantedOrgDataResponseModel>(It.IsAny<string>(), It.IsAny<CancellationToken>(), It.IsAny<SqlParameter[]>()))
             .ReturnsAsync(expectedData);
 
         // Act
-        var result = await _organisationService.GetOrganisationsDetails();
+        var result = await _organisationService.GetOrganisationsDetails(CancellationToken.None);
 
         // Assert
         Assert.IsNotNull(result);
@@ -351,6 +353,7 @@ public class OrganisationServiceTests
         _mockSynapseDbContext.Verify(
             ctx => ctx.RunSqlAsync<AcceptedGrantedOrgDataResponseModel>(
                 It.IsAny<string>(),
+                It.IsAny<CancellationToken>(),
                 It.IsAny<SqlParameter[]>()),
             Times.Once);
     }
@@ -360,11 +363,11 @@ public class OrganisationServiceTests
     {
         // Arrange
         _mockSynapseDbContext
-            .Setup(ctx => ctx.RunSqlAsync<AcceptedGrantedOrgDataResponseModel>(It.IsAny<string>(), It.IsAny<SqlParameter[]>()))
+            .Setup(ctx => ctx.RunSqlAsync<AcceptedGrantedOrgDataResponseModel>(It.IsAny<string>(), It.IsAny<CancellationToken>(), It.IsAny<SqlParameter[]>()))
             .ThrowsAsync(new InvalidOperationException("Database error"));
 
         // Act & Assert
-        var exception = await Assert.ThrowsExactlyAsync<InvalidOperationException>(() => _organisationService.GetOrganisationsDetails(It.IsAny<string>()));
+        var exception = await Assert.ThrowsExactlyAsync<InvalidOperationException>(() => _organisationService.GetOrganisationsDetails(It.IsAny<CancellationToken>(), It.IsAny<string>()));
 
         // Assert
         Assert.AreEqual("Database error", exception.Message);

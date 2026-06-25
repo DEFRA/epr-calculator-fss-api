@@ -1,9 +1,9 @@
 ﻿namespace EPR.Calculator.FSS.API.UnitTests.Controllers;
 
 using AutoFixture;
-using EPR.Calculator.FSS.API.Common.Models;
-using EPR.Calculator.FSS.API.Common.Services;
 using EPR.Calculator.FSS.API.Controllers;
+using EPR.Calculator.FSS.API.Models;
+using EPR.Calculator.FSS.API.Services;
 using EPR.Calculator.FSS.API.Validators;
 using FluentAssertions;
 using FluentValidation.Results;
@@ -52,7 +52,7 @@ public class OrganisationsControllerTests
         // Arrange
         var createdOrModifiedAfter = "2021-01-30";
         this._organisationServiceMock
-           .Setup(service => service.GetOrganisationsDetails(It.IsAny<string>()))
+           .Setup(service => service.GetOrganisationsDetails(It.IsAny<CancellationToken>(), It.IsAny<string>()))
            .ReturnsAsync(new List<OrganisationDetails>
                             {
                                 new OrganisationDetails
@@ -83,7 +83,7 @@ public class OrganisationsControllerTests
         // Arrange
         var organisationDetailsList = new List<OrganisationDetails>();
         this._organisationServiceMock.Setup(x =>
-            x.GetOrganisationsDetails(It.IsAny<string>()))
+            x.GetOrganisationsDetails(It.IsAny<CancellationToken>(), It.IsAny<string>()))
             .ThrowsAsync(new HttpRequestException("Exception", null, HttpStatusCode.NotFound));
 
         // Act
@@ -103,7 +103,7 @@ public class OrganisationsControllerTests
 
         // Arrange
         this._organisationServiceMock.Setup(x =>
-            x.GetOrganisationsDetails(It.IsAny<string>()))
+            x.GetOrganisationsDetails(It.IsAny<CancellationToken>(), It.IsAny<string>()))
             .ThrowsAsync(new HttpRequestException("Test exception", null, HttpStatusCode.BadRequest));
 
         // Act
@@ -121,7 +121,7 @@ public class OrganisationsControllerTests
         var createdOrModifiedAfter = "2025-01-30";
 
         this._organisationServiceMock.Setup(x =>
-            x.GetOrganisationsDetails(It.IsAny<string>()))
+            x.GetOrganisationsDetails(It.IsAny<CancellationToken>(), It.IsAny<string>()))
             .ThrowsAsync(new HttpRequestException("InternalServerError exception", null, HttpStatusCode.InternalServerError));
 
         // Act
@@ -139,7 +139,7 @@ public class OrganisationsControllerTests
         // Arrange
         var createdOrModifiedAfter = "25-01-30";
         this._organisationServiceMock.Setup(x =>
-            x.GetOrganisationsDetails(It.IsAny<string>()))
+            x.GetOrganisationsDetails(It.IsAny<CancellationToken>(), It.IsAny<string>()))
             .ThrowsAsync(new HttpRequestException("Test exception", null, HttpStatusCode.BadRequest));
 
         // Act
@@ -158,7 +158,7 @@ public class OrganisationsControllerTests
         var createdOrModifiedAfter = "2025-01-30";
 
         this._organisationServiceMock
-        .Setup(service => service.GetOrganisationsDetails(It.IsAny<string>()))
+        .Setup(service => service.GetOrganisationsDetails(It.IsAny<CancellationToken>(), It.IsAny<string>()))
         .ReturnsAsync(new List<OrganisationDetails>());
         // Act
         var result = await this._organisationController.GetOrganisationsDetails(createdOrModifiedAfter) as NotFoundObjectResult;
