@@ -1,22 +1,21 @@
-﻿using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+﻿using System.Diagnostics.CodeAnalysis;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
-using System.Diagnostics.CodeAnalysis;
 
-namespace EPR.Calculator.FSS.API.HealthCheck
+namespace EPR.Calculator.FSS.API.HealthCheck;
+
+[ExcludeFromCodeCoverage]
+public static class HealthCheckOptionsBuilder
 {
-    [ExcludeFromCodeCoverage]
-    public static class HealthCheckOptionsBuilder
+    public static HealthCheckOptions Build()
     {
-        public static HealthCheckOptions Build()
+        return new HealthCheckOptions
         {
-            return new HealthCheckOptions
+            AllowCachingResponses = false,
+            ResultStatusCodes =
             {
-                AllowCachingResponses = false,
-                ResultStatusCodes =
-                {
-                    [HealthStatus.Healthy] = StatusCodes.Status200OK,
-                },
-            };
-        }
+                [HealthStatus.Healthy] = StatusCodes.Status200OK,
+            },
+        };
     }
 }

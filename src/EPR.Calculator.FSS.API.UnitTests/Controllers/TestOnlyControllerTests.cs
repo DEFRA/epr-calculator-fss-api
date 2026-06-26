@@ -1,4 +1,5 @@
-﻿using EPR.Calculator.FSS.API.Configs;
+﻿using System.Net.Mime;
+using EPR.Calculator.FSS.API.Configs;
 using EPR.Calculator.FSS.API.Controllers;
 using EPR.Calculator.FSS.API.Helpers;
 using FluentAssertions;
@@ -8,7 +9,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Moq;
-using System.Net.Mime;
 
 namespace EPR.Calculator.FSS.API.UnitTests.Controllers;
 

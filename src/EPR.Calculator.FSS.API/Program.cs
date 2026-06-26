@@ -1,4 +1,6 @@
-﻿using Azure.Storage.Blobs;
+﻿using System.Configuration;
+using System.IO.Compression;
+using Azure.Storage.Blobs;
 using EPR.Calculator.FSS.API;
 using EPR.Calculator.FSS.API.Configs;
 using EPR.Calculator.FSS.API.Data;
@@ -9,8 +11,6 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
-using System.Configuration;
-using System.IO.Compression;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -1,6 +1,7 @@
-﻿namespace EPR.Calculator.FSS.API.Services;
+﻿using EPR.Calculator.FSS.API.Models;
 
-using EPR.Calculator.FSS.API.Models;
+namespace EPR.Calculator.FSS.API.Services;
+
 public interface IOrganisationService
 {
     /// <summary>

@@ -1,17 +1,14 @@
-﻿namespace EPR.Calculator.FSS.API;
-
+﻿using System.Data;
+using System.Globalization;
 using EPR.Calculator.FSS.API.Data;
 using EPR.Calculator.FSS.API.Data.Entities;
 using EPR.Calculator.FSS.API.Models;
 using EPR.Calculator.FSS.API.Services;
 using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
-using System.Data;
-using System.Globalization;
+
+namespace EPR.Calculator.FSS.API;
 
 #pragma warning disable CA1848 // Use the LoggerMessage delegates
-
 public class OrganisationService(
     SynapseDbContext synapseDbContext,
     ILogger<OrganisationService> logger)

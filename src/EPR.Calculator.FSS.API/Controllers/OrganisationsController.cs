@@ -1,12 +1,10 @@
-﻿namespace EPR.Calculator.FSS.API.Controllers;
-
-using API.Validators;
+﻿using EPR.Calculator.FSS.API.Helpers;
 using EPR.Calculator.FSS.API.Models;
 using EPR.Calculator.FSS.API.Services;
-using Helpers;
-using Microsoft.AspNetCore.Http;
+using EPR.Calculator.FSS.API.Validators;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+
+namespace EPR.Calculator.FSS.API.Controllers;
 
 /// <summary>
 /// Controller for the API to retrieve Organization Details.

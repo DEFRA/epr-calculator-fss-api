@@ -1,10 +1,8 @@
-﻿namespace EPR.Calculator.FSS.API.Data;
-
+﻿using System.Diagnostics.CodeAnalysis;
 using EPR.Calculator.FSS.API.Data.Entities;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Threading.Tasks;
+
+namespace EPR.Calculator.FSS.API.Data;
 
 [ExcludeFromCodeCoverage]
 public class SynapseDbContext : DbContext

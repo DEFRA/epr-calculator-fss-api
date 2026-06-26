@@ -1,5 +1,4 @@
-﻿namespace EPR.Calculator.FSS.API.UnitTests.Controllers;
-
+﻿using System.Net;
 using AutoFixture;
 using EPR.Calculator.FSS.API.Controllers;
 using EPR.Calculator.FSS.API.Models;
@@ -11,7 +10,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using System.Net;
+
+namespace EPR.Calculator.FSS.API.UnitTests.Controllers;
 
 [TestClass]
 public class OrganisationsControllerTests

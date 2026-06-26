@@ -1,24 +1,23 @@
 ﻿using EPR.Calculator.FSS.API.Properties;
 using FluentValidation;
 
-namespace EPR.Calculator.FSS.API.Validators
+namespace EPR.Calculator.FSS.API.Validators;
+
+/// <summary>
+/// Validator for Run IDs.
+/// </summary>
+public class RunIdValidator : AbstractValidator<int>
 {
     /// <summary>
-    /// Validator for Run IDs.
+    /// Initializes a new instance of the <see cref="RunIdValidator"/> class.
     /// </summary>
-    public class RunIdValidator : AbstractValidator<int>
+    public RunIdValidator()
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="RunIdValidator"/> class.
-        /// </summary>
-        public RunIdValidator()
-        {
-            this.RuleFor(runId => runId)
-                .Cascade(CascadeMode.Stop)
-                .NotNull()
-                .WithMessage(Resources.RunIdIsEmpty)
-                .GreaterThan(0)
-                .WithMessage(Resources.RunIdIsZero);
-        }
+        this.RuleFor(runId => runId)
+            .Cascade(CascadeMode.Stop)
+            .NotNull()
+            .WithMessage(Resources.RunIdIsEmpty)
+            .GreaterThan(0)
+            .WithMessage(Resources.RunIdIsZero);
     }
 }

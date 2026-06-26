@@ -2,25 +2,24 @@
 using FluentValidation;
 using FluentValidation.Results;
 
-namespace EPR.Calculator.FSS.API.UnitTests.Validators
+namespace EPR.Calculator.FSS.API.UnitTests.Validators;
+
+/// <summary>
+/// Implementation of <see cref="AbstractValidator{T}"/> for unit testing purposes.
+/// </summary>
+/// <inheritdoc/>
+public class MockRunIdValidator(Func<bool> returnValueGenerator) : RunIdValidator
 {
-    /// <summary>
-    /// Implementation of <see cref="AbstractValidator{T}"/> for unit testing purposes.
-    /// </summary>
+    private Func<bool> ReturnValueGenerator { get; init; } = returnValueGenerator;
+
     /// <inheritdoc/>
-    public class MockRunIdValidator(Func<bool> returnValueGenerator) : RunIdValidator
+    public override ValidationResult Validate(ValidationContext<int> context)
     {
-        private Func<bool> ReturnValueGenerator { get; init; } = returnValueGenerator;
-
-        /// <inheritdoc/>
-        public override ValidationResult Validate(ValidationContext<int> context)
+        if (!this.ReturnValueGenerator.Invoke())
         {
-            if (!this.ReturnValueGenerator.Invoke())
-            {
-                return new ValidationResult([new ValidationFailure()]);
-            }
-
-            return new ValidationResult();
+            return new ValidationResult([new ValidationFailure()]);
         }
+
+        return new ValidationResult();
     }
 }
