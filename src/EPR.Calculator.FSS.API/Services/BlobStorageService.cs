@@ -25,7 +25,7 @@ public class BlobStorageService : IBlobStorageService
         this.testContainerClient = blobServiceClient.GetBlobContainerClient(settings.TestOnlyContainerName ??
             throw new ConfigurationErrorsException("Test-Only container name is missing in configuration."));
 
-        EnsureContainersExist();
+        _ = EnsureContainersExist();
     }
 
     public async Task<FileStreamResult> GetFileContents(string fileName)

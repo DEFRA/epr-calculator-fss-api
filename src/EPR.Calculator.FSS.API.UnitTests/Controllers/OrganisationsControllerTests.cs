@@ -16,30 +16,24 @@ namespace EPR.Calculator.FSS.API.UnitTests.Controllers;
 [TestClass]
 public class OrganisationsControllerTests
 {
-    private readonly NullLogger<OrganisationsController> _nullLogger = new();
-    private readonly Mock<ValidationFailure> _validationFailureMock;
-    private readonly Mock<ValidationResult> _validationResultMock;
-    private Mock<OrganisationSearchFilterValidator> validatorMock = null!;
-    private Mock<IOrganisationService> _organisationServiceMock = null!;
-    private OrganisationsController _organisationController = null!;
+    private readonly NullLogger<OrganisationsController> nullLogger = new();
+    private readonly Mock<IOrganisationService> organisationServiceMock;
+    private readonly OrganisationsController organisationController = null!;
 
     public OrganisationsControllerTests()
     {
         this.Fixture = new Fixture();
-        this._organisationServiceMock = new Mock<IOrganisationService>();
-        this._organisationController = new OrganisationsController(
-            _organisationServiceMock.Object,
+        this.organisationServiceMock = new Mock<IOrganisationService>();
+        this.organisationController = new OrganisationsController(
+            organisationServiceMock.Object,
             new OrganisationSearchFilterValidator(),
-            _nullLogger)
+            nullLogger)
         {
             ControllerContext = new ControllerContext
             {
                 HttpContext = new DefaultHttpContext(),
             },
         };
-        validatorMock = new Mock<OrganisationSearchFilterValidator>();
-        _validationFailureMock = new Mock<ValidationFailure>();
-        _validationResultMock = new Mock<ValidationResult>();
     }
 
     private IFixture Fixture { get; init; }
@@ -52,19 +46,38 @@ public class OrganisationsControllerTests
     public async Task GetOrganisationsDetails_WithValidParams(string? createdOrModifiedAfter, string? financialYear)
     {
         // Arrange
-        this._organisationServiceMock
+        this.organisationServiceMock
            .Setup(service => service.GetOrganisationsDetails(It.IsAny<CancellationToken>(), It.IsAny<string?>(), It.IsAny<int?>()))
            .ReturnsAsync(new List<OrganisationDetails>
                             {
                                 new OrganisationDetails
                                 {
-                                    OrganisationId = "12345",
-                                    OrganisationName = "Test Org"
-                                },
+                                        OrganisationId = "12345",
+                                        OrganisationName = "Test Org",
+                                    OrganisationTradingName = "Test Trading",
+                                    CompaniesHouseNumber = "12345678",
+                                    HomeNationCode = "EN",
+                                    ServiceOfNoticeAddrLine1 = "1 Test Street",
+                                    ServiceOfNoticeAddrLine2 = "Suite 100",
+                                    ServiceOfNoticeAddrCity = "Test City",
+                                    ServiceOfNoticeAddrCounty = "Test County",
+                                    ServiceOfNoticeAddrCountry = "England",
+                                    ServiceOfNoticeAddrPostcode = "TE1 1ST",
+                                    ServiceOfNoticeAddrPhoneNumber = "01234567890",
+                                    SoleTraderFirstName = "John",
+                                    SoleTraderLastName = "Smith",
+                                    SoleTraderPhoneNumber = "07123456789",
+                                    SoleTraderEmail = "john.smith@test.com",
+                                    PrimaryContactPersonFirstName = "Jane",
+                                    PrimaryContactPersonLastName = "Doe",
+                                    PrimaryContactPersonPhoneNumber = "07987654321",
+                                    PrimaryContactPersonEmail = "jane.doe@test.com",
+                                    SubsidiaryDetails = new List<SubsidiaryDetails>()
+                                }
                             });
 
         // Act
-        var result = await _organisationController.GetOrganisationsDetails(
+        var result = await organisationController.GetOrganisationsDetails(
             createdOrModifiedAfter: createdOrModifiedAfter,
             financialYear: financialYear) as ObjectResult;
 
@@ -73,23 +86,24 @@ public class OrganisationsControllerTests
         result?.StatusCode.Should().Be((int)HttpStatusCode.OK);
         result?.Value.Should().BeOfType<OrganisationsDetailsResponse>();
 
-        var response = result.Value as OrganisationsDetailsResponse;
-        response.OrganisationsDetails.Should().NotBeNullOrEmpty();
-        response.OrganisationsDetails.Count.Should().Be(1);
-        response.OrganisationsDetails[0].OrganisationId.Should().Be("12345");
-        response.OrganisationsDetails[0].OrganisationName.Should().Be("Test Org");
+        var response = result!.Value as OrganisationsDetailsResponse;
+        result.Should().NotBeNull();
+        response!.OrganisationsDetails.Should().NotBeNullOrEmpty();
+        response!.OrganisationsDetails.Count.Should().Be(1);
+        response!.OrganisationsDetails[0].OrganisationId.Should().Be("12345");
+        response!.OrganisationsDetails[0].OrganisationName.Should().Be("Test Org");
     }
 
     [TestMethod]
     public async Task GetOrganisationsDetails_Empty()
     {
         // Arrange
-        this._organisationServiceMock
+        this.organisationServiceMock
            .Setup(service => service.GetOrganisationsDetails(It.IsAny<CancellationToken>(), It.IsAny<string?>(), It.IsAny<int?>()))
            .ReturnsAsync(new List<OrganisationDetails>());
 
         // Act
-        var result = await _organisationController.GetOrganisationsDetails(
+        var result = await organisationController.GetOrganisationsDetails(
             createdOrModifiedAfter: "2021-01-30",
             financialYear: "2021-22") as ObjectResult;
 
@@ -101,12 +115,12 @@ public class OrganisationsControllerTests
     [TestMethod]
     public async Task GetOrganisationsDetails_Error()
     {
-        this._organisationServiceMock
+        this.organisationServiceMock
             .Setup(x => x.GetOrganisationsDetails(It.IsAny<CancellationToken>(), It.IsAny<string?>(), It.IsAny<int?>()))
             .ThrowsAsync(new HttpRequestException("InternalServerError exception", null, HttpStatusCode.InternalServerError));
 
         // Act
-        var result = await this._organisationController.GetOrganisationsDetails(
+        var result = await this.organisationController.GetOrganisationsDetails(
             createdOrModifiedAfter: null,
             financialYear: null) as ActionResult;
 
@@ -123,7 +137,7 @@ public class OrganisationsControllerTests
     [DataRow("40-13-2025")]
     public async Task GetOrganisationsDetails_InvalidCreatedOrModifiedAfter(string createdOrModifiedAfter)
     {
-        var result = await this._organisationController.GetOrganisationsDetails(
+        var result = await this.organisationController.GetOrganisationsDetails(
             createdOrModifiedAfter: createdOrModifiedAfter,
             financialYear: null) as BadRequestObjectResult;
 
@@ -140,7 +154,7 @@ public class OrganisationsControllerTests
     [DataRow("2025")]
     public async Task GetOrganisationsDetails_InvalidFinancialYear(string financialYear)
     {
-        var result = await this._organisationController.GetOrganisationsDetails(
+        var result = await this.organisationController.GetOrganisationsDetails(
             createdOrModifiedAfter: null,
             financialYear: "bad") as BadRequestObjectResult;
 

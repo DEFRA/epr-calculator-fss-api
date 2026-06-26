@@ -18,42 +18,42 @@ namespace EPR.Calculator.FSS.API.UnitTests.Controllers;
 [TestClass]
 public class BillingControllerTests
 {
-    private Mock<IValidator<int>> _mockRunIdValidator = new();
-    private Mock<IBlobStorageService> _mockBlobStorageService = new();
-    private IFixture _fixture = null!;
-    private BillingController _billingControllerUnderTest;
+    private readonly Mock<IValidator<int>> mockRunIdValidator = new();
+    private readonly Mock<IBlobStorageService> mockBlobStorageService = new();
+    private IFixture fixture = null!;
+    private BillingController billingControllerUnderTest = null!;
 
     [TestInitialize]
     public void Setup()
     {
-        _fixture = new Fixture().Customize(new AutoMoqCustomization());
+        fixture = new Fixture().Customize(new AutoMoqCustomization());
 
-        _billingControllerUnderTest = new BillingController(
-            this._mockBlobStorageService.Object,
+        billingControllerUnderTest = new BillingController(
+            mockBlobStorageService.Object,
             new TelemetryClient(new TelemetryConfiguration
             {
                 TelemetryChannel = new Microsoft.ApplicationInsights.Channel.InMemoryChannel(),
                 DisableTelemetry = true,
             }),
-            _mockRunIdValidator.Object);
+            mockRunIdValidator.Object);
     }
 
     [TestMethod]
     public async Task CallGetBillingsDetails_Success()
     {
         // Arrange
-        var runId = _fixture.Create<int>();
+        var runId = fixture.Create<int>();
         var expectedFileName = BillingFileNameHelper.Create(runId);
 
-        _mockRunIdValidator.Setup(v => v.Validate(runId)).Returns(new ValidationResult());
+        mockRunIdValidator.Setup(v => v.Validate(runId)).Returns(new ValidationResult());
 
         var billingsDetails = new FileStreamResult(new MemoryStream(), "application/json");
 
-        _mockBlobStorageService.Setup(service => service.GetFileContents(expectedFileName))
+        mockBlobStorageService.Setup(service => service.GetFileContents(expectedFileName))
             .ReturnsAsync(billingsDetails);
 
         // Act
-        IActionResult result = await _billingControllerUnderTest.GetBillingsDetails(runId);
+        IActionResult result = await billingControllerUnderTest.GetBillingsDetails(runId);
 
         // Assert
         using (new AssertionScope())
@@ -64,7 +64,7 @@ public class BillingControllerTests
 
             fileResult.Should().BeSameAs(billingsDetails);
 
-            _mockBlobStorageService.Verify(
+            mockBlobStorageService.Verify(
                 service => service.GetFileContents(expectedFileName),
                 Times.Once);
         }
@@ -74,7 +74,7 @@ public class BillingControllerTests
     public async Task CallGetBillingsDetails_Returns400WhenValidationFails()
     {
         // Arrange
-        var runId = _fixture.Create<int>();
+        var runId = fixture.Create<int>();
         var expectedFileName = BillingFileNameHelper.Create(runId);
 
         var validationFailures = new List<ValidationFailure>
@@ -82,16 +82,16 @@ public class BillingControllerTests
             new("RunId", "RunId is invalid")
         };
 
-        _mockRunIdValidator.Setup(v => v.Validate(runId))
+        mockRunIdValidator.Setup(v => v.Validate(runId))
             .Returns(new ValidationResult(validationFailures));
 
         var billingsDetails = new FileStreamResult(new MemoryStream(), "application/json");
 
-        _mockBlobStorageService.Setup(service => service.GetFileContents(expectedFileName))
+        mockBlobStorageService.Setup(service => service.GetFileContents(expectedFileName))
             .ReturnsAsync(billingsDetails);
 
         // Act
-        IActionResult result = await _billingControllerUnderTest.GetBillingsDetails(runId);
+        IActionResult result = await billingControllerUnderTest.GetBillingsDetails(runId);
 
         // Assert
         using (new AssertionScope())
@@ -99,8 +99,8 @@ public class BillingControllerTests
             var badRequestResult = result.Should().BeOfType<BadRequestObjectResult>().Which;
             var problemDetails = badRequestResult.Value.Should().BeOfType<ProblemDetails>().Which;
             problemDetails.Detail.Should().Be("RunId is invalid");
-            _mockRunIdValidator.Verify(v => v.Validate(runId), Times.Once());
-            _mockBlobStorageService.Verify(service => service.GetFileContents(expectedFileName), Times.Never);
+            mockRunIdValidator.Verify(v => v.Validate(runId), Times.Once());
+            mockBlobStorageService.Verify(service => service.GetFileContents(expectedFileName), Times.Never);
         }
     }
 
@@ -115,15 +115,15 @@ public class BillingControllerTests
     public async Task CallGetBillingsDetails_Return400WhenBillingsNotFound(Type exceptionType)
     {
         // Arrange
-        var runId = _fixture.Create<int>();
+        var runId = fixture.Create<int>();
         var expectedFileName = BillingFileNameHelper.Create(runId);
 
-        _mockRunIdValidator.Setup(v => v.Validate(runId)).Returns(new ValidationResult());
-        _mockBlobStorageService.Setup(service => service.GetFileContents(expectedFileName))
+        mockRunIdValidator.Setup(v => v.Validate(runId)).Returns(new ValidationResult());
+        mockBlobStorageService.Setup(service => service.GetFileContents(expectedFileName))
             .Throws((Exception)Activator.CreateInstance(exceptionType)!);
 
         // Act
-        IActionResult result = await _billingControllerUnderTest.GetBillingsDetails(runId);
+        IActionResult result = await billingControllerUnderTest.GetBillingsDetails(runId);
 
         // Assert
         Assert.IsInstanceOfType<NotFoundObjectResult>(result);
@@ -142,15 +142,15 @@ public class BillingControllerTests
     public async Task CallGetBillingsDetails_Return500WhenServiceThrowsException(Type exceptionType)
     {
         // Arrange
-        var runId = _fixture.Create<int>();
+        var runId = fixture.Create<int>();
         var expectedFileName = BillingFileNameHelper.Create(runId);
 
-        _mockRunIdValidator.Setup(v => v.Validate(runId)).Returns(new ValidationResult());
-        _mockBlobStorageService.Setup(service => service.GetFileContents(expectedFileName))
+        mockRunIdValidator.Setup(v => v.Validate(runId)).Returns(new ValidationResult());
+        mockBlobStorageService.Setup(service => service.GetFileContents(expectedFileName))
             .Throws((Exception)Activator.CreateInstance(exceptionType)!);
 
         // Act
-        IActionResult result = await _billingControllerUnderTest.GetBillingsDetails(runId);
+        IActionResult result = await billingControllerUnderTest.GetBillingsDetails(runId);
 
         // Assert
         using (new AssertionScope())

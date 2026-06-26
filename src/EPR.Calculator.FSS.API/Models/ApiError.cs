@@ -2,13 +2,13 @@
 
 public class ApiError
 {
-    public string Error { get; set; }
+    public required string Error { get; set; }
 
-    public string Message { get; set; }
+    public required string Message { get; set; }
 
-    public string Description { get; set; }
+    public required string Description { get; set; }
 
-    public int StatusCode { get; set; }
+    public required int StatusCode { get; set; }
 
-    public string ErrorCode { get; set; }
+    public required string ErrorCode { get; set; }
 }

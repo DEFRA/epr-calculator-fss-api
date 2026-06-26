@@ -10,6 +10,7 @@ namespace EPR.Calculator.FSS.API.Controllers;
 /// Controller for the API to retrieve Organization Details.
 /// </summary>
 [ApiController]
+[Route("api/v1")]
 public class OrganisationsController(
     IOrganisationService organisationService,
     OrganisationSearchFilterValidator organisationSearchFilterValidator,
@@ -19,7 +20,7 @@ public class OrganisationsController(
     private const string ErrorMessage = "Error Getting the Organisation details";
 
     [HttpGet]
-    [Route("api/v1/organisations-details")]
+    [Route("organisations-details")]
     [Consumes("application/json")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]

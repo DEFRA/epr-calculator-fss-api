@@ -27,7 +27,8 @@ public class OrganisationSearchFilterValidator : AbstractValidator<OrganisationS
             DateTimeStyles.None,
             out _);
 
-    private static bool BeValidFinancialYear(string value) =>
+    private static bool BeValidFinancialYear(string? value) =>
+        value is not null &&
         value.Length == 7 &&
         value[4] == '-' &&
         int.TryParse(value[..4], out var start) &&

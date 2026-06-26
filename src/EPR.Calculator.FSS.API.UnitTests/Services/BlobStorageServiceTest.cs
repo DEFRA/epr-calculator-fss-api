@@ -9,12 +9,12 @@ namespace EPR.Calculator.FSS.API.UnitTests.Services
     [TestClass]
     public class BlobStorageServiceTest
     {
-        private BlobStorageService blobStorageService;
-        private Mock<BlobServiceClient> mockBlobServiceClient;
-        private Mock<BlobContainerClient> mockBlobContainerClient;
-        private Mock<BlobContainerClient> mockTestBlobContainerClient;
-        private Mock<BlobClient> mockBlobClient;
-        private Mock<BlobClient> mockTestBlobClient;
+        private BlobStorageService blobStorageService = null!;
+        private Mock<BlobServiceClient> mockBlobServiceClient = null!;
+        private Mock<BlobContainerClient> mockBlobContainerClient = null!;
+        private Mock<BlobContainerClient> mockTestBlobContainerClient = null!;
+        private Mock<BlobClient> mockBlobClient = null!;
+        private Mock<BlobClient> mockTestBlobClient = null!;
 
         public TestContext TestContext { get; set; }
 

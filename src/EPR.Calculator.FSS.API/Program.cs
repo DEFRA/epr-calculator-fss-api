@@ -102,4 +102,4 @@ app.MapControllers();
 
 app.MapHealthChecks("/admin/health", HealthCheckOptionsBuilder.Build()).AllowAnonymous();
 
-app.Run();
+await app.RunAsync();

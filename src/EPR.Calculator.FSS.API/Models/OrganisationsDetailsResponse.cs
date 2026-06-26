@@ -2,5 +2,5 @@
 
 public class OrganisationsDetailsResponse
 {
-    public IList<OrganisationDetails> OrganisationsDetails { get; set; } = new List<OrganisationDetails>();
+    public required IList<OrganisationDetails> OrganisationsDetails { get; set; }
 }

@@ -5,7 +5,7 @@ namespace EPR.Calculator.FSS.API.Models;
 [ExcludeFromCodeCoverage]
 public class OrganisationSearchFilter
 {
-    public string? CreatedOrModifiedAfter { get; set; }
+    public required string? CreatedOrModifiedAfter { get; set; }
 
-    public string? FinancialYear { get; set; }
+    public required string? FinancialYear { get; set; }
 }

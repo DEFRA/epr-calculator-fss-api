@@ -2,9 +2,9 @@
 
 public class SubsidiaryDetails
 {
-    required public string SubsidiaryId { get; set; }
+    public required string SubsidiaryId { get; set; }
 
-    public string? SubsidiaryName { get; set; }
+    public required string? SubsidiaryName { get; set; }
 
-    public string? SubsidiaryTradingName { get; set; }
+    public required string? SubsidiaryTradingName { get; set; }
 }

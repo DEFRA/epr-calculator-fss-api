@@ -31,8 +31,6 @@ variables:
     value: 'EPR.Calculator.FSS.API'
   - name: testProjectFolder
     value: 'EPR.Calculator.FSS.API.UnitTests'
-  - name: DataFolder
-    value: 'EPR.Calculator.FSS.API.Data'
   - name: sonarQubeProjectKey
     value: epr-calculator-fss-api
   - name: sonarQubeProjectName
@@ -58,7 +56,6 @@ extends:
   parameters:
     solutionFolder: ${{ variables.solutionFolder }}
     projectFolder: ${{ variables.projectFolder }}
-    DataFolder: ${{ variables.DataFolder }}
     testProjectFolder: ${{ variables.testProjectFolder }}
     sonarQubeProjectKey: ${{ variables.sonarQubeProjectKey }}
     sonarQubeProjectName: ${{ variables.sonarQubeProjectName }}
