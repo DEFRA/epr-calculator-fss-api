@@ -14,11 +14,15 @@ public class OrganisationService(
     ILogger<OrganisationService> logger)
     : IOrganisationService
 {
-    public async Task<IReadOnlyCollection<OrganisationDetails>> GetOrganisationsDetails(CancellationToken cancellationToken, string? createdOrModifiedAfter = null, int? relativeYear = null)
+
+    public async Task<IReadOnlyCollection<OrganisationDetails>> GetOrganisationsDetails(
+        CancellationToken cancellationToken,
+        string? createdOrModifiedAfter = null,
+        int? relativeYear = null)
     {
         var organisationsList = new List<OrganisationDetails>();
 
-        const string sql = "EXECUTE [dbo].[GetLatestAcceptedGrantedOrgData] @createdOrModifiedAfter @relativeYear";
+        const string sql = "EXECUTE [dbo].[GetLatestAcceptedGrantedOrgData] @createdOrModifiedAfter, @relativeYear";
 
         var parameters = new[]
         {
@@ -26,30 +30,65 @@ public class OrganisationService(
             new SqlParameter("@relativeYear", SqlDbType.NVarChar) { Value = relativeYear },
         };
 
-        var acceptedGrantedOrgDataResponse = await synapseDbContext.RunSqlAsync<AcceptedGrantedOrgDataResponseModel>(sql, cancellationToken, parameters);
+        var acceptedGrantedOrgDataResponse = await synapseDbContext
+            .RunSqlAsync<AcceptedGrantedOrgDataResponseModel>(sql, cancellationToken, parameters);
 
         var organisationsLookup = acceptedGrantedOrgDataResponse
             .Where(x => x.OrganisationId is not null)
-            .ToLookup(x => x.OrganisationId!.Value);
+            .Select(x => new
+            {
+                Data = x,
+                SubsidiaryId = string.IsNullOrWhiteSpace(x.SubsidiaryId)
+                    ? null
+                    : x.SubsidiaryId,
+            })
+            .ToLookup(x => new
+            {
+                OrganisationId = x.Data.OrganisationId!.Value,
+                x.Data.RelativeYear,
+            });
 
-        foreach (var organisationId in organisationsLookup.Select(x => x.Key))
+        foreach (var organisationKey in organisationsLookup.Select(x => x.Key))
         {
-            var parent = organisationsLookup[organisationId]
-                .FirstOrDefault(o => string.IsNullOrWhiteSpace(o.SubsidiaryId));
+            var organisationRecords = organisationsLookup[organisationKey];
+
+            var parent = organisationRecords
+                .Where(x => x.SubsidiaryId is null)
+                .OrderByDescending(x => DateTimeOffset.Parse(x.Data.DecisionDate, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind))
+                .Select(x => x.Data)
+                .FirstOrDefault();
 
             if (parent is null)
             {
-                logger.LogWarning("Parent organisation not found for organisation_id {OrganisationId}. Skipping this organisation.", organisationId);
+                logger.LogWarning(
+                    "Parent organisation not found for organisation_id {OrganisationId} and relative_year {RelativeYear}. Skipping.",
+                    organisationKey.OrganisationId,
+                    organisationKey.RelativeYear);
+
                 continue;
             }
 
+            var subsidiaries = organisationRecords
+                .Where(x => !string.IsNullOrWhiteSpace(x.SubsidiaryId))
+                .Select(x => x.Data)
+                .Select(x => new SubsidiaryDetails
+                {
+                    SubsidiaryId = x.SubsidiaryId!,
+                    SubsidiaryName = x.OrganisationName,
+                    SubsidiaryTradingName = x.TradingName,
+                    FinancialYear = ToFinancialYear(x.RelativeYear),
+                })
+                .ToList();
+
             organisationsList.Add(new OrganisationDetails
             {
-                OrganisationId = organisationId.ToString(CultureInfo.InvariantCulture),
+                OrganisationId = organisationKey.OrganisationId.ToString(CultureInfo.InvariantCulture),
+                FinancialYear = ToFinancialYear(parent.RelativeYear),
                 OrganisationName = parent.OrganisationName,
                 OrganisationTradingName = parent.TradingName,
                 CompaniesHouseNumber = parent.CompaniesHouseNumber,
                 HomeNationCode = parent.HomeNationCode,
+
                 ServiceOfNoticeAddrLine1 = parent.ServiceOfNoticeAddrLine1,
                 ServiceOfNoticeAddrLine2 = parent.ServiceOfNoticeAddrLine2,
                 ServiceOfNoticeAddrCity = parent.ServiceOfNoticeAddrCity,
@@ -57,26 +96,29 @@ public class OrganisationService(
                 ServiceOfNoticeAddrCountry = parent.ServiceOfNoticeAddrCountry,
                 ServiceOfNoticeAddrPostcode = parent.ServiceOfNoticeAddrPostcode,
                 ServiceOfNoticeAddrPhoneNumber = parent.ServiceOfNoticeAddrPhoneNumber,
+
                 SoleTraderFirstName = parent.SoleTraderFirstName,
                 SoleTraderLastName = parent.SoleTraderLastName,
                 SoleTraderPhoneNumber = parent.SoleTraderPhoneNumber,
                 SoleTraderEmail = parent.SoleTraderEmail,
+
                 PrimaryContactPersonFirstName = parent.PrimaryContactPersonFirstName,
                 PrimaryContactPersonLastName = parent.PrimaryContactPersonLastName,
                 PrimaryContactPersonPhoneNumber = parent.PrimaryContactPersonPhoneNumber,
                 PrimaryContactPersonEmail = parent.PrimaryContactPersonEmail,
-                SubsidiaryDetails = organisationsLookup[organisationId]
-                    .Where(x => x.SubsidiaryId is not null)
-                    .Select(s => new SubsidiaryDetails
-                    {
-                        SubsidiaryId = s.SubsidiaryId!,
-                        SubsidiaryName = s.OrganisationName,
-                        SubsidiaryTradingName = s.TradingName,
-                    })
-                    .ToList(),
+
+                SubsidiaryDetails = subsidiaries,
             });
         }
 
-        return organisationsList.AsReadOnly();
+        return organisationsList
+            .OrderBy(x => long.Parse(x.OrganisationId, CultureInfo.InvariantCulture))
+            .ThenBy(x => x.FinancialYear)
+            .ToList()
+            .AsReadOnly();
     }
+
+    private static string ToFinancialYear(int relativeYear) =>
+        $"{relativeYear}-{(relativeYear + 1) % 100:D2}";
+
 }

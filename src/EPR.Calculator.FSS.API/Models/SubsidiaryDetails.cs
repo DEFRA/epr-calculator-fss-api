@@ -1,10 +1,14 @@
-﻿namespace EPR.Calculator.FSS.API.Models;
+﻿using Microsoft.VisualBasic;
 
-public class SubsidiaryDetails
+namespace EPR.Calculator.FSS.API.Models;
+
+public record SubsidiaryDetails
 {
-    public required string SubsidiaryId { get; set; }
+    public required string SubsidiaryId { get; init; }
 
-    public required string? SubsidiaryName { get; set; }
+    public required string? SubsidiaryName { get; init; }
 
-    public required string? SubsidiaryTradingName { get; set; }
+    public required string? SubsidiaryTradingName { get; init; }
+
+    public required string FinancialYear { get; init; }
 }

@@ -1,6 +1,6 @@
 ﻿namespace EPR.Calculator.FSS.API.Models;
 
-public class OrganisationsDetailsResponse
+public record    OrganisationsDetailsResponse
 {
-    public required IList<OrganisationDetails> OrganisationsDetails { get; set; }
+    public required IList<OrganisationDetails> OrganisationsDetails { get; init; }
 }

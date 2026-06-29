@@ -52,8 +52,9 @@ public class OrganisationsControllerTests
                             {
                                 new OrganisationDetails
                                 {
-                                        OrganisationId = "12345",
-                                        OrganisationName = "Test Org",
+                                    OrganisationId = "12345",
+                                    FinancialYear = "2024-25",
+                                    OrganisationName = "Test Org",
                                     OrganisationTradingName = "Test Trading",
                                     CompaniesHouseNumber = "12345678",
                                     HomeNationCode = "EN",

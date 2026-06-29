@@ -1,69 +1,75 @@
-﻿namespace EPR.Calculator.FSS.API.Data.Entities;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
-using System.ComponentModel.DataAnnotations.Schema;
+namespace EPR.Calculator.FSS.API.Data.Entities;
 
-public class AcceptedGrantedOrgDataResponseModel
+public record AcceptedGrantedOrgDataResponseModel
 {
     [Column("organisation_id")]
-    public int? OrganisationId { get; set; }
+    public required int? OrganisationId { get; init; }
 
     [Column("subsidiary_id")]
-    public string? SubsidiaryId { get; set; }
+    public required string? SubsidiaryId { get; init; }
 
     [Column("organisation_name")]
-    public string? OrganisationName { get; set; }
+    public required string? OrganisationName { get; init; }
 
     [Column("trading_name")]
-    public string? TradingName { get; set; }
+    public required string? TradingName { get; init; }
+
+    [Column("relative_year")]
+    public required int RelativeYear { get; init; }
 
     [Column("companies_house_number")]
-    public string? CompaniesHouseNumber { get; set; }
+    public required string? CompaniesHouseNumber { get; init; }
 
     [Column("home_nation_code")]
-    public string? HomeNationCode { get; set; }
+    public required string? HomeNationCode { get; init; }
 
     [Column("service_of_notice_addr_line1")]
-    public string? ServiceOfNoticeAddrLine1 { get; set; }
+    public required string? ServiceOfNoticeAddrLine1 { get; init; }
 
     [Column("service_of_notice_addr_line2")]
-    public string? ServiceOfNoticeAddrLine2 { get; set; }
+    public required string? ServiceOfNoticeAddrLine2 { get; init; }
 
     [Column("service_of_notice_addr_city")]
-    public string? ServiceOfNoticeAddrCity { get; set; }
+    public required string? ServiceOfNoticeAddrCity { get; init; }
 
     [Column("service_of_notice_addr_county")]
-    public string? ServiceOfNoticeAddrCounty { get; set; }
+    public required string? ServiceOfNoticeAddrCounty { get; init; }
 
     [Column("service_of_notice_addr_country")]
-    public string? ServiceOfNoticeAddrCountry { get; set; }
+    public required string? ServiceOfNoticeAddrCountry { get; init; }
 
     [Column("service_of_notice_addr_postcode")]
-    public string? ServiceOfNoticeAddrPostcode { get; set; }
+    public required string? ServiceOfNoticeAddrPostcode { get; init; }
 
     [Column("service_of_notice_addr_phone_number")]
-    public string? ServiceOfNoticeAddrPhoneNumber { get; set; }
+    public required string? ServiceOfNoticeAddrPhoneNumber { get; init; }
 
     [Column("sole_trader_first_name")]
-    public string? SoleTraderFirstName { get; set; }
+    public required string? SoleTraderFirstName { get; init; }
 
     [Column("sole_trader_last_name")]
-    public string? SoleTraderLastName { get; set; }
+    public required string? SoleTraderLastName { get; init; }
 
     [Column("sole_trader_phone_number")]
-    public string? SoleTraderPhoneNumber { get; set; }
+    public required string? SoleTraderPhoneNumber { get; init; }
 
     [Column("sole_trader_email")]
-    public string? SoleTraderEmail { get; set; }
+    public required string? SoleTraderEmail { get; init; }
 
     [Column("primary_contact_person_first_name")]
-    public string? PrimaryContactPersonFirstName { get; set; }
+    public required string? PrimaryContactPersonFirstName { get; init; }
 
     [Column("primary_contact_person_last_name")]
-    public string? PrimaryContactPersonLastName { get; set; }
+    public required string? PrimaryContactPersonLastName { get; init; }
 
     [Column("primary_contact_person_phone_number")]
-    public string? PrimaryContactPersonPhoneNumber { get; set; }
+    public required string? PrimaryContactPersonPhoneNumber { get; init; }
 
     [Column("primary_contact_person_email")]
-    public string? PrimaryContactPersonEmail { get; set; }
+    public required string? PrimaryContactPersonEmail { get; init; }
+
+    [Column("Decision_Date")]
+    public required string DecisionDate { get; init; }
 }

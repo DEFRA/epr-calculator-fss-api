@@ -1,14 +1,14 @@
 ﻿namespace EPR.Calculator.FSS.API.Models;
 
-public class ApiError
+public record ApiError
 {
-    public required string Error { get; set; }
+    public required string Error { get; init; }
 
-    public required string Message { get; set; }
+    public required string Message { get; init; }
 
-    public required string Description { get; set; }
+    public required string Description { get; init; }
 
-    public required int StatusCode { get; set; }
+    public required int StatusCode { get; init; }
 
-    public required string ErrorCode { get; set; }
+    public required string ErrorCode { get; init; }
 }
