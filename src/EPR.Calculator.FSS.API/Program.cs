@@ -1,10 +1,9 @@
 ﻿using Azure.Storage.Blobs;
 using EPR.Calculator.FSS.API;
-using EPR.Calculator.FSS.API.Common;
 using EPR.Calculator.FSS.API.Common.Data;
 using EPR.Calculator.FSS.API.Common.Services;
 using EPR.Calculator.FSS.API.Common.Validators;
-using EPR.Calculator.FSS.API.Constants;
+using EPR.Calculator.FSS.API.Configs;
 using EPR.Calculator.FSS.API.HealthCheck;
 using EPR.Calculator.FSS.API.Validators;
 using FluentValidation;
@@ -25,6 +24,7 @@ if (builder.Environment.IsDevelopment())
 // Add services to the container.
 
 builder.Services.AddControllers();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddApplicationInsightsTelemetry();
@@ -33,7 +33,6 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddFluentValidationClientsideAdapters();
-builder.Services.AddScoped<IBillingService, BillingService>();
 builder.Services.AddScoped<IBlobStorageService, BlobStorageService>();
 builder.Services.AddScoped<IOrganisationService, OrganisationService>();
 
@@ -47,6 +46,9 @@ builder.Services.AddDbContext<SynapseDbContext>(options =>
 // Configure blob storage settings.
 builder.Services.Configure<BlobStorageSettings>(
     builder.Configuration.GetSection("BlobStorage"));
+
+builder.Services.Configure<FeatureManagementSettings>(
+    builder.Configuration.GetSection(FeatureManagementSettings.SectionName));
 
 builder.Services.AddSingleton<BlobServiceClient>(provider =>
 {
@@ -79,6 +81,8 @@ builder.Services.Configure<GzipCompressionProviderOptions>(options =>
     options.Level = CompressionLevel.SmallestSize;
 });
 
+builder.Services.AddRequestDecompression();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -93,6 +97,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.UseResponseCompression();
+app.UseRequestDecompression();
 
 app.MapControllers();
 

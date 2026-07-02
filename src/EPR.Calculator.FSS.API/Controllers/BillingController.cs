@@ -1,5 +1,6 @@
 ﻿using EPR.Calculator.FSS.API.Common;
 using EPR.Calculator.FSS.API.Common.Properties;
+using EPR.Calculator.FSS.API.Helpers;
 using FluentValidation;
 using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Mvc;
@@ -12,12 +13,12 @@ namespace EPR.Calculator.FSS.API.Controllers
     /// <summary>
     /// Controller for the API to retrieve billings files.
     /// </summary>
-    /// <param name="billingService">A service object that implements <see cref="IBillingService"/>.</param>
+    /// <param name="blobStorageService">A service object that implements <see cref="IBlobStorageService"/>.</param>
     /// <param name="telemetryClient">A <see cref="TelemetryClient"/>.</param>
     /// <param name="runIdValidator">A validator for the run ID.</param>
     [Route("api/[controller]")]
     public class BillingController(
-        IBillingService billingService,
+        IBlobStorageService blobStorageService,
         TelemetryClient telemetryClient,
         IValidator<int> runIdValidator)
         : Controller
@@ -28,7 +29,7 @@ namespace EPR.Calculator.FSS.API.Controllers
         private static readonly CompositeFormat BillingDataRetrieved
             = CompositeFormat.Parse(Resources.BillingDataRetrieved);
 
-        private IBillingService BillingService { get; init; } = billingService;
+        private IBlobStorageService BlobStorageService { get; init; } = blobStorageService;
 
         private IValidator<int> RunIdValidator { get; init; } = runIdValidator;
 
@@ -59,16 +60,17 @@ namespace EPR.Calculator.FSS.API.Controllers
                     });
                 }
 
-                var billingData = await this.BillingService.GetBillingData(calculatorRunId);
+                var fileName = BillingFileNameHelper.Create(calculatorRunId);
+                var billingData = await this.BlobStorageService.GetFileContents(fileName);
 
                 this.TelemetryClient.TrackTrace(string.Format(
                     CultureInfo.CurrentCulture,
                     BillingDataRetrieved,
                     calculatorRunId,
                     DateTime.UtcNow,
-                    billingData.Length));
+                    billingData.FileStream.Length));
 
-                return Content(billingData, MediaTypeNames.Application.Json);
+                return billingData;
             }
             catch (Exception ex) when (ex is FileNotFoundException)
             {
