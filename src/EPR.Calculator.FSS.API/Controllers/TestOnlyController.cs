@@ -23,7 +23,7 @@ namespace EPR.Calculator.FSS.API.Controllers
         [Route("billingDetails")]
         [Consumes(MediaTypeNames.Application.Json)]
         [SuppressMessage("Security", "S5693", Justification = "Required to support large billing JSON uploads during testing.")]
-        [RequestSizeLimit(150_000_000)]
+        [RequestSizeLimit(1_500_000_000)]
         public async Task<IActionResult> UploadBillingDetails(
             [FromQuery] int calculatorRunId,
             [FromServices] IOptions<FeatureManagementSettings> featureManagementSettings)
