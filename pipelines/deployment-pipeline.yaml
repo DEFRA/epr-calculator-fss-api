@@ -68,7 +68,7 @@ variables:
 resources:
   repositories:
     - repository: CommonTemplates
-      name: RWD-CPR-EPR4P-ADO/epr-webapps-code-deploy-templates
+      name: defra/epr-webapps-code-deploy-templates
       type: git
       ref: main
 
