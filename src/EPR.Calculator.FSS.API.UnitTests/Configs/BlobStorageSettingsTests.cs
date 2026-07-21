@@ -2,58 +2,57 @@
 
 using EPR.Calculator.FSS.API.Configs;
 
-namespace EPR.Calculator.FSS.API.UnitTests.Configs
+namespace EPR.Calculator.FSS.API.UnitTests.Configs;
+
+[TestClass]
+public class BlobStorageSettingsTests
 {
-    [TestClass]
-    public class BlobStorageSettingsTests
+    public BlobStorageSettingsTests()
     {
-        public BlobStorageSettingsTests()
-        {
-            Fixture = new Fixture();
-            this.TestClass = new BlobStorageSettings();
-        }
+        Fixture = new Fixture();
+        this.TestClass = new BlobStorageSettings();
+    }
 
-        private BlobStorageSettings TestClass { get; init; }
+    private BlobStorageSettings TestClass { get; init; }
 
-        private IFixture Fixture { get; init; }
+    private IFixture Fixture { get; init; }
 
-        [TestMethod]
-        public void CanSetAndGetConnectionString()
-        {
-            // Arrange
-            var testValue = Fixture.Create<string>();
+    [TestMethod]
+    public void CanSetAndGetConnectionString()
+    {
+        // Arrange
+        var testValue = Fixture.Create<string>();
 
-            // Act
-            this.TestClass.ConnectionString = testValue;
+        // Act
+        this.TestClass.ConnectionString = testValue;
 
-            // Assert
-            Assert.AreEqual(testValue, this.TestClass.ConnectionString);
-        }
+        // Assert
+        Assert.AreEqual(testValue, this.TestClass.ConnectionString);
+    }
 
-        [TestMethod]
-        public void CanSetAndGetContainerName()
-        {
-            // Arrange
-            var testValue = Fixture.Create<string>();
+    [TestMethod]
+    public void CanSetAndGetContainerName()
+    {
+        // Arrange
+        var testValue = Fixture.Create<string>();
 
-            // Act
-            this.TestClass.ContainerName = testValue;
+        // Act
+        this.TestClass.ContainerName = testValue;
 
-            // Assert
-            Assert.AreEqual(testValue, this.TestClass.ContainerName);
-        }
+        // Assert
+        Assert.AreEqual(testValue, this.TestClass.ContainerName);
+    }
 
-        [TestMethod]
-        public void CanSetAndGetCsvFileName()
-        {
-            // Arrange
-            var testValue = Fixture.Create<string>();
+    [TestMethod]
+    public void CanSetAndGetCsvFileName()
+    {
+        // Arrange
+        var testValue = Fixture.Create<string>();
 
-            // Act
-            this.TestClass.CsvFileName = testValue;
+        // Act
+        this.TestClass.CsvFileName = testValue;
 
-            // Assert
-            Assert.AreEqual(testValue, this.TestClass.CsvFileName);
-        }
+        // Assert
+        Assert.AreEqual(testValue, this.TestClass.CsvFileName);
     }
 }

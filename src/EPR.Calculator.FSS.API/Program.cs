@@ -1,17 +1,16 @@
-﻿using Azure.Storage.Blobs;
+﻿using System.Configuration;
+using System.IO.Compression;
+using Azure.Storage.Blobs;
 using EPR.Calculator.FSS.API;
-using EPR.Calculator.FSS.API.Common.Data;
-using EPR.Calculator.FSS.API.Common.Services;
-using EPR.Calculator.FSS.API.Common.Validators;
 using EPR.Calculator.FSS.API.Configs;
+using EPR.Calculator.FSS.API.Data;
 using EPR.Calculator.FSS.API.HealthCheck;
+using EPR.Calculator.FSS.API.Services;
 using EPR.Calculator.FSS.API.Validators;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
-using System.Configuration;
-using System.IO.Compression;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -103,4 +102,4 @@ app.MapControllers();
 
 app.MapHealthChecks("/admin/health", HealthCheckOptionsBuilder.Build()).AllowAnonymous();
 
-app.Run();
+await app.RunAsync();

@@ -1,11 +1,8 @@
-﻿namespace EPR.Calculator.FSS.API.Common.Data;
-
-using EPR.Calculator.FSS.API.Common.Data.Entities;
+﻿using System.Diagnostics.CodeAnalysis;
+using EPR.Calculator.FSS.API.Data.Entities;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Threading.Tasks;
+
+namespace EPR.Calculator.FSS.API.Data;
 
 [ExcludeFromCodeCoverage]
 public class SynapseDbContext : DbContext
@@ -21,10 +18,15 @@ public class SynapseDbContext : DbContext
 
     public DbSet<AcceptedGrantedOrgDataResponseModel> AcceptedGrantedOrgDataResponseModel { get; set; } = null!;
 
-    public virtual async Task<IList<TEntity>> RunSqlAsync<TEntity>(string sql, params object[] parameters)
+    public virtual async Task<IList<TEntity>> RunSqlAsync<TEntity>(
+        string sql,
+        CancellationToken cancellationToken,
+        params object[] parameters)
         where TEntity : class
     {
-        return await Set<TEntity>().FromSqlRaw(sql, parameters).AsAsyncEnumerable().ToListAsync();
+        return await Set<TEntity>()
+            .FromSqlRaw(sql, parameters)
+            .ToListAsync(cancellationToken);
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

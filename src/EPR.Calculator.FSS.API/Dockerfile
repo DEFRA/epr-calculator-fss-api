@@ -1,13 +1,13 @@
-FROM defradigital/dotnetcore-development:dotnet8.0 AS base
- 
+﻿FROM defradigital/dotnetcore-development:dotnet8.0 AS base
+
 USER root
 ARG PORT=8080
 ENV ASPNETCORE_URLS=http://*:${PORT}
 EXPOSE ${PORT}
- 
+
 RUN apk update && apk --no-cache add icu-libs
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=0
- 
+
 FROM defradigital/dotnetcore-development:dotnet8.0 AS build
 USER root
 
@@ -19,21 +19,7 @@ ENV PATH="${PATH}:/root/.dotnet/tools"
 
 WORKDIR /src
 COPY ["EPR.Calculator.FSS.API/EPR.Calculator.FSS.API.csproj", "EPR.Calculator.FSS.API/"]
-COPY EPR.Calculator.FSS.API.Common/. ./EPR.Calculator.FSS.API.Common/.
 
-# Copy the nuget.config and local package file
-COPY NuGet.Config ./NuGet.Config
-COPY Package ./Package
-COPY stylecop.json ./stylecop.json
-
-# Debugging steps
-RUN ls -la /src
-RUN ls -la /src/EPR.Calculator.FSS.API
-RUN ls -la /src/Package
-RUN cat /src/NuGet.Config
-
-# TODO - leaving in now, once confirmed app works from the image and data works correctly - this can be removed 
-#RUN dotnet restore "./EPR.Calculator.FSS.API/EPR.Calculator.FSS.API.csproj" --configfile ./NuGet.Config
 RUN dotnet restore "./EPR.Calculator.FSS.API/EPR.Calculator.FSS.API.csproj"
 
 # Copy the rest of the source code

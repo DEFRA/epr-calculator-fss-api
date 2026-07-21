@@ -1,10 +1,11 @@
-﻿namespace EPR.Calculator.FSS.API.Common.UnitTests.Services;
-
-using EPR.Calculator.FSS.API.Common.Data;
-using EPR.Calculator.FSS.API.Common.Data.Entities;
+﻿
+using EPR.Calculator.FSS.API.Data;
+using EPR.Calculator.FSS.API.Data.Entities;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using Moq;
+
+namespace EPR.Calculator.FSS.API.UnitTests.Services;
 
 [TestClass]
 public class OrganisationServiceTests
@@ -27,11 +28,11 @@ public class OrganisationServiceTests
         // Arrange
         var emptyData = new List<AcceptedGrantedOrgDataResponseModel>();
         _mockSynapseDbContext
-            .Setup(ctx => ctx.RunSqlAsync<AcceptedGrantedOrgDataResponseModel>(It.IsAny<string>(), It.IsAny<SqlParameter[]>()))
+            .Setup(ctx => ctx.RunSqlAsync<AcceptedGrantedOrgDataResponseModel>(It.IsAny<string>(), It.IsAny<CancellationToken>(), It.IsAny<SqlParameter[]>()))
             .ReturnsAsync(emptyData);
 
         // Act
-        var result = await _organisationService.GetOrganisationsDetails();
+        var result = await _organisationService.GetOrganisationsDetails(CancellationToken.None);
 
         // Assert
         Assert.IsNotNull(result);
@@ -47,6 +48,7 @@ public class OrganisationServiceTests
             new ()
             {
                 OrganisationId = 12345,
+                RelativeYear = 2025,
                 SubsidiaryId = null,
                 OrganisationName = "Example Organisation Ltd",
                 TradingName = "Example Trading Name",
@@ -67,10 +69,12 @@ public class OrganisationServiceTests
                 PrimaryContactPersonLastName = "Smith",
                 PrimaryContactPersonPhoneNumber = "+44 7911 654321",
                 PrimaryContactPersonEmail = "jane.smith@example.com",
+                DecisionDate = "2025-06-01T00:00:00.0000000Z"
             },
             new ()
             {
                 OrganisationId = 67890,
+                RelativeYear = 2025,
                 SubsidiaryId = null,
                 OrganisationName = "Example Organisation Ltd 2",
                 TradingName = "Trading Name 2",
@@ -91,15 +95,16 @@ public class OrganisationServiceTests
                 PrimaryContactPersonLastName = "Smitherson",
                 PrimaryContactPersonPhoneNumber = "+44 7911 123123",
                 PrimaryContactPersonEmail = "j.smitherson@example.com",
+                DecisionDate = "2025-06-01T00:00:00.0000000Z"
             },
         };
 
         _mockSynapseDbContext
-            .Setup(ctx => ctx.RunSqlAsync<AcceptedGrantedOrgDataResponseModel>(It.IsAny<string>(), It.IsAny<SqlParameter[]>()))
+            .Setup(ctx => ctx.RunSqlAsync<AcceptedGrantedOrgDataResponseModel>(It.IsAny<string>(), It.IsAny<CancellationToken>(), It.IsAny<SqlParameter[]>()))
             .ReturnsAsync(expectedData);
 
         // Act
-        var result = await _organisationService.GetOrganisationsDetails();
+        var result = await _organisationService.GetOrganisationsDetails(CancellationToken.None);
 
         // Assert
         Assert.IsNotNull(result);
@@ -110,6 +115,7 @@ public class OrganisationServiceTests
         Assert.AreEqual("12345", firstOrganisation.OrganisationId);
         Assert.AreEqual("Example Organisation Ltd", firstOrganisation.OrganisationName);
         Assert.AreEqual("Example Trading Name", firstOrganisation.OrganisationTradingName);
+        Assert.AreEqual("2025-26", firstOrganisation.FinancialYear);
         Assert.AreEqual("12345678", firstOrganisation.CompaniesHouseNumber);
         Assert.AreEqual("ENG", firstOrganisation.HomeNationCode);
         Assert.AreEqual("123 Example Street", firstOrganisation.ServiceOfNoticeAddrLine1);
@@ -134,6 +140,7 @@ public class OrganisationServiceTests
         Assert.AreEqual("67890", secondOrganisation.OrganisationId);
         Assert.AreEqual("Example Organisation Ltd 2", secondOrganisation.OrganisationName);
         Assert.AreEqual("Trading Name 2", secondOrganisation.OrganisationTradingName);
+        Assert.AreEqual("2025-26", secondOrganisation.FinancialYear);
         Assert.AreEqual("00012345", secondOrganisation.CompaniesHouseNumber);
         Assert.AreEqual("NI", secondOrganisation.HomeNationCode);
         Assert.AreEqual("123 West Street", secondOrganisation.ServiceOfNoticeAddrLine1);
@@ -156,6 +163,7 @@ public class OrganisationServiceTests
         _mockSynapseDbContext.Verify(
             ctx => ctx.RunSqlAsync<AcceptedGrantedOrgDataResponseModel>(
                 It.IsAny<string>(),
+                It.IsAny<CancellationToken>(),
                 It.IsAny<SqlParameter[]>()),
             Times.Once);
     }
@@ -172,6 +180,7 @@ public class OrganisationServiceTests
                 SubsidiaryId = null,
                 OrganisationName = "Example Organisation Ltd",
                 TradingName = "Example Trading Name",
+                RelativeYear = 2025,
                 CompaniesHouseNumber = "12345678",
                 HomeNationCode = "ENG",
                 ServiceOfNoticeAddrLine1 = "123 Example Street",
@@ -189,6 +198,7 @@ public class OrganisationServiceTests
                 PrimaryContactPersonLastName = "Smith",
                 PrimaryContactPersonPhoneNumber = "+44 7911 654321",
                 PrimaryContactPersonEmail = "jane.smith@example.com",
+                DecisionDate = "2025-06-01T00:00:00.0000000Z"
             },
             new ()
             {
@@ -196,15 +206,34 @@ public class OrganisationServiceTests
                 SubsidiaryId = "900001",
                 OrganisationName = "Happy Shopper",
                 TradingName = "Subsidiary Trading Name",
+                RelativeYear = 2025,
+                CompaniesHouseNumber = "99999999",
+                HomeNationCode = "ENG",
+                ServiceOfNoticeAddrLine1 = "99 Example Street",
+                ServiceOfNoticeAddrLine2 = "Suite 456",
+                ServiceOfNoticeAddrCity = "London",
+                ServiceOfNoticeAddrCounty = "Greater London",
+                ServiceOfNoticeAddrCountry = "United Kingdom",
+                ServiceOfNoticeAddrPostcode = "E1 6AN",
+                ServiceOfNoticeAddrPhoneNumber = "+44 20 7946 0123",
+                SoleTraderFirstName = "John",
+                SoleTraderLastName = "Doe",
+                SoleTraderPhoneNumber = "+44 7911 123456",
+                SoleTraderEmail = "john.doe@example.com",
+                PrimaryContactPersonFirstName = "Jane",
+                PrimaryContactPersonLastName = "Smith",
+                PrimaryContactPersonPhoneNumber = "+44 7911 654321",
+                PrimaryContactPersonEmail = "jane.smith@example.com",
+                DecisionDate = "2025-06-01T00:00:00.0000000Z"
             },
         };
 
         _mockSynapseDbContext
-            .Setup(ctx => ctx.RunSqlAsync<AcceptedGrantedOrgDataResponseModel>(It.IsAny<string>(), It.IsAny<SqlParameter[]>()))
+            .Setup(ctx => ctx.RunSqlAsync<AcceptedGrantedOrgDataResponseModel>(It.IsAny<string>(), It.IsAny<CancellationToken>(), It.IsAny<SqlParameter[]>()))
             .ReturnsAsync(expectedData);
 
         // Act
-        var result = await _organisationService.GetOrganisationsDetails();
+        var result = await _organisationService.GetOrganisationsDetails(CancellationToken.None);
 
         // Assert
         Assert.IsNotNull(result);
@@ -215,6 +244,7 @@ public class OrganisationServiceTests
         Assert.AreEqual("12345", firstOrganisation.OrganisationId);
         Assert.AreEqual("Example Organisation Ltd", firstOrganisation.OrganisationName);
         Assert.AreEqual("Example Trading Name", firstOrganisation.OrganisationTradingName);
+        Assert.AreEqual("2025-26", firstOrganisation.FinancialYear);
         Assert.AreEqual("12345678", firstOrganisation.CompaniesHouseNumber);
         Assert.AreEqual("ENG", firstOrganisation.HomeNationCode);
         Assert.AreEqual("123 Example Street", firstOrganisation.ServiceOfNoticeAddrLine1);
@@ -237,10 +267,12 @@ public class OrganisationServiceTests
         Assert.AreEqual("900001", firstOrganisation.SubsidiaryDetails[0].SubsidiaryId);
         Assert.AreEqual("Happy Shopper", firstOrganisation.SubsidiaryDetails[0].SubsidiaryName);
         Assert.AreEqual("Subsidiary Trading Name", firstOrganisation.SubsidiaryDetails[0].SubsidiaryTradingName);
+        Assert.AreEqual("2025-26", firstOrganisation.SubsidiaryDetails[0].FinancialYear);
 
         _mockSynapseDbContext.Verify(
             ctx => ctx.RunSqlAsync<AcceptedGrantedOrgDataResponseModel>(
                 It.IsAny<string>(),
+                It.IsAny<CancellationToken>(),
                 It.IsAny<SqlParameter[]>()),
             Times.Once);
     }
@@ -257,6 +289,7 @@ public class OrganisationServiceTests
                 SubsidiaryId = "000111",
                 OrganisationName = "Example Organisation Ltd",
                 TradingName = "Example Trading Name",
+                RelativeYear = 2025,
                 CompaniesHouseNumber = "12345678",
                 HomeNationCode = "ENG",
                 ServiceOfNoticeAddrLine1 = "123 Example Street",
@@ -274,6 +307,7 @@ public class OrganisationServiceTests
                 PrimaryContactPersonLastName = "Smith",
                 PrimaryContactPersonPhoneNumber = "+44 7911 654321",
                 PrimaryContactPersonEmail = "jane.smith@example.com",
+                DecisionDate = "2025-06-01T00:00:00.0000000Z"
             },
             new ()
             {
@@ -281,6 +315,7 @@ public class OrganisationServiceTests
                 SubsidiaryId = null,
                 OrganisationName = "Example Organisation Ltd 2",
                 TradingName = "Trading Name 2",
+                RelativeYear = 2025,
                 CompaniesHouseNumber = "00012345",
                 HomeNationCode = "NI",
                 ServiceOfNoticeAddrLine1 = "123 West Street",
@@ -298,6 +333,7 @@ public class OrganisationServiceTests
                 PrimaryContactPersonLastName = "Smitherson",
                 PrimaryContactPersonPhoneNumber = "+44 7911 123123",
                 PrimaryContactPersonEmail = "j.smitherson@example.com",
+                DecisionDate = "2025-06-01T00:00:00.0000000Z"
             },
             new ()
             {
@@ -305,15 +341,34 @@ public class OrganisationServiceTests
                 SubsidiaryId = "900001",
                 OrganisationName = "Happy Shopper",
                 TradingName = "Subsidiary Trading Name",
+                RelativeYear = 2025,
+                CompaniesHouseNumber = "99999999",
+                HomeNationCode = "ENG",
+                ServiceOfNoticeAddrLine1 = "99 Example Street",
+                ServiceOfNoticeAddrLine2 = "Suite 456",
+                ServiceOfNoticeAddrCity = "London",
+                ServiceOfNoticeAddrCounty = "Greater London",
+                ServiceOfNoticeAddrCountry = "United Kingdom",
+                ServiceOfNoticeAddrPostcode = "E1 6AN",
+                ServiceOfNoticeAddrPhoneNumber = "+44 20 7946 0123",
+                SoleTraderFirstName = "John",
+                SoleTraderLastName = "Doe",
+                SoleTraderPhoneNumber = "+44 7911 123456",
+                SoleTraderEmail = "john.doe@example.com",
+                PrimaryContactPersonFirstName = "Jane",
+                PrimaryContactPersonLastName = "Smith",
+                PrimaryContactPersonPhoneNumber = "+44 7911 654321",
+                PrimaryContactPersonEmail = "jane.smith@example.com",
+                DecisionDate = "2025-06-01T00:00:00.0000000Z"
             },
         };
 
         _mockSynapseDbContext
-            .Setup(ctx => ctx.RunSqlAsync<AcceptedGrantedOrgDataResponseModel>(It.IsAny<string>(), It.IsAny<SqlParameter[]>()))
+            .Setup(ctx => ctx.RunSqlAsync<AcceptedGrantedOrgDataResponseModel>(It.IsAny<string>(), It.IsAny<CancellationToken>(), It.IsAny<SqlParameter[]>()))
             .ReturnsAsync(expectedData);
 
         // Act
-        var result = await _organisationService.GetOrganisationsDetails();
+        var result = await _organisationService.GetOrganisationsDetails(CancellationToken.None);
 
         // Assert
         Assert.IsNotNull(result);
@@ -325,6 +380,7 @@ public class OrganisationServiceTests
         Assert.AreEqual("67890", firstOrganisation.OrganisationId);
         Assert.AreEqual("Example Organisation Ltd 2", firstOrganisation.OrganisationName);
         Assert.AreEqual("Trading Name 2", firstOrganisation.OrganisationTradingName);
+        Assert.AreEqual("2025-26", firstOrganisation.FinancialYear);
         Assert.AreEqual("00012345", firstOrganisation.CompaniesHouseNumber);
         Assert.AreEqual("NI", firstOrganisation.HomeNationCode);
         Assert.AreEqual("123 West Street", firstOrganisation.ServiceOfNoticeAddrLine1);
@@ -347,12 +403,87 @@ public class OrganisationServiceTests
         Assert.AreEqual("900001", firstOrganisation.SubsidiaryDetails[0].SubsidiaryId);
         Assert.AreEqual("Happy Shopper", firstOrganisation.SubsidiaryDetails[0].SubsidiaryName);
         Assert.AreEqual("Subsidiary Trading Name", firstOrganisation.SubsidiaryDetails[0].SubsidiaryTradingName);
+        Assert.AreEqual("2025-26", firstOrganisation.SubsidiaryDetails[0].FinancialYear);
 
         _mockSynapseDbContext.Verify(
             ctx => ctx.RunSqlAsync<AcceptedGrantedOrgDataResponseModel>(
                 It.IsAny<string>(),
+                It.IsAny<CancellationToken>(),
                 It.IsAny<SqlParameter[]>()),
             Times.Once);
+    }
+
+    [TestMethod]
+    public async Task GetOrganisationsDetails_DedupedByReferenceNumberAndDecisionDate()
+    {
+        // Arrange
+        var expectedData = new List<AcceptedGrantedOrgDataResponseModel>
+        {
+            new ()
+            {
+                OrganisationId = 12345,
+                RelativeYear = 2025,
+                SubsidiaryId = null,
+                OrganisationName = "Example Organisation Ltd",
+                TradingName = "Example Trading Name",
+                CompaniesHouseNumber = "12345678",
+                HomeNationCode = "ENG",
+                ServiceOfNoticeAddrLine1 = "123 Example Street",
+                ServiceOfNoticeAddrLine2 = "Suite 456",
+                ServiceOfNoticeAddrCity = "London",
+                ServiceOfNoticeAddrCounty = "Greater London",
+                ServiceOfNoticeAddrCountry = "United Kingdom",
+                ServiceOfNoticeAddrPostcode = "E1 6AN",
+                ServiceOfNoticeAddrPhoneNumber = "+44 20 7946 0123",
+                SoleTraderFirstName = "John",
+                SoleTraderLastName = "Doe",
+                SoleTraderPhoneNumber = "+44 7911 123456",
+                SoleTraderEmail = "john.doe@example.com",
+                PrimaryContactPersonFirstName = "Jane",
+                PrimaryContactPersonLastName = "Smith",
+                PrimaryContactPersonPhoneNumber = "+44 7911 654321",
+                PrimaryContactPersonEmail = "jane.smith@example.com",
+                DecisionDate = "2025-06-01T00:00:00.0000000Z"
+            },
+            new ()
+            {
+                OrganisationId = 12345,
+                RelativeYear = 2025,
+                SubsidiaryId = null,
+                OrganisationName = "Example Organisation Ltd - UPDATED",
+                TradingName = "Example Trading Name",
+                CompaniesHouseNumber = "12345678",
+                HomeNationCode = "ENG",
+                ServiceOfNoticeAddrLine1 = "123 Example Street",
+                ServiceOfNoticeAddrLine2 = "Suite 456",
+                ServiceOfNoticeAddrCity = "London",
+                ServiceOfNoticeAddrCounty = "Greater London",
+                ServiceOfNoticeAddrCountry = "United Kingdom",
+                ServiceOfNoticeAddrPostcode = "E1 6AN",
+                ServiceOfNoticeAddrPhoneNumber = "+44 20 7946 0123",
+                SoleTraderFirstName = "John",
+                SoleTraderLastName = "Doe",
+                SoleTraderPhoneNumber = "+44 7911 123456",
+                SoleTraderEmail = "john.doe@example.com",
+                PrimaryContactPersonFirstName = "Jane",
+                PrimaryContactPersonLastName = "Smith",
+                PrimaryContactPersonPhoneNumber = "+44 7911 654321",
+                PrimaryContactPersonEmail = "jane.smith@example.com",
+                DecisionDate = "2025-06-02T00:00:00.0000000Z"
+            },
+        };
+
+        _mockSynapseDbContext
+            .Setup(ctx => ctx.RunSqlAsync<AcceptedGrantedOrgDataResponseModel>(It.IsAny<string>(), It.IsAny<CancellationToken>(), It.IsAny<SqlParameter[]>()))
+            .ReturnsAsync(expectedData);
+
+        // Act
+        var result = await _organisationService.GetOrganisationsDetails(CancellationToken.None);
+
+        // Assert
+        Assert.IsNotNull(result);
+        Assert.AreEqual(1, result.Count);
+        Assert.AreEqual("Example Organisation Ltd - UPDATED", result.First().OrganisationName);
     }
 
     [TestMethod]
@@ -360,11 +491,11 @@ public class OrganisationServiceTests
     {
         // Arrange
         _mockSynapseDbContext
-            .Setup(ctx => ctx.RunSqlAsync<AcceptedGrantedOrgDataResponseModel>(It.IsAny<string>(), It.IsAny<SqlParameter[]>()))
+            .Setup(ctx => ctx.RunSqlAsync<AcceptedGrantedOrgDataResponseModel>(It.IsAny<string>(), It.IsAny<CancellationToken>(), It.IsAny<SqlParameter[]>()))
             .ThrowsAsync(new InvalidOperationException("Database error"));
 
         // Act & Assert
-        var exception = await Assert.ThrowsExactlyAsync<InvalidOperationException>(() => _organisationService.GetOrganisationsDetails(It.IsAny<string>()));
+        var exception = await Assert.ThrowsExactlyAsync<InvalidOperationException>(() => _organisationService.GetOrganisationsDetails(It.IsAny<CancellationToken>(), It.IsAny<string>()));
 
         // Assert
         Assert.AreEqual("Database error", exception.Message);
