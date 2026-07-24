@@ -42,11 +42,7 @@ public class OrganisationService(
                     ? null
                     : x.SubsidiaryId,
             })
-            .ToLookup(x => new
-            {
-                OrganisationId = x.Data.OrganisationId!.Value,
-                x.Data.RelativeYear,
-            });
+            .ToLookup(x => x.Data.OrganisationId!.Value); // Add relative year to group by when agreed with FSS - currently dedupes by OrganisationId && DecisionDate to preserve createdOrModifiedAfter existing functionality.
 
         foreach (var organisationKey in organisationsLookup.Select(x => x.Key))
         {
@@ -60,16 +56,12 @@ public class OrganisationService(
 
             if (parent is null)
             {
-                logger.LogWarning(
-                    "Parent organisation not found for organisation_id {OrganisationId} and relative_year {RelativeYear}. Skipping.",
-                    organisationKey.OrganisationId,
-                    organisationKey.RelativeYear);
-
+                logger.LogWarning("Parent organisation not found for organisation_id {OrganisationKey}. Skipping.", organisationKey);
                 continue;
             }
 
             var subsidiaries = organisationRecords
-                .Where(x => !string.IsNullOrWhiteSpace(x.SubsidiaryId))
+                .Where(x => !string.IsNullOrWhiteSpace(x.SubsidiaryId) && x.Data.RelativeYear == parent.RelativeYear)
                 .Select(x => x.Data)
                 .Select(x => new SubsidiaryDetails
                 {
@@ -82,7 +74,7 @@ public class OrganisationService(
 
             organisationsList.Add(new OrganisationDetails
             {
-                OrganisationId = organisationKey.OrganisationId.ToString(CultureInfo.InvariantCulture),
+                OrganisationId = organisationKey.ToString(CultureInfo.InvariantCulture),
                 FinancialYear = ToFinancialYear(parent.RelativeYear),
                 OrganisationName = parent.OrganisationName,
                 OrganisationTradingName = parent.TradingName,

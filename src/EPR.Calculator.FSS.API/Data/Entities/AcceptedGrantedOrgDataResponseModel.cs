@@ -71,5 +71,5 @@ public record AcceptedGrantedOrgDataResponseModel
     public required string? PrimaryContactPersonEmail { get; init; }
 
     [Column("Decision_Date")]
-    public required string DecisionDate { get; init; }
+    public required string DecisionDate { get; init; } // Used to dedupe organisation across relative years
 }
