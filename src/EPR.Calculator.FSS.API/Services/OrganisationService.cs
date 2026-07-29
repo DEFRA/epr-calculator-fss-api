@@ -17,17 +17,17 @@ public class OrganisationService(
 
     public async Task<IReadOnlyCollection<OrganisationDetails>> GetOrganisationsDetails(
         CancellationToken cancellationToken,
-        string? createdOrModifiedAfter = null,
+        DateTime? approvedAfter = null,
         int? relativeYear = null)
     {
         var organisationsList = new List<OrganisationDetails>();
 
-        const string sql = "EXECUTE [dbo].[GetLatestAcceptedGrantedOrgData] @createdOrModifiedAfter, @relativeYear";
+        const string sql = "EXECUTE [dbo].[GetLatestAcceptedGrantedOrgData] @approvedAfter, @relativeYear";
 
         var parameters = new[]
         {
-            new SqlParameter("@createdOrModifiedAfter", SqlDbType.NVarChar) { Value = createdOrModifiedAfter },
-            new SqlParameter("@relativeYear", SqlDbType.NVarChar) { Value = relativeYear },
+            new SqlParameter("@approvedAfter", SqlDbType.DateTime) { Value = approvedAfter },
+            new SqlParameter("@relativeYear" , SqlDbType.NVarChar) { Value = relativeYear },
         };
 
         var acceptedGrantedOrgDataResponse = await synapseDbContext
@@ -42,7 +42,7 @@ public class OrganisationService(
                     ? null
                     : x.SubsidiaryId,
             })
-            .ToLookup(x => x.Data.OrganisationId!.Value); // Add relative year to group by when agreed with FSS - currently dedupes by OrganisationId && DecisionDate to preserve createdOrModifiedAfter existing functionality.
+            .ToLookup(x => x.Data.OrganisationId!.Value); // Add relative year to group by when agreed with FSS - currently dedupes by OrganisationId && DecisionDate to preserve approvedAfter existing functionality.
 
         foreach (var organisationKey in organisationsLookup.Select(x => x.Key))
         {
@@ -50,7 +50,7 @@ public class OrganisationService(
 
             var parent = organisationRecords
                 .Where(x => x.SubsidiaryId is null)
-                .OrderByDescending(x => DateTimeOffset.Parse(x.Data.DecisionDate, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind))
+                .OrderByDescending(x => x.Data.DecisionDateTime)
                 .Select(x => x.Data)
                 .FirstOrDefault();
 
@@ -69,6 +69,7 @@ public class OrganisationService(
                     SubsidiaryName = x.OrganisationName,
                     SubsidiaryTradingName = x.TradingName,
                     FinancialYear = ToFinancialYear(x.RelativeYear),
+                    ApprovedDate =  x.DecisionDateTime
                 })
                 .ToList();
 
@@ -76,6 +77,8 @@ public class OrganisationService(
             {
                 OrganisationId = organisationKey.ToString(CultureInfo.InvariantCulture),
                 FinancialYear = ToFinancialYear(parent.RelativeYear),
+                ApprovedDate = parent.DecisionDateTime,
+
                 OrganisationName = parent.OrganisationName,
                 OrganisationTradingName = parent.TradingName,
                 CompaniesHouseNumber = parent.CompaniesHouseNumber,

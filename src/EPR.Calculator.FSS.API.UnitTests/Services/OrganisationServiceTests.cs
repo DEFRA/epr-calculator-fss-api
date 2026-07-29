@@ -495,7 +495,7 @@ public class OrganisationServiceTests
             .ThrowsAsync(new InvalidOperationException("Database error"));
 
         // Act & Assert
-        var exception = await Assert.ThrowsExactlyAsync<InvalidOperationException>(() => _organisationService.GetOrganisationsDetails(It.IsAny<CancellationToken>(), It.IsAny<string>()));
+        var exception = await Assert.ThrowsExactlyAsync<InvalidOperationException>(() => _organisationService.GetOrganisationsDetails(It.IsAny<CancellationToken>(), It.IsAny<DateTime>()));
 
         // Assert
         Assert.AreEqual("Database error", exception.Message);

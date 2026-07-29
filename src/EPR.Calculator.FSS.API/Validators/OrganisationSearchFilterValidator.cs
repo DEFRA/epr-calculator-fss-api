@@ -8,9 +8,9 @@ public class OrganisationSearchFilterValidator : AbstractValidator<OrganisationS
 {
     public OrganisationSearchFilterValidator()
     {
-        RuleFor(x => x.CreatedOrModifiedAfter)
+        RuleFor(x => x.ApprovedAfter)
             .Must(BeAValidDate)
-            .When(x => x.CreatedOrModifiedAfter != null)
+            .When(x => x.ApprovedAfter != null)
             .WithMessage("Please enter a valid date. E.g. 2025-05-20");
 
         RuleFor(x => x.FinancialYear)
@@ -19,13 +19,34 @@ public class OrganisationSearchFilterValidator : AbstractValidator<OrganisationS
             .WithMessage("Financial year must be like 2025-26");
     }
 
-    private static bool BeAValidDate(string? value) =>
+    public static DateTime? TryParseApprovedAfter(string? value) =>
         DateTime.TryParseExact(
             value,
             ["yyyy-MM-dd", "yyyy-MMM-dd"],
             CultureInfo.InvariantCulture,
             DateTimeStyles.None,
-            out _);
+            out var date)
+                ? date
+                : null;
+
+    private static bool BeAValidDate(string? value) =>
+        TryParseApprovedAfter(value).HasValue;
+
+    public static int? TryParseFinancialYear(string? financialYear)
+    {
+        if (string.IsNullOrWhiteSpace(financialYear))
+        {
+            return null;
+        }
+
+        var parts = financialYear.Split('-');
+        if (parts.Length != 2)
+        {
+            return null;
+        }
+
+        return int.TryParse(parts[0], out var year) ? year : null;
+    }
 
     private static bool BeValidFinancialYear(string? value) =>
         value is not null &&

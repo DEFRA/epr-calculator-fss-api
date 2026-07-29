@@ -43,17 +43,18 @@ public class OrganisationsControllerTests
     [DataRow(null, "2025-26")]
     [DataRow("2025-01-30", null)]
     [DataRow(null, null)]
-    public async Task GetOrganisationsDetails_WithValidParams(string? createdOrModifiedAfter, string? financialYear)
+    public async Task GetOrganisationsDetails_WithValidParams(string? approvedAfter, string? financialYear)
     {
         // Arrange
         this.organisationServiceMock
-           .Setup(service => service.GetOrganisationsDetails(It.IsAny<CancellationToken>(), It.IsAny<string?>(), It.IsAny<int?>()))
+           .Setup(service => service.GetOrganisationsDetails(It.IsAny<CancellationToken>(), It.IsAny<DateTime?>(), It.IsAny<int?>()))
            .ReturnsAsync(new List<OrganisationDetails>
                             {
                                 new OrganisationDetails
                                 {
                                     OrganisationId = "12345",
                                     FinancialYear = "2024-25",
+                                    ApprovedDate = DateTime.Now,
                                     OrganisationName = "Test Org",
                                     OrganisationTradingName = "Test Trading",
                                     CompaniesHouseNumber = "12345678",
@@ -79,7 +80,7 @@ public class OrganisationsControllerTests
 
         // Act
         var result = await organisationController.GetOrganisationsDetails(
-            createdOrModifiedAfter: createdOrModifiedAfter,
+            approvedAfter: approvedAfter,
             financialYear: financialYear) as ObjectResult;
 
         // Assert
@@ -100,12 +101,12 @@ public class OrganisationsControllerTests
     {
         // Arrange
         this.organisationServiceMock
-           .Setup(service => service.GetOrganisationsDetails(It.IsAny<CancellationToken>(), It.IsAny<string?>(), It.IsAny<int?>()))
+           .Setup(service => service.GetOrganisationsDetails(It.IsAny<CancellationToken>(), It.IsAny<DateTime?>(), It.IsAny<int?>()))
            .ReturnsAsync(new List<OrganisationDetails>());
 
         // Act
         var result = await organisationController.GetOrganisationsDetails(
-            createdOrModifiedAfter: "2021-01-30",
+            approvedAfter: "2021-01-30",
             financialYear: "2021-22") as ObjectResult;
 
         // Assert
@@ -117,12 +118,12 @@ public class OrganisationsControllerTests
     public async Task GetOrganisationsDetails_Error()
     {
         this.organisationServiceMock
-            .Setup(x => x.GetOrganisationsDetails(It.IsAny<CancellationToken>(), It.IsAny<string?>(), It.IsAny<int?>()))
+            .Setup(x => x.GetOrganisationsDetails(It.IsAny<CancellationToken>(), It.IsAny<DateTime?>(), It.IsAny<int?>()))
             .ThrowsAsync(new HttpRequestException("InternalServerError exception", null, HttpStatusCode.InternalServerError));
 
         // Act
         var result = await this.organisationController.GetOrganisationsDetails(
-            createdOrModifiedAfter: null,
+            approvedAfter: null,
             financialYear: null) as ActionResult;
 
         // Assert
@@ -136,10 +137,10 @@ public class OrganisationsControllerTests
     [DataRow("1-1-1")]
     [DataRow("01-01-2025")]
     [DataRow("40-13-2025")]
-    public async Task GetOrganisationsDetails_InvalidCreatedOrModifiedAfter(string createdOrModifiedAfter)
+    public async Task GetOrganisationsDetails_InvalidApprovedAfter(string approvedAfter)
     {
         var result = await this.organisationController.GetOrganisationsDetails(
-            createdOrModifiedAfter: createdOrModifiedAfter,
+            approvedAfter: approvedAfter,
             financialYear: null) as BadRequestObjectResult;
 
         // Assert
@@ -156,7 +157,7 @@ public class OrganisationsControllerTests
     public async Task GetOrganisationsDetails_InvalidFinancialYear(string financialYear)
     {
         var result = await this.organisationController.GetOrganisationsDetails(
-            createdOrModifiedAfter: null,
+            approvedAfter: null,
             financialYear: "bad") as BadRequestObjectResult;
 
         // Assert
