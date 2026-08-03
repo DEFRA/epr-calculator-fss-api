@@ -3,10 +3,25 @@ using System.Globalization;
 using EPR.Calculator.FSS.API.Data;
 using EPR.Calculator.FSS.API.Data.Entities;
 using EPR.Calculator.FSS.API.Models;
-using EPR.Calculator.FSS.API.Services;
 using Microsoft.Data.SqlClient;
 
-namespace EPR.Calculator.FSS.API;
+namespace EPR.Calculator.FSS.API.Services;
+
+public interface IOrganisationService
+{
+
+     /// <summary>
+    /// Get the Organisation Data for the calculator run.
+    /// </summary>
+    /// <param name="approvedAfter">Date the data was created or last changed.</param>
+    /// <param name="relativeYear">the relative year for the data.</param>
+    /// <param name="cancellationToken">The database cancellation token .</param>
+    /// <returns>Organisation details collection.</returns>
+    Task<IReadOnlyCollection<OrganisationDetails>> GetOrganisationsDetails(
+        DateTime? approvedAfter,
+        RelativeYear? relativeYear,
+        CancellationToken cancellationToken);
+}
 
 #pragma warning disable CA1848 // Use the LoggerMessage delegates
 public class OrganisationService(
@@ -14,11 +29,10 @@ public class OrganisationService(
     ILogger<OrganisationService> logger)
     : IOrganisationService
 {
-
     public async Task<IReadOnlyCollection<OrganisationDetails>> GetOrganisationsDetails(
-        CancellationToken cancellationToken,
-        DateTime? approvedAfter = null,
-        int? relativeYear = null)
+        DateTime? approvedAfter,
+        RelativeYear? relativeYear,
+        CancellationToken cancellationToken)
     {
         var organisationsList = new List<OrganisationDetails>();
 
@@ -27,7 +41,7 @@ public class OrganisationService(
         var parameters = new[]
         {
             new SqlParameter("@approvedAfter", SqlDbType.DateTime) { Value = approvedAfter },
-            new SqlParameter("@relativeYear" , SqlDbType.NVarChar) { Value = relativeYear },
+            new SqlParameter("@relativeYear" , SqlDbType.Int     ) { Value = relativeYear?.Value },
         };
 
         var acceptedGrantedOrgDataResponse = await synapseDbContext

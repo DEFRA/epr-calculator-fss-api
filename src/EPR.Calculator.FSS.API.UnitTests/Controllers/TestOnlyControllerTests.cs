@@ -2,6 +2,7 @@
 using EPR.Calculator.FSS.API.Configs;
 using EPR.Calculator.FSS.API.Controllers;
 using EPR.Calculator.FSS.API.Helpers;
+using EPR.Calculator.FSS.API.Services;
 using FluentAssertions;
 using FluentValidation;
 using FluentValidation.Results;

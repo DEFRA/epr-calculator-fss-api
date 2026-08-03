@@ -1,6 +1,8 @@
 ﻿
 using EPR.Calculator.FSS.API.Data;
 using EPR.Calculator.FSS.API.Data.Entities;
+using EPR.Calculator.FSS.API.Models;
+using EPR.Calculator.FSS.API.Services;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -32,7 +34,7 @@ public class OrganisationServiceTests
             .ReturnsAsync(emptyData);
 
         // Act
-        var result = await _organisationService.GetOrganisationsDetails(CancellationToken.None);
+        var result = await _organisationService.GetOrganisationsDetails(approvedAfter: null, relativeYear: null, CancellationToken.None);
 
         // Assert
         Assert.IsNotNull(result);
@@ -104,7 +106,7 @@ public class OrganisationServiceTests
             .ReturnsAsync(expectedData);
 
         // Act
-        var result = await _organisationService.GetOrganisationsDetails(CancellationToken.None);
+        var result = await _organisationService.GetOrganisationsDetails(approvedAfter: null, relativeYear: null, CancellationToken.None);
 
         // Assert
         Assert.IsNotNull(result);
@@ -233,7 +235,7 @@ public class OrganisationServiceTests
             .ReturnsAsync(expectedData);
 
         // Act
-        var result = await _organisationService.GetOrganisationsDetails(CancellationToken.None);
+        var result = await _organisationService.GetOrganisationsDetails(approvedAfter: null, relativeYear: null, CancellationToken.None);
 
         // Assert
         Assert.IsNotNull(result);
@@ -368,13 +370,13 @@ public class OrganisationServiceTests
             .ReturnsAsync(expectedData);
 
         // Act
-        var result = await _organisationService.GetOrganisationsDetails(CancellationToken.None);
+        var result = await _organisationService.GetOrganisationsDetails(approvedAfter: null, relativeYear: null, CancellationToken.None);
 
         // Assert
         Assert.IsNotNull(result);
         Assert.AreEqual(1, result.Count);
 
-        Models.OrganisationDetails organisationDetails = result.First();
+        OrganisationDetails organisationDetails = result.First();
         var firstOrganisation = organisationDetails;
 
         Assert.AreEqual("67890", firstOrganisation.OrganisationId);
@@ -478,7 +480,7 @@ public class OrganisationServiceTests
             .ReturnsAsync(expectedData);
 
         // Act
-        var result = await _organisationService.GetOrganisationsDetails(CancellationToken.None);
+        var result = await _organisationService.GetOrganisationsDetails(approvedAfter: null, relativeYear: null, CancellationToken.None);
 
         // Assert
         Assert.IsNotNull(result);
@@ -495,7 +497,8 @@ public class OrganisationServiceTests
             .ThrowsAsync(new InvalidOperationException("Database error"));
 
         // Act & Assert
-        var exception = await Assert.ThrowsExactlyAsync<InvalidOperationException>(() => _organisationService.GetOrganisationsDetails(It.IsAny<CancellationToken>(), It.IsAny<DateTime>()));
+        var exception = await Assert.ThrowsExactlyAsync<InvalidOperationException>(() =>
+            _organisationService.GetOrganisationsDetails(It.IsAny<DateTime>(), It.IsAny<RelativeYear>(), It.IsAny<CancellationToken>()));
 
         // Assert
         Assert.AreEqual("Database error", exception.Message);
