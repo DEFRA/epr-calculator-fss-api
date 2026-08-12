@@ -2,6 +2,7 @@
 using System.Text;
 using EPR.Calculator.FSS.API.Helpers;
 using EPR.Calculator.FSS.API.Properties;
+using EPR.Calculator.FSS.API.Services;
 using FluentValidation;
 using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Mvc;
@@ -38,8 +39,7 @@ public class BillingController(
     /// </summary>
     /// <param name="calculatorRunId">The run ID to retrieve the billings details for.</param>
     /// <returns>The billings details as a string.</returns>
-    [HttpGet]
-    [Route("billingDetails")]
+    [HttpGet("billingDetails")]
     public async Task<IActionResult> GetBillingsDetails([FromQuery] int calculatorRunId)
     {
         try

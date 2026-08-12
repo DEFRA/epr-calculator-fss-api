@@ -2,5 +2,5 @@
 
 public record    OrganisationsDetailsResponse
 {
-    public required IList<OrganisationDetails> OrganisationsDetails { get; init; }
+    public required IEnumerable<OrganisationDetails> OrganisationsDetails { get; init; }
 }

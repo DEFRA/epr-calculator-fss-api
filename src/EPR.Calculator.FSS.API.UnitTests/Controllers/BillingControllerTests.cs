@@ -2,6 +2,7 @@
 using AutoFixture.AutoMoq;
 using EPR.Calculator.FSS.API.Controllers;
 using EPR.Calculator.FSS.API.Helpers;
+using EPR.Calculator.FSS.API.Services;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using FluentValidation;

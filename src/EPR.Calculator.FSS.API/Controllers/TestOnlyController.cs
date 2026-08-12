@@ -2,6 +2,7 @@
 using System.Net.Mime;
 using EPR.Calculator.FSS.API.Configs;
 using EPR.Calculator.FSS.API.Helpers;
+using EPR.Calculator.FSS.API.Services;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -19,8 +20,7 @@ public class TestOnlyController(
     IValidator<int> runIdValidator)
     : Controller
 {
-    [HttpPost]
-    [Route("billingDetails")]
+    [HttpPost("billingDetails")]
     [Consumes(MediaTypeNames.Application.Json)]
     [SuppressMessage("Security", "S5693", Justification = "Required to support large billing JSON uploads during testing.")]
     [RequestSizeLimit(1_500_000_000)]

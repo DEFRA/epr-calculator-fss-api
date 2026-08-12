@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Globalization;
 
 namespace EPR.Calculator.FSS.API.Data.Entities;
 
@@ -71,5 +72,9 @@ public record AcceptedGrantedOrgDataResponseModel
     public required string? PrimaryContactPersonEmail { get; init; }
 
     [Column("Decision_Date")]
-    public required string DecisionDate { get; init; } // Used to dedupe organisation across relative years
+    public required string DecisionDate { get; init; }
+
+    [NotMapped]
+    public DateTime DecisionDateTime =>
+        DateTime.Parse(DecisionDate, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
 }

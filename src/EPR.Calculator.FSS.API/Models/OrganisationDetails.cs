@@ -10,6 +10,8 @@ public record OrganisationDetails
 
     public required string FinancialYear {get; init; }
 
+    public required DateTime ApprovedDate { get; init; }
+
     public required string? CompaniesHouseNumber { get; init; }
 
     public required string? HomeNationCode { get; init; }

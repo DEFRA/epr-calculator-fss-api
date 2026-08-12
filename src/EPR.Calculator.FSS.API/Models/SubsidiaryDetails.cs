@@ -11,4 +11,7 @@ public record SubsidiaryDetails
     public required string? SubsidiaryTradingName { get; init; }
 
     public required string FinancialYear { get; init; }
+
+    public required DateTime ApprovedDate { get; init; }
+
 }
