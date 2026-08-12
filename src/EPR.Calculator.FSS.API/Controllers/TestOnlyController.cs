@@ -21,7 +21,7 @@ public class TestOnlyController(
     : Controller
 {
     [HttpPost("billingDetails")]
-    [Consumes(MediaTypeNames.Application.Json)]
+    [Consumes(MediaTypeNames.Application.Octet)]
     [SuppressMessage("Security", "S5693", Justification = "Required to support large billing JSON uploads during testing.")]
     [RequestSizeLimit(1_500_000_000)]
     public async Task<IActionResult> UploadBillingDetails(
@@ -41,19 +41,6 @@ public class TestOnlyController(
             {
                 Title = "Validation Error",
                 Detail = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage)),
-                Status = StatusCodes.Status400BadRequest
-            });
-        }
-
-        if (!string.Equals(
-                Request.ContentType,
-                MediaTypeNames.Application.Json,
-                StringComparison.OrdinalIgnoreCase))
-        {
-            return BadRequest(new ProblemDetails
-            {
-                Title = "Validation Error",
-                Detail = "Content-Type must be application/json",
                 Status = StatusCodes.Status400BadRequest
             });
         }
