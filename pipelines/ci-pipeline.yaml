@@ -41,7 +41,7 @@ variables:
     value: true
 
   - name: dotnetVersion
-    value: dotnetVersion8
+    value: dotnetVersion10
 
 resources:
   repositories:

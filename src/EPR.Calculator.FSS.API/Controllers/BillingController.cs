@@ -1,10 +1,6 @@
-﻿using System.Globalization;
-using System.Text;
-using EPR.Calculator.FSS.API.Helpers;
-using EPR.Calculator.FSS.API.Properties;
+﻿using EPR.Calculator.FSS.API.Helpers;
 using EPR.Calculator.FSS.API.Services;
 using FluentValidation;
-using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EPR.Calculator.FSS.API.Controllers;
@@ -13,27 +9,13 @@ namespace EPR.Calculator.FSS.API.Controllers;
 /// Controller for the API to retrieve billings files.
 /// </summary>
 /// <param name="blobStorageService">A service object that implements <see cref="IBlobStorageService"/>.</param>
-/// <param name="telemetryClient">A <see cref="TelemetryClient"/>.</param>
 /// <param name="runIdValidator">A validator for the run ID.</param>
 [Route("api/[controller]")]
 public class BillingController(
     IBlobStorageService blobStorageService,
-    TelemetryClient telemetryClient,
     IValidator<int> runIdValidator)
-    : Controller
+    : ControllerBase
 {
-    private static readonly CompositeFormat RunIdIsInvalid
-        = CompositeFormat.Parse(Resources.RunIdIsInvalid);
-
-    private static readonly CompositeFormat BillingDataRetrieved
-        = CompositeFormat.Parse(Resources.BillingDataRetrieved);
-
-    private IBlobStorageService BlobStorageService { get; init; } = blobStorageService;
-
-    private IValidator<int> RunIdValidator { get; init; } = runIdValidator;
-
-    private TelemetryClient TelemetryClient { get; init; } = telemetryClient;
-
     /// <summary>
     /// API endpoint to retrieve billing details for a given runId.
     /// </summary>
@@ -44,12 +26,10 @@ public class BillingController(
     {
         try
         {
-            var validatorResult = RunIdValidator.Validate(calculatorRunId);
+            var validatorResult = runIdValidator.Validate(calculatorRunId);
 
             if (!validatorResult.IsValid)
             {
-                this.TelemetryClient.TrackTrace(string.Format(CultureInfo.CurrentCulture, RunIdIsInvalid, calculatorRunId));
-
                 return BadRequest(new ProblemDetails
                 {
                     Title = "Validation Error",
@@ -59,32 +39,18 @@ public class BillingController(
             }
 
             var fileName = BillingFileNameHelper.Create(calculatorRunId);
-            var billingData = await this.BlobStorageService.GetFileContents(fileName);
-
-            this.TelemetryClient.TrackTrace(string.Format(
-                CultureInfo.CurrentCulture,
-                BillingDataRetrieved,
-                calculatorRunId,
-                DateTime.UtcNow,
-                billingData.FileStream.Length));
+            var billingData = await blobStorageService.GetFileContents(fileName);
 
             return billingData;
         }
-        catch (Exception ex) when (ex is FileNotFoundException)
+        catch (FileNotFoundException)
         {
-            this.TelemetryClient.TrackException(ex);
-
             return NotFound(new ProblemDetails
             {
                 Title = "The requested resource could not be found.",
                 Detail = "The resource you requested does not exist.",
                 Status = StatusCodes.Status404NotFound
             });
-        }
-        catch(Exception ex)
-        {
-            this.TelemetryClient.TrackException(ex);
-            return StatusCode(StatusCodes.Status500InternalServerError, ex);
         }
     }
 }
