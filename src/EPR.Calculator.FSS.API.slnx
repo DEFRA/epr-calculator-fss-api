@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="EPR.Calculator.FSS.API.UnitTests/EPR.Calculator.FSS.API.UnitTests.csproj" />
+  <Project Path="EPR.Calculator.FSS.API/EPR.Calculator.FSS.API.csproj" />
+</Solution>

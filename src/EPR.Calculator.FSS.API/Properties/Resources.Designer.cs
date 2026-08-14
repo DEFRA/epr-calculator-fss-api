@@ -59,38 +59,11 @@ namespace EPR.Calculator.FSS.API.Properties {
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to Error retrieving billing data for runId {0} at {1}, error: {2}.
-        /// </summary>
-        public static string BillingDataMiscError {
-            get {
-                return ResourceManager.GetString("BillingDataMiscError", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Billing data retrieved for runId: {0} at {1}, length {2}..
-        /// </summary>
-        public static string BillingDataRetrieved {
-            get {
-                return ResourceManager.GetString("BillingDataRetrieved", resourceCulture);
-            }
-        }
-
-        /// <summary>
         ///   Looks up a localized string similar to Run ID cannot be empty..
         /// </summary>
         public static string RunIdIsEmpty {
             get {
                 return ResourceManager.GetString("RunIdIsEmpty", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to $&quot;RunId &quot;{0}&quot;is invalid.&quot;.
-        /// </summary>
-        public static string RunIdIsInvalid {
-            get {
-                return ResourceManager.GetString("RunIdIsInvalid", resourceCulture);
             }
         }
 

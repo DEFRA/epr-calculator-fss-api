@@ -1,72 +1,68 @@
 ﻿using System.Configuration;
 using System.IO.Compression;
+using System.Reflection;
+using Azure.Monitor.OpenTelemetry.AspNetCore;
 using Azure.Storage.Blobs;
-using EPR.Calculator.FSS.API;
 using EPR.Calculator.FSS.API.Configs;
 using EPR.Calculator.FSS.API.Data;
 using EPR.Calculator.FSS.API.HealthCheck;
 using EPR.Calculator.FSS.API.Services;
 using EPR.Calculator.FSS.API.Validators;
 using FluentValidation;
-using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add User Secrets in Development
-if (builder.Environment.IsDevelopment())
+builder.Configuration
+    .AddUserSecrets(Assembly.GetExecutingAssembly(), optional: true)
+    .AddEnvironmentVariables();
+
+var applicationInsightsConnectionString =
+    builder.Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"];
+
+if (!string.IsNullOrWhiteSpace(applicationInsightsConnectionString))
 {
-    builder.Configuration.AddUserSecrets<Program>();
+    builder.Services
+        .AddOpenTelemetry()
+        .UseAzureMonitor();
 }
 
-// Add services to the container.
+builder.Services.AddProblemDetails();
 
 builder.Services.AddControllers();
-
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddApplicationInsightsTelemetry();
 builder.Services.AddHealthChecks();
 builder.Services.AddSwaggerGen();
-builder.Services.AddControllers();
-builder.Services.AddFluentValidationAutoValidation();
-builder.Services.AddFluentValidationClientsideAdapters();
+
 builder.Services.AddScoped<IBlobStorageService, BlobStorageService>();
 builder.Services.AddScoped<IOrganisationService, OrganisationService>();
 
-// Configure the database context.
 builder.Services.AddDbContext<SynapseDbContext>(options =>
 {
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("SynapseDatabase"));
 });
 
-// Configure blob storage settings.
 builder.Services.Configure<BlobStorageSettings>(
     builder.Configuration.GetSection("BlobStorage"));
+
+var blobStorageConnectionString =
+    builder.Configuration["BlobStorage:ConnectionString"];
+
+if (string.IsNullOrWhiteSpace(blobStorageConnectionString))
+{
+    throw new ConfigurationErrorsException(
+        "Blob Storage connection string is not configured.");
+}
+
+builder.Services.AddSingleton(
+    new BlobServiceClient(blobStorageConnectionString));
 
 builder.Services.Configure<FeatureManagementSettings>(
     builder.Configuration.GetSection(FeatureManagementSettings.SectionName));
 
-builder.Services.AddSingleton<BlobServiceClient>(provider =>
-{
-    var configuration = provider.GetRequiredService<IConfiguration>();
-    var connectionString = configuration.GetSection("BlobStorage:ConnectionString").Value;
-    if (string.IsNullOrEmpty(connectionString))
-    {
-        throw new ConfigurationErrorsException("Blob Storage connection string is not configured.");
-    }
-
-    return new BlobServiceClient(connectionString);
-});
-
-builder.Services.AddScoped<RunIdValidator, RunIdValidator>();
-
-// Configure validation.
-builder.Services.AddFluentValidationAutoValidation();
-builder.Services.AddFluentValidationClientsideAdapters();
 builder.Services.AddValidatorsFromAssemblyContaining<RunIdValidator>();
 
 builder.Services.Configure<ApiBehaviorOptions>(options =>
@@ -74,12 +70,12 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
     options.SuppressModelStateInvalidFilter = true;
 });
 
-// Add compression support for billing data.
 builder.Services.AddResponseCompression(options =>
 {
     options.EnableForHttps = true;
     options.Providers.Add<GzipCompressionProvider>();
 });
+
 builder.Services.Configure<GzipCompressionProviderOptions>(options =>
 {
     options.Level = CompressionLevel.SmallestSize;
@@ -89,22 +85,23 @@ builder.Services.AddRequestDecompression();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+app.UseExceptionHandler();
+
+if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("local"))
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
 app.UseResponseCompression();
 app.UseRequestDecompression();
+app.UseAuthorization();
 
 app.MapControllers();
 
-app.MapHealthChecks("/admin/health", HealthCheckOptionsBuilder.Build()).AllowAnonymous();
+app.MapHealthChecks(
+    "/admin/health",
+    HealthCheckOptionsBuilder.Build()).AllowAnonymous();
 
 await app.RunAsync();
