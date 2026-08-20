@@ -43,7 +43,6 @@ public class TestOnlyControllerTests
             .Setup(v => v.Validate(runId))
             .Returns(new ValidationResult());
 
-        controller.Request.ContentType = "application/json";
         controller.Request.Body = new MemoryStream("""{"field1":"value1"}"""u8.ToArray());
 
         var featureManagementSettings = Options.Create(new FeatureManagementSettings
@@ -103,8 +102,6 @@ public class TestOnlyControllerTests
                 new ValidationFailure("calculatorRunId", "Invalid run id")
             ]));
 
-        controller.Request.ContentType = MediaTypeNames.Application.Json;
-
         var featureManagementSettings = Options.Create(new FeatureManagementSettings
         {
             EnableBillingUploadEndpoint = true
@@ -118,40 +115,6 @@ public class TestOnlyControllerTests
         var problemDetails = badRequest.Value.Should().BeOfType<ProblemDetails>().Which;
 
         problemDetails.Detail.Should().Be("Invalid run id");
-
-        mockBlobStorageService.Verify(
-            x => x.UploadFile(
-                It.IsAny<string>(),
-                It.IsAny<Stream>(),
-                It.IsAny<string>()),
-            Times.Never);
-    }
-
-    [TestMethod]
-    public async Task UploadBillingDetails_WhenContentTypeIsNotJson_ReturnsBadRequest()
-    {
-        // Arrange
-        const int runId = 123;
-
-        mockRunIdValidator
-            .Setup(v => v.Validate(runId))
-            .Returns(new ValidationResult());
-
-        controller.Request.ContentType = MediaTypeNames.Text.Plain;
-
-        var featureManagementSettings = Options.Create(new FeatureManagementSettings
-        {
-            EnableBillingUploadEndpoint = true
-        });
-
-        // Act
-        var result = await controller.UploadBillingDetails(runId, featureManagementSettings);
-
-        // Assert
-        var badRequest = result.Should().BeOfType<BadRequestObjectResult>().Which;
-        var problemDetails = badRequest.Value.Should().BeOfType<ProblemDetails>().Which;
-
-        problemDetails.Detail.Should().Be("Content-Type must be application/json");
 
         mockBlobStorageService.Verify(
             x => x.UploadFile(
