@@ -1,6 +1,8 @@
 ﻿using System.Configuration;
 using System.IO.Compression;
 using System.Reflection;
+using Azure.Core;
+using Azure.Identity;
 using Azure.Monitor.OpenTelemetry.AspNetCore;
 using Azure.Storage.Blobs;
 using EPR.Calculator.FSS.API.Configs;
@@ -12,6 +14,7 @@ using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,6 +41,31 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IBlobStorageService, BlobStorageService>();
 builder.Services.AddScoped<IOrganisationService, OrganisationService>();
+
+builder.Services.Configure<EprCalculatorApiSettings>(
+    builder.Configuration.GetSection(EprCalculatorApiSettings.SectionName));
+
+builder.Services.AddSingleton<TokenCredential>(
+    builder.Environment.IsDevelopment() || builder.Environment.IsEnvironment("local")
+        ? new AzureCliCredential()
+        : new ManagedIdentityCredential(ManagedIdentityId.SystemAssigned));
+
+builder.Services.AddTransient<EprCalculatorApiAuthHandler>();
+
+builder.Services.AddHttpClient<IDownloadService, DownloadService>((serviceProvider, client) =>
+{
+    var settings = serviceProvider.GetRequiredService<IOptions<EprCalculatorApiSettings>>().Value;
+
+    if (string.IsNullOrWhiteSpace(settings.BaseUrl))
+    {
+        throw new ConfigurationErrorsException("EprCalculatorApi base URL is not configured.");
+    }
+
+    client.BaseAddress = new Uri(settings.BaseUrl);
+})
+.AddHttpMessageHandler<EprCalculatorApiAuthHandler>();
+
+builder.Services.AddHostedService<CalculatorApiStartupProbe>();
 
 builder.Services.AddDbContext<SynapseDbContext>(options =>
 {
