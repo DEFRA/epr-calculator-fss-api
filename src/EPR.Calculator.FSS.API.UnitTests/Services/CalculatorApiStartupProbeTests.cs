@@ -15,7 +15,7 @@ public class CalculatorApiStartupProbeTests
     [TestInitialize]
     public void Setup()
     {
-        probe = new CalculatorApiStartupProbe(mockDownloadService.Object, mockLogger.Object);
+        probe = new CalculatorApiStartupProbe(mockDownloadService.Object, mockLogger.Object, TimeSpan.FromSeconds(1));
     }
 
     [TestMethod]
@@ -32,6 +32,22 @@ public class CalculatorApiStartupProbeTests
         // Assert
         VerifyLog(LogLevel.Information, Times.Once());
         VerifyLog(LogLevel.Error, Times.Never());
+    }
+
+    [TestMethod]
+    public async Task ExecuteAsync_WaitsForStartupDelayThenRunsProbe()
+    {
+        // Arrange
+        mockDownloadService
+            .Setup(s => s.DownloadFile(-1, It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new FileNotFoundException());
+
+        // Act
+        await probe.StartAsync(CancellationToken.None);
+        await probe.ExecuteTask!;
+
+        // Assert
+        VerifyLog(LogLevel.Information, Times.Once());
     }
 
     [TestMethod]

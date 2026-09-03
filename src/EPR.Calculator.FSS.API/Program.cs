@@ -72,7 +72,10 @@ builder.Services.AddHttpClient<IDownloadService, DownloadService>((serviceProvid
 })
 .AddHttpMessageHandler<EprCalculatorApiAuthHandler>();
 
-builder.Services.AddHostedService<CalculatorApiStartupProbe>();
+builder.Services.AddHostedService(serviceProvider => new CalculatorApiStartupProbe(
+    serviceProvider.GetRequiredService<IDownloadService>(),
+    serviceProvider.GetRequiredService<ILogger<CalculatorApiStartupProbe>>(),
+    TimeSpan.FromSeconds(60)));
 
 builder.Services.AddDbContext<SynapseDbContext>(options =>
 {

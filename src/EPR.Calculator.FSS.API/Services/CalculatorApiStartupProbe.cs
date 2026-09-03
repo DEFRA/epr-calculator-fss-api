@@ -8,19 +8,20 @@ namespace EPR.Calculator.FSS.API.Services;
 /// </summary>
 /// <param name="downloadService">A service object that implements <see cref="IDownloadService"/>.</param>
 /// <param name="logger">The logger to record the check's result on.</param>
+/// <param name="startupDelay">The delay before performing the startup check.</param>
 #pragma warning disable CA1848 // Use the LoggerMessage delegates
 #pragma warning disable S6667 // FileNotFoundException here is the expected success signal, not an error worth attaching
 public class CalculatorApiStartupProbe(
     IDownloadService downloadService,
-    ILogger<CalculatorApiStartupProbe> logger)
+    ILogger<CalculatorApiStartupProbe> logger,
+    TimeSpan startupDelay)
     : BackgroundService
 {
     private const int ProbeRunId = -1;
-    private static readonly TimeSpan StartupDelay = TimeSpan.FromSeconds(60);
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        await Task.Delay(StartupDelay, stoppingToken);
+        await Task.Delay(startupDelay, stoppingToken);
 
         await ProbeAsync(stoppingToken);
     }
