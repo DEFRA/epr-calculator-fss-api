@@ -53,7 +53,7 @@ builder.Services.Configure<EprCalculatorApiSettings>(
     builder.Configuration.GetSection(EprCalculatorApiSettings.SectionName));
 
 builder.Services.AddSingleton<TokenCredential>(
-    builder.Environment.IsDevelopment() || builder.Environment.IsEnvironment("local")
+    builder.Environment.IsEnvironment("local")
         ? new AzureCliCredential()
         : new ManagedIdentityCredential(ManagedIdentityId.SystemAssigned));
 
