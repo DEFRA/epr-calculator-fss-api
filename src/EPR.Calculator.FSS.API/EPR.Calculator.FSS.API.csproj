@@ -12,7 +12,19 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Azure.Identity" Version="1.21.0" />
+    <!--
+      Aliased so Program.cs and EprCalculatorApiAuthHandler.cs can pull AzureCliCredential/
+      ManagedIdentityCredential/ManagedIdentityId/TokenCredential/TokenRequestContext from this
+      assembly specifically via `extern alias AzureCoreCredentials`, instead of adding a direct
+      Azure.Identity reference. Microsoft.Data.SqlClient depends on Azure.Identity 1.17.1 for its
+      own "Authentication=Active Directory Default" connection strings; a direct Azure.Identity
+      reference here would force the whole project (SqlClient included) onto a newer resolved
+      version, changing how SqlClient authenticates to Synapse at runtime. Keep it aliased so that
+      dependency stays untouched.
+    -->
+    <PackageReference Include="Azure.Core" Version="1.60.0">
+      <Aliases>AzureCoreCredentials</Aliases>
+    </PackageReference>
     <PackageReference Include="Azure.Storage.Blobs" Version="12.29.1" />
     <PackageReference Include="FluentValidation" Version="12.1.1" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />

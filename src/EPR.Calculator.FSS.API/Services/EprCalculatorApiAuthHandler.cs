@@ -1,7 +1,13 @@
+// Pulled from the Azure.Core assembly (aliased in the .csproj), not Azure.Identity - see the
+// comment on the Azure.Core PackageReference for why. Don't add a plain `using Azure.Identity;`
+// or a direct Azure.Identity PackageReference here; it reintroduces the Synapse auth regression.
+extern alias AzureCoreCredentials;
+
 using System.Net.Http.Headers;
-using Azure.Core;
 using EPR.Calculator.FSS.API.Configs;
 using Microsoft.Extensions.Options;
+using TokenCredential = AzureCoreCredentials::Azure.Core.TokenCredential;
+using TokenRequestContext = AzureCoreCredentials::Azure.Core.TokenRequestContext;
 
 namespace EPR.Calculator.FSS.API.Services;
 

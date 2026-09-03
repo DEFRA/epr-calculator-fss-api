@@ -1,9 +1,16 @@
-﻿using System.Configuration;
+﻿// Pulled from the Azure.Core assembly (aliased in the .csproj), not Azure.Identity - see the
+// comment on the Azure.Core PackageReference for why. Don't add a plain `using Azure.Identity;`
+// or a direct Azure.Identity PackageReference here; it reintroduces the Synapse auth regression.
+extern alias AzureCoreCredentials;
+
+using System.Configuration;
 using System.IO.Compression;
 using System.Reflection;
-using Azure.Core;
-using Azure.Identity;
 using Azure.Monitor.OpenTelemetry.AspNetCore;
+using AzureCliCredential = AzureCoreCredentials::Azure.Identity.AzureCliCredential;
+using ManagedIdentityCredential = AzureCoreCredentials::Azure.Identity.ManagedIdentityCredential;
+using ManagedIdentityId = AzureCoreCredentials::Azure.Identity.ManagedIdentityId;
+using TokenCredential = AzureCoreCredentials::Azure.Core.TokenCredential;
 using Azure.Storage.Blobs;
 using EPR.Calculator.FSS.API.Configs;
 using EPR.Calculator.FSS.API.Data;
