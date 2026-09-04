@@ -7,8 +7,6 @@ using FluentAssertions;
 using FluentAssertions.Execution;
 using FluentValidation;
 using FluentValidation.Results;
-using Microsoft.ApplicationInsights;
-using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -31,11 +29,6 @@ public class BillingControllerTests
 
         billingControllerUnderTest = new BillingController(
             mockBlobStorageService.Object,
-            new TelemetryClient(new TelemetryConfiguration
-            {
-                TelemetryChannel = new Microsoft.ApplicationInsights.Channel.InMemoryChannel(),
-                DisableTelemetry = true,
-            }),
             mockRunIdValidator.Object);
     }
 
@@ -128,40 +121,5 @@ public class BillingControllerTests
 
         // Assert
         Assert.IsInstanceOfType<NotFoundObjectResult>(result);
-    }
-
-   /// <summary>
-   /// Checks that the controller returns a 500 when the service throws an exception *other than
-   /// the ones that indicate the billings were not found.
-   /// </summary>
-   /// <param name="exceptionType">The type of exception to test.</param>
-   /// <returns>A <see cref="Task"/>.</returns>
-    [TestMethod]
-    [DataRow(typeof(Exception))]
-    [DataRow(typeof(ApplicationException))]
-    [DataRow(typeof(OutOfMemoryException))]
-    public async Task CallGetBillingsDetails_Return500WhenServiceThrowsException(Type exceptionType)
-    {
-        // Arrange
-        var runId = fixture.Create<int>();
-        var expectedFileName = BillingFileNameHelper.Create(runId);
-
-        mockRunIdValidator.Setup(v => v.Validate(runId)).Returns(new ValidationResult());
-        mockBlobStorageService.Setup(service => service.GetFileContents(expectedFileName))
-            .Throws((Exception)Activator.CreateInstance(exceptionType)!);
-
-        // Act
-        IActionResult result = await billingControllerUnderTest.GetBillingsDetails(runId);
-
-        // Assert
-        using (new AssertionScope())
-        {
-            Assert.IsInstanceOfType(result, typeof(IStatusCodeActionResult));
-            var castedResult = result as IStatusCodeActionResult;
-            Assert.IsNotNull(castedResult);
-            Assert.AreEqual(
-                StatusCodes.Status500InternalServerError,
-                castedResult.StatusCode);
-        }
     }
 }

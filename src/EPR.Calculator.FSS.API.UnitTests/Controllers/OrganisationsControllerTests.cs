@@ -20,13 +20,7 @@ public class OrganisationsControllerTests
     public OrganisationsControllerTests()
     {
         this.organisationServiceMock = new Mock<IOrganisationService>();
-        this.organisationController = new OrganisationsController(
-            organisationServiceMock.Object,
-            new TelemetryClient(new TelemetryConfiguration
-            {
-                TelemetryChannel = new Microsoft.ApplicationInsights.Channel.InMemoryChannel(),
-                DisableTelemetry = true,
-            }))
+        this.organisationController = new OrganisationsController(organisationServiceMock.Object)
         {
             ControllerContext = new ControllerContext
             {
@@ -105,32 +99,14 @@ public class OrganisationsControllerTests
 
         // Assert
         result.Should().NotBeNull();
-        result!.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
+        result.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
         result.Value.Should().BeOfType<ApiError>();
 
         var error = result.Value as ApiError;
         error.Should().NotBeNull();
-        error!.Error.Should().Be("Bad Request");
+        error.Error.Should().Be("Bad Request");
         error.ErrorCode.Should().Be("invalid_request");
         error.StatusCode.Should().Be(400);
         error.Message.Should().Contain("invalid-date");
-    }
-
-    [TestMethod]
-    public async Task GetOrganisationsDetails_Error()
-    {
-        this.organisationServiceMock
-            .Setup(x => x.GetOrganisationsDetails(It.IsAny<DateTime?>(), It.IsAny<RelativeYear?>(), It.IsAny<CancellationToken>()))
-            .ThrowsAsync(new HttpRequestException("InternalServerError exception", null, HttpStatusCode.InternalServerError));
-
-        // Act
-        var result = await this.organisationController.GetOrganisationsDetails(
-            approvedAfter: null,
-            financialYear: null) as ActionResult;
-
-        // Assert
-        result.Should().BeOfType<StatusCodeResult>();
-        var statusCodeResult = result as StatusCodeResult;
-        statusCodeResult?.StatusCode.Should().Be(500);
     }
 }

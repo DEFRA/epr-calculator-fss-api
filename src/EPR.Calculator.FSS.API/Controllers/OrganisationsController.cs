@@ -1,7 +1,6 @@
 ﻿using EPR.Calculator.FSS.API.Helpers;
 using EPR.Calculator.FSS.API.Models;
 using EPR.Calculator.FSS.API.Services;
-using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EPR.Calculator.FSS.API.Controllers;
@@ -12,12 +11,10 @@ namespace EPR.Calculator.FSS.API.Controllers;
 [ApiController]
 [Route("api/v1")]
 public class OrganisationsController(
-    IOrganisationService organisationService,
-    TelemetryClient telemetryClient)
+    IOrganisationService organisationService)
     : ControllerBase
 {
     [HttpGet("organisations-details")]
-    [Consumes("application/json")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -37,20 +34,12 @@ public class OrganisationsController(
             });
         }
 
-        try
+        return Ok(new OrganisationsDetailsResponse
         {
-            return Ok(new OrganisationsDetailsResponse
-            {
-                OrganisationsDetails = await organisationService.GetOrganisationsDetails(
-                    approvedAfter    : approvedAfter?.UtcDateTime,
-                    relativeYear     : financialYear?.ToRelativeYear(),
-                    cancellationToken: HttpContext.RequestAborted)
-            });
-        }
-        catch (Exception ex)
-        {
-            telemetryClient.TrackException(ex);
-            return HandleError.Handle(ex);
-        }
+            OrganisationsDetails = await organisationService.GetOrganisationsDetails(
+                approvedAfter    : approvedAfter?.UtcDateTime,
+                relativeYear     : financialYear?.ToRelativeYear(),
+                cancellationToken: HttpContext.RequestAborted)
+        });
     }
 }

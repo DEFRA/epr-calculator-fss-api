@@ -82,3 +82,7 @@ dotnet_naming_rule.private_static_fields_should_be_pascal_case.severity = sugges
 # Analyzer configuration
 # CS1591: Missing XML comment for publicly visible type or member
 dotnet_diagnostic.CS1591.severity = none
+# Standard ILogger methods are preferred over LoggerMessage delegates for readability.
+dotnet_diagnostic.CA1848.severity = none
+# Logging arguments in this project are inexpensive; avoid unnecessary IsEnabled checks.
+dotnet_diagnostic.CA1873.severity = none
