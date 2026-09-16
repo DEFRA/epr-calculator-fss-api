@@ -754,6 +754,7 @@
       "epr.calculator.fss.api": {
         "type": "Project",
         "dependencies": {
+          "Azure.Core": "[1.60.0, )",
           "Azure.Monitor.OpenTelemetry.AspNetCore": "[1.6.0, )",
           "Azure.Storage.Blobs": "[12.29.1, )",
           "FluentValidation": "[12.1.1, )",
