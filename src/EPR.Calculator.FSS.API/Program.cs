@@ -1,7 +1,16 @@
-﻿using System.Configuration;
+﻿// Pulled from the Azure.Core assembly (aliased in the .csproj), not Azure.Identity - see the
+// comment on the Azure.Core PackageReference for why. Don't add a plain `using Azure.Identity;`
+// or a direct Azure.Identity PackageReference here; it reintroduces the Synapse auth regression.
+extern alias AzureCoreCredentials;
+
+using System.Configuration;
 using System.IO.Compression;
 using System.Reflection;
 using Azure.Monitor.OpenTelemetry.AspNetCore;
+using AzureCliCredential = AzureCoreCredentials::Azure.Identity.AzureCliCredential;
+using ManagedIdentityCredential = AzureCoreCredentials::Azure.Identity.ManagedIdentityCredential;
+using ManagedIdentityId = AzureCoreCredentials::Azure.Identity.ManagedIdentityId;
+using TokenCredential = AzureCoreCredentials::Azure.Core.TokenCredential;
 using Azure.Storage.Blobs;
 using EPR.Calculator.FSS.API.Configs;
 using EPR.Calculator.FSS.API.Data;
@@ -12,6 +21,7 @@ using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,6 +48,34 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IBlobStorageService, BlobStorageService>();
 builder.Services.AddScoped<IOrganisationService, OrganisationService>();
+
+builder.Services.Configure<EprCalculatorApiSettings>(
+    builder.Configuration.GetSection(EprCalculatorApiSettings.SectionName));
+
+builder.Services.AddSingleton<TokenCredential>(
+    builder.Environment.IsEnvironment("local")
+        ? new AzureCliCredential()
+        : new ManagedIdentityCredential(ManagedIdentityId.SystemAssigned));
+
+builder.Services.AddTransient<EprCalculatorApiAuthHandler>();
+
+builder.Services.AddHttpClient<IDownloadService, DownloadService>((serviceProvider, client) =>
+{
+    var settings = serviceProvider.GetRequiredService<IOptions<EprCalculatorApiSettings>>().Value;
+
+    if (string.IsNullOrWhiteSpace(settings.BaseUrl))
+    {
+        throw new ConfigurationErrorsException("EprCalculatorApi base URL is not configured.");
+    }
+
+    client.BaseAddress = new Uri(settings.BaseUrl);
+})
+.AddHttpMessageHandler<EprCalculatorApiAuthHandler>();
+
+builder.Services.AddHostedService(serviceProvider => new CalculatorApiStartupProbe(
+    serviceProvider.GetRequiredService<IDownloadService>(),
+    serviceProvider.GetRequiredService<ILogger<CalculatorApiStartupProbe>>(),
+    TimeSpan.FromSeconds(60)));
 
 builder.Services.AddDbContext<SynapseDbContext>(options =>
 {
