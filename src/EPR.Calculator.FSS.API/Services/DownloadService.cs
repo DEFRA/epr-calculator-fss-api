@@ -6,7 +6,7 @@ namespace EPR.Calculator.FSS.API.Services;
 public interface IDownloadService
 {
     /// <summary>
-    /// Streams the billing JSON file for the given calculator run from the EPR Calculator API.
+    /// Streams the billing CSV file for the given calculator run from the EPR Calculator API. (In future, should be amended to download json endpoint)
     /// </summary>
     /// <param name="runId">The calculator run ID to download the billing file for.</param>
     /// <param name="cancellationToken">The cancellation token for the request.</param>
@@ -19,7 +19,7 @@ public class DownloadService(HttpClient httpClient, ILogger<DownloadService> log
     public async Task<FileStreamResult> DownloadFile(int runId, CancellationToken cancellationToken)
     {
         var response = await httpClient.GetAsync(
-            $"v1/downloadBillingJson/{runId}",
+            $"v1/downloadBillingFile/{runId}",
             HttpCompletionOption.ResponseHeadersRead,
             cancellationToken);
 
@@ -36,7 +36,7 @@ public class DownloadService(HttpClient httpClient, ILogger<DownloadService> log
         var contentType = response.Content.Headers.ContentType?.ToString() ?? "application/octet-stream";
         var fileName = response.Content.Headers.ContentDisposition?.FileNameStar
             ?? response.Content.Headers.ContentDisposition?.FileName
-            ?? $"billing-{runId}.json";
+            ?? $"billing-{runId}.csv";
 
         return new FileStreamResult(new HttpResponseContentStream(response, contentStream), contentType)
         {

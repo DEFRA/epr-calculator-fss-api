@@ -48,7 +48,7 @@ public class DownloadServiceTests
         Assert.IsNotNull(handler.LastRequest);
         Assert.AreEqual(HttpMethod.Get, handler.LastRequest.Method);
         Assert.AreEqual(
-            new Uri($"https://calculator-api.test/v1/downloadBillingJson/{runId}"),
+            new Uri($"https://calculator-api.test/v1/downloadBillingFile/{runId}"),
             handler.LastRequest.RequestUri);
     }
 
@@ -98,7 +98,7 @@ public class DownloadServiceTests
         var result = await service.DownloadFile(runId, CancellationToken.None);
 
         // Assert
-        Assert.AreEqual($"billing-{runId}.json", result.FileDownloadName);
+        Assert.AreEqual($"billing-{runId}.csv", result.FileDownloadName);
     }
 
     [TestMethod]
