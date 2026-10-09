@@ -1,15 +1,14 @@
-﻿using System.Configuration;
 using Azure.Storage.Blobs;
 using EPR.Calculator.FSS.API.Configs;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 
 namespace EPR.Calculator.FSS.API.Services;
-
 
 public interface IBlobStorageService
 {
     /// <summary>
-    /// Downloads a file from the specified blob storage.
+    /// Downloads a file from the test-only blob storage container.
     /// </summary>
     /// <param name="fileName">The name of the file to download.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the download result.</returns>
@@ -27,42 +26,18 @@ public interface IBlobStorageService
 
 public class BlobStorageService : IBlobStorageService
 {
-    private readonly FeatureManagementSettings featureManagementSettings;
-    private readonly BlobContainerClient containerClient;
     private readonly BlobContainerClient testContainerClient;
 
-    public BlobStorageService(BlobServiceClient blobServiceClient, IConfiguration configuration)
+    public BlobStorageService(BlobServiceClient blobServiceClient, IOptions<BlobStorageSettings> blobStorageSettings)
     {
-        this.featureManagementSettings = configuration.GetSection(FeatureManagementSettings.SectionName).Get<FeatureManagementSettings>() ??
-            throw new ConfigurationErrorsException("FeatureManagement settings are missing in configuration.");
+        this.testContainerClient = blobServiceClient.GetBlobContainerClient(blobStorageSettings.Value.TestOnlyContainerName);
 
-        var settings = configuration.GetSection(BlobStorageSettings.SectionName).Get<BlobStorageSettings>() ??
-            throw new ConfigurationErrorsException("BlobStorage settings are missing in configuration.");
-
-        this.containerClient = blobServiceClient.GetBlobContainerClient(settings.ContainerName ??
-            throw new ConfigurationErrorsException("Container name is missing in configuration."));
-
-        this.testContainerClient = blobServiceClient.GetBlobContainerClient(settings.TestOnlyContainerName ??
-            throw new ConfigurationErrorsException("Test-Only container name is missing in configuration."));
-
-        _ = EnsureContainersExist();
+        _ = EnsureContainerExists();
     }
 
     public async Task<FileStreamResult> GetFileContents(string fileName)
     {
-        if (this.featureManagementSettings.EnableBillingUploadEndpoint)
-        {
-            var testBlobClient = testContainerClient.GetBlobClient(fileName);
-
-            if (await testBlobClient.ExistsAsync())
-            {
-                var testDownload = await testBlobClient.OpenReadAsync(new Azure.Storage.Blobs.Models.BlobOpenReadOptions(false));
-                var testProperties = await testBlobClient.GetPropertiesAsync();
-                return new FileStreamResult(testDownload, testProperties.Value.ContentType);
-            }
-        }
-
-        var blobClient = containerClient.GetBlobClient(fileName);
+        var blobClient = testContainerClient.GetBlobClient(fileName);
 
         if (!await blobClient.ExistsAsync())
         {
@@ -87,9 +62,8 @@ public class BlobStorageService : IBlobStorageService
             });
     }
 
-    private async Task EnsureContainersExist()
+    private async Task EnsureContainerExists()
     {
-        await containerClient.CreateIfNotExistsAsync();
         await testContainerClient.CreateIfNotExistsAsync();
     }
 }
