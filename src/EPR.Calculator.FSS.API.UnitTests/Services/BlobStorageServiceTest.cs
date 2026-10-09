@@ -1,7 +1,9 @@
-﻿using Azure;
+using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using EPR.Calculator.FSS.API.Configs;
 using EPR.Calculator.FSS.API.Services;
+using Microsoft.Extensions.Options;
 using Moq;
 using System.Text;
 
@@ -10,11 +12,11 @@ namespace EPR.Calculator.FSS.API.UnitTests.Services
     [TestClass]
     public class BlobStorageServiceTest
     {
+        private const string TestOnlyContainerName = "TestOnlyContainerName";
+
         private BlobStorageService blobStorageService = null!;
         private Mock<BlobServiceClient> mockBlobServiceClient = null!;
-        private Mock<BlobContainerClient> mockBlobContainerClient = null!;
         private Mock<BlobContainerClient> mockTestBlobContainerClient = null!;
-        private Mock<BlobClient> mockBlobClient = null!;
         private Mock<BlobClient> mockTestBlobClient = null!;
 
         public TestContext TestContext { get; set; }
@@ -22,61 +24,44 @@ namespace EPR.Calculator.FSS.API.UnitTests.Services
         [TestInitialize]
         public void Init()
         {
-            static void SetupBlobClient(Mock<BlobClient> blobClient, string content)
-            {
-                blobClient
-                    .Setup(x => x.ExistsAsync(It.IsAny<CancellationToken>()))
-                    .ReturnsAsync(Response.FromValue(true, null!));
-
-                blobClient
-                    .Setup(x => x.OpenReadAsync(
-                        It.IsAny<BlobOpenReadOptions>(),
-                        It.IsAny<CancellationToken>()))
-                    .Returns(Task.FromResult<Stream>(
-                        new MemoryStream(Encoding.UTF8.GetBytes(content))));
-
-                blobClient
-                    .Setup(x => x.GetPropertiesAsync(
-                        null,
-                        It.IsAny<CancellationToken>()))
-                    .ReturnsAsync(Response.FromValue(
-                        BlobsModelFactory.BlobProperties(
-                            contentType: "application/octet-stream"),
-                        null!));
-            }
-
             mockBlobServiceClient = new Mock<BlobServiceClient>();
-
-            mockBlobContainerClient = new Mock<BlobContainerClient>();
             mockTestBlobContainerClient = new Mock<BlobContainerClient>();
-
-            mockBlobClient = new Mock<BlobClient>();
             mockTestBlobClient = new Mock<BlobClient>();
 
-            var config = ConfigurationItems.GetConfigurationValues();
+            mockTestBlobClient
+                .Setup(x => x.ExistsAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Response.FromValue(true, null!));
 
-            mockBlobContainerClient
-                .Setup(x => x.GetBlobClient(It.IsAny<string>()))
-                .Returns(mockBlobClient.Object);
+            mockTestBlobClient
+                .Setup(x => x.OpenReadAsync(
+                    It.IsAny<BlobOpenReadOptions>(),
+                    It.IsAny<CancellationToken>()))
+                .Returns(Task.FromResult<Stream>(
+                    new MemoryStream(Encoding.UTF8.GetBytes("test content"))));
+
+            mockTestBlobClient
+                .Setup(x => x.GetPropertiesAsync(
+                    null,
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Response.FromValue(
+                    BlobsModelFactory.BlobProperties(
+                        contentType: "application/octet-stream"),
+                    null!));
 
             mockTestBlobContainerClient
                 .Setup(x => x.GetBlobClient(It.IsAny<string>()))
                 .Returns(mockTestBlobClient.Object);
 
             mockBlobServiceClient
-                .Setup(x => x.GetBlobContainerClient(config["BlobStorage:ContainerName"]))
-                .Returns(mockBlobContainerClient.Object);
-
-            mockBlobServiceClient
-                .Setup(x => x.GetBlobContainerClient(config["BlobStorage:TestOnlyContainerName"]))
+                .Setup(x => x.GetBlobContainerClient(TestOnlyContainerName))
                 .Returns(mockTestBlobContainerClient.Object);
-
-            SetupBlobClient(mockBlobClient, "main content");
-            SetupBlobClient(mockTestBlobClient, "test content");
 
             blobStorageService = new BlobStorageService(
                 mockBlobServiceClient.Object,
-                config);
+                Options.Create(new BlobStorageSettings
+                {
+                    TestOnlyContainerName = TestOnlyContainerName,
+                }));
         }
 
         [TestMethod]
@@ -85,7 +70,7 @@ namespace EPR.Calculator.FSS.API.UnitTests.Services
             // Arrange
             var fileName = "missing.txt";
 
-            mockBlobClient
+            mockTestBlobClient
                 .Setup(x => x.ExistsAsync(It.IsAny<CancellationToken>()))
                 .ReturnsAsync(Response.FromValue(false, null!));
 
@@ -97,44 +82,7 @@ namespace EPR.Calculator.FSS.API.UnitTests.Services
         [TestMethod]
         public async Task GetFileContents_WhenFileExists_ReturnsContents()
         {
-            using CancellationTokenSource cancellationTokenSource = new();
-            this.mockBlobClient
-                .Setup(x => x.ExistsAsync(cancellationTokenSource.Token))
-                .ReturnsAsync(Response.FromValue(true, null!));
-
             var result = await this.blobStorageService.GetFileContents("test.txt");
-            using var reader = new StreamReader(result.FileStream);
-            var content = await reader.ReadToEndAsync(TestContext.CancellationTokenSource.Token);
-
-            Assert.IsNotNull(result);
-            Assert.AreEqual("main content", content);
-
-            this.mockTestBlobClient.Verify(
-                x => x.OpenReadAsync(
-                    It.IsAny<BlobOpenReadOptions>(),
-                    It.IsAny<CancellationToken>()),
-                Times.Never);
-
-            this.mockBlobClient.Verify(
-                x => x.OpenReadAsync(
-                    It.IsAny<BlobOpenReadOptions>(),
-                    It.IsAny<CancellationToken>()),
-                Times.Once);
-        }
-
-        [TestMethod]
-        public async Task GetFileContents_WhenBillingUploadEndpointEnabled_ReturnsTestContainerFile()
-        {
-            var config = ConfigurationItems.GetConfigurationValues();
-            config["FeatureManagement:EnableBillingUploadEndpoint"] = "true";
-            var service = new BlobStorageService(this.mockBlobServiceClient.Object, config);
-
-            using CancellationTokenSource cancellationTokenSource = new();
-            this.mockTestBlobClient
-                .Setup(x => x.ExistsAsync(cancellationTokenSource.Token))
-                .ReturnsAsync(Response.FromValue(true, null!));
-
-            var result = await service.GetFileContents("test.txt");
             using var reader = new StreamReader(result.FileStream);
             var content = await reader.ReadToEndAsync(TestContext.CancellationTokenSource.Token);
 
@@ -146,12 +94,6 @@ namespace EPR.Calculator.FSS.API.UnitTests.Services
                     It.IsAny<BlobOpenReadOptions>(),
                     It.IsAny<CancellationToken>()),
                 Times.Once);
-
-            this.mockBlobClient.Verify(
-                x => x.OpenReadAsync(
-                    It.IsAny<BlobOpenReadOptions>(),
-                    It.IsAny<CancellationToken>()),
-                Times.Never);
         }
 
         [TestMethod]
