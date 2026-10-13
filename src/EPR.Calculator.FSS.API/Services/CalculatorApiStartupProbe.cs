@@ -1,4 +1,4 @@
-using EPR.Calculator.FSS.API.Configs;
+using EPR.Calculator.FSS.API.Clients.EprCalculatorApi;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 
@@ -8,13 +8,13 @@ namespace EPR.Calculator.FSS.API.Services;
 /// Shortly after startup, makes one authenticated call to the EPR Calculator API for a run ID that
 /// can never exist, so a `FileNotFoundException` response confirms connectivity and auth are working
 /// </summary>
-/// <param name="downloadService">A service object that implements <see cref="IDownloadService"/>.</param>
+/// <param name="eprCalculatorApiClient">The client used to call the EPR Calculator API.</param>
 /// <param name="logger">The logger to record the check's result on.</param>
 /// <param name="startupDelay">The delay before performing the startup check.</param>
 #pragma warning disable CA1848 // Use the LoggerMessage delegates
 #pragma warning disable S6667 // FileNotFoundException here is the expected success signal, not an error worth attaching
 public class CalculatorApiStartupProbe(
-    IDownloadService downloadService,
+    IEprCalculatorApiClient eprCalculatorApiClient,
     ILogger<CalculatorApiStartupProbe> logger,
     TimeSpan startupDelay)
     : BackgroundService
@@ -32,7 +32,7 @@ public class CalculatorApiStartupProbe(
     {
         try
         {
-            var result = await downloadService.DownloadFile(ProbeRunId, cancellationToken);
+            var result = await eprCalculatorApiClient.DownloadBillingFile(ProbeRunId, cancellationToken);
             await result.FileStream.DisposeAsync();
 
             logger.LogInformation("Calculator API startup check succeeded: however unexpectedly a billing file was returned for run ID {ProbeRunId}.", ProbeRunId);

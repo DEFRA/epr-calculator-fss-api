@@ -1,27 +1,19 @@
-﻿// Pulled from the Azure.Core assembly (aliased in the .csproj), not Azure.Identity - see the
-// comment on the Azure.Core PackageReference for why. Don't add a plain `using Azure.Identity;`
-// or a direct Azure.Identity PackageReference here; it reintroduces the Synapse auth regression.
-extern alias AzureCoreCredentials;
-
-using System.Configuration;
+﻿using System.Configuration;
 using System.IO.Compression;
 using System.Reflection;
 using Azure.Monitor.OpenTelemetry.AspNetCore;
-using AzureCliCredential = AzureCoreCredentials::Azure.Identity.AzureCliCredential;
-using ManagedIdentityCredential = AzureCoreCredentials::Azure.Identity.ManagedIdentityCredential;
-using ManagedIdentityId = AzureCoreCredentials::Azure.Identity.ManagedIdentityId;
-using TokenCredential = AzureCoreCredentials::Azure.Core.TokenCredential;
+using Azure.Core;
+using Azure.Identity;
 using Azure.Storage.Blobs;
+using EPR.Calculator.FSS.API.Clients.EprCommonDataApi;
+using EPR.Calculator.FSS.API.Clients.EprCalculatorApi;
 using EPR.Calculator.FSS.API.Configs;
-using EPR.Calculator.FSS.API.Data;
 using EPR.Calculator.FSS.API.HealthCheck;
 using EPR.Calculator.FSS.API.Services;
 using EPR.Calculator.FSS.API.Validators;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.ResponseCompression;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,10 +39,12 @@ builder.Services.AddHealthChecks();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IBlobStorageService, BlobStorageService>();
-builder.Services.AddScoped<IOrganisationService, OrganisationService>();
 
-builder.Services.Configure<EprCalculatorApiSettings>(
-    builder.Configuration.GetSection(EprCalculatorApiSettings.SectionName));
+builder.Services
+    .AddOptions<EprCalculatorApiSettings>()
+    .BindConfiguration(EprCalculatorApiSettings.SectionName)
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
 
 builder.Services.AddSingleton<TokenCredential>(
     builder.Environment.IsEnvironment("local")
@@ -59,29 +53,22 @@ builder.Services.AddSingleton<TokenCredential>(
 
 builder.Services.AddTransient<EprCalculatorApiAuthHandler>();
 
-builder.Services.AddHttpClient<IDownloadService, DownloadService>((serviceProvider, client) =>
-{
-    var settings = serviceProvider.GetRequiredService<IOptions<EprCalculatorApiSettings>>().Value;
-
-    if (string.IsNullOrWhiteSpace(settings.BaseUrl))
-    {
-        throw new ConfigurationErrorsException("EprCalculatorApi base URL is not configured.");
-    }
-
-    client.BaseAddress = new Uri(settings.BaseUrl);
-})
-.AddHttpMessageHandler<EprCalculatorApiAuthHandler>();
+builder.Services
+    .AddHttpClient<IEprCalculatorApiClient, EprCalculatorApiHttpClient>()
+    .AddHttpMessageHandler<EprCalculatorApiAuthHandler>();
 
 builder.Services.AddHostedService(serviceProvider => new CalculatorApiStartupProbe(
-    serviceProvider.GetRequiredService<IDownloadService>(),
+    serviceProvider.GetRequiredService<IEprCalculatorApiClient>(),
     serviceProvider.GetRequiredService<ILogger<CalculatorApiStartupProbe>>(),
     TimeSpan.FromSeconds(60)));
 
-builder.Services.AddDbContext<SynapseDbContext>(options =>
-{
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("SynapseDatabase"));
-});
+builder.Services
+    .AddOptions<EprCommonDataApiSettings>()
+    .BindConfiguration(EprCommonDataApiSettings.SectionName)
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+
+builder.Services.AddHttpClient<IEprCommonDataApiClient, EprCommonDataApiHttpClient>();
 
 builder.Services.Configure<BlobStorageSettings>(
     builder.Configuration.GetSection("BlobStorage"));

@@ -7,9 +7,6 @@ namespace EPR.Calculator.FSS.API.Models;
 [TypeConverter(typeof(FinancialYearTypeConverter))]
 public readonly record struct FinancialYear(string Value)
 {
-    public RelativeYear ToRelativeYear() =>
-        new(int.Parse(Value[..4], CultureInfo.InvariantCulture));
-
     public override string ToString() => Value;
 }
 
