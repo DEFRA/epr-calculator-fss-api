@@ -1,18 +1,20 @@
 using System.Net;
 using System.Net.Http.Headers;
-using EPR.Calculator.FSS.API.Services;
+using EPR.Calculator.FSS.API.Configs;
+using EPR.Calculator.FSS.API.Clients.EprCalculatorApi;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Moq;
 
-namespace EPR.Calculator.FSS.API.UnitTests.Services;
+namespace EPR.Calculator.FSS.API.UnitTests.Clients.EprCalculatorApi;
 
 [TestClass]
-public class DownloadServiceTests
+public class EprCalculatorApiHttpClientTests
 {
-    private readonly Mock<ILogger<DownloadService>> mockLogger = new();
+    private readonly Mock<ILogger<EprCalculatorApiHttpClient>> mockLogger = new();
 
     [TestMethod]
-    public async Task DownloadFile_WhenFileExists_ReturnsStreamedContentWithHeadersFromResponse()
+    public async Task DownloadBillingFile_WhenFileExists_ReturnsStreamedContentWithHeadersFromResponse()
     {
         // Arrange
         const int runId = 42;
@@ -32,10 +34,10 @@ public class DownloadServiceTests
             return response;
         });
 
-        var service = CreateService(handler);
+        var client = CreateClient(handler);
 
         // Act
-        var result = await service.DownloadFile(runId, CancellationToken.None);
+        var result = await client.DownloadBillingFile(runId, CancellationToken.None);
 
         // Assert
         Assert.AreEqual("application/json", result.ContentType);
@@ -53,31 +55,31 @@ public class DownloadServiceTests
     }
 
     [TestMethod]
-    public async Task DownloadFile_WhenFileNotFound_ThrowsFileNotFoundException()
+    public async Task DownloadBillingFile_WhenFileNotFound_ThrowsFileNotFoundException()
     {
         // Arrange
         var handler = new FakeHttpMessageHandler(_ => new HttpResponseMessage(HttpStatusCode.NotFound));
-        var service = CreateService(handler);
+        var client = CreateClient(handler);
 
         // Act / Assert
         await Assert.ThrowsExactlyAsync<FileNotFoundException>(
-            () => service.DownloadFile(99, CancellationToken.None));
+            () => client.DownloadBillingFile(99, CancellationToken.None));
     }
 
     [TestMethod]
-    public async Task DownloadFile_WhenServerError_ThrowsHttpRequestException()
+    public async Task DownloadBillingFile_WhenServerError_ThrowsHttpRequestException()
     {
         // Arrange
         var handler = new FakeHttpMessageHandler(_ => new HttpResponseMessage(HttpStatusCode.InternalServerError));
-        var service = CreateService(handler);
+        var client = CreateClient(handler);
 
         // Act / Assert
         await Assert.ThrowsExactlyAsync<HttpRequestException>(
-            () => service.DownloadFile(1, CancellationToken.None));
+            () => client.DownloadBillingFile(1, CancellationToken.None));
     }
 
     [TestMethod]
-    public async Task DownloadFile_WhenNoContentDisposition_FallsBackToDefaultFileName()
+    public async Task DownloadBillingFile_WhenNoContentDisposition_FallsBackToDefaultFileName()
     {
         // Arrange
         const int runId = 7;
@@ -92,17 +94,17 @@ public class DownloadServiceTests
             return response;
         });
 
-        var service = CreateService(handler);
+        var client = CreateClient(handler);
 
         // Act
-        var result = await service.DownloadFile(runId, CancellationToken.None);
+        var result = await client.DownloadBillingFile(runId, CancellationToken.None);
 
         // Assert
         Assert.AreEqual($"billing-{runId}.csv", result.FileDownloadName);
     }
 
     [TestMethod]
-    public async Task DownloadFile_StreamForwardsToUnderlyingContentAndDisposesItOnDispose()
+    public async Task DownloadBillingFile_StreamForwardsToUnderlyingContentAndDisposesItOnDispose()
     {
         var innerStream = new MemoryStream("hello world"u8.ToArray());
 
@@ -116,9 +118,9 @@ public class DownloadServiceTests
             return response;
         });
 
-        var service = CreateService(handler);
+        var client = CreateClient(handler);
 
-        var result = await service.DownloadFile(1, CancellationToken.None);
+        var result = await client.DownloadBillingFile(1, CancellationToken.None);
         var stream = result.FileStream;
 
         Assert.IsTrue(stream.CanRead);
@@ -150,15 +152,11 @@ public class DownloadServiceTests
         Assert.IsFalse(innerStream.CanRead, "disposing the wrapper should dispose the underlying content stream");
     }
 
-    private DownloadService CreateService(HttpMessageHandler handler)
-    {
-        var httpClient = new HttpClient(handler)
-        {
-            BaseAddress = new Uri("https://calculator-api.test/"),
-        };
-
-        return new DownloadService(httpClient, mockLogger.Object);
-    }
+    private EprCalculatorApiHttpClient CreateClient(HttpMessageHandler handler) =>
+        new(
+            new HttpClient(handler),
+            Options.Create(new EprCalculatorApiSettings { BaseUrl = "https://calculator-api.test/" }),
+            mockLogger.Object);
 
     private sealed class FakeHttpMessageHandler(Func<HttpRequestMessage, HttpResponseMessage> responder) : HttpMessageHandler
     {

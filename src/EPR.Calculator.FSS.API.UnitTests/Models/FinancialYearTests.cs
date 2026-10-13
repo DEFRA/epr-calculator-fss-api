@@ -10,10 +10,6 @@ public class FinancialYearTests
         TypeDescriptor.GetConverter(typeof(FinancialYear));
 
     [TestMethod]
-    public void ToRelativeYear_ReturnsExpectedRelativeYear() =>
-        Assert.AreEqual(new RelativeYear(2025), new FinancialYear("2025-26").ToRelativeYear());
-
-    [TestMethod]
     public void ToString_ReturnsOriginalValue() =>
         Assert.AreEqual("2025-26", new FinancialYear("2025-26").ToString());
 
