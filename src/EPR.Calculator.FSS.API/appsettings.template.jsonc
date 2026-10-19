@@ -1,0 +1,29 @@
+{
+  /* -----------------------------------------------------------------------------
+    App configuration template for EPR.Calculator.FSS.API.
+
+    When running locally, clone it to either:
+     - appsettings.local.json (gitignored)
+     - secrets.json with the correct UserSecretsId location:
+       {secrets root}/e7bcafa6-ad86-4616-8f7f-8f1db227e2a0/secrets.json
+
+    Values given are examples for local hosting alongside a locally running
+    epr-calculator-api and epr-common-data-api. When connecting to Defra's
+    infrastructure, obtain the correct values from Azure/KeyVault.
+  */
+
+  "BlobStorage": {
+    "ConnectionString"     : "UseDevelopmentStorage=true",
+    "ContainerName"        : "paycal-billingfilejsonauthorisedforfss",
+    "TestOnlyContainerName": "paycal-billingfilejsonauthorisedforfss-testonly"
+  },
+
+  "EprCalculatorApi": {
+    "BaseUrl": "https://localhost:7265",
+    "Scope"  : ""
+  },
+
+  "EprCommonDataApi": {
+    "BaseUrl": "https://localhost:5001"
+  }
+}
