@@ -59,6 +59,7 @@ builder.Services.AddSingleton<TokenCredential>(
         : new ManagedIdentityCredential(ManagedIdentityId.SystemAssigned));
 
 builder.Services.AddTransient<EprCalculatorApiAuthHandler>();
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddHttpClient<IDownloadService, DownloadService>((serviceProvider, client) =>
 {
