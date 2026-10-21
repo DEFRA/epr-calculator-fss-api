@@ -1,12 +1,14 @@
 using System.Net;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
+using Microsoft.Net.Http.Headers;
 
 namespace EPR.Calculator.FSS.API.Services;
 
 public interface IDownloadService
 {
     /// <summary>
-    /// Streams the billing CSV file for the given calculator run from the EPR Calculator API. (In future, should be amended to download json endpoint)
+    /// Streams the billing JSON file for the given calculator run from the EPR Calculator API. 
     /// </summary>
     /// <param name="runId">The calculator run ID to download the billing file for.</param>
     /// <param name="cancellationToken">The cancellation token for the request.</param>
@@ -14,14 +16,17 @@ public interface IDownloadService
     Task<FileStreamResult> DownloadFile(int runId, CancellationToken cancellationToken);
 }
 
-public class DownloadService(HttpClient httpClient, ILogger<DownloadService> logger) : IDownloadService
+public class DownloadService(HttpClient httpClient, IHttpContextAccessor httpContextAccessor, ILogger<DownloadService> logger) : IDownloadService
 {
     public async Task<FileStreamResult> DownloadFile(int runId, CancellationToken cancellationToken)
     {
-        var response = await httpClient.GetAsync(
-            $"v1/downloadBillingFile/{runId}",
-            HttpCompletionOption.ResponseHeadersRead,
-            cancellationToken);
+        using var request = new HttpRequestMessage(HttpMethod.Get, $"v1/downloadBillingJson/{runId}");
+
+        // Ask for gzip only when our caller accepts it, so the compressed bytes can be passed straight through.
+        if (AcceptsGzip(httpContextAccessor.HttpContext?.Request.Headers.AcceptEncoding ?? StringValues.Empty))
+            request.Headers.AcceptEncoding.Add(new System.Net.Http.Headers.StringWithQualityHeaderValue("gzip"));
+
+        var response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
 
         if (response.StatusCode == HttpStatusCode.NotFound)
         {
@@ -36,12 +41,39 @@ public class DownloadService(HttpClient httpClient, ILogger<DownloadService> log
         var contentType = response.Content.Headers.ContentType?.ToString() ?? "application/octet-stream";
         var fileName = response.Content.Headers.ContentDisposition?.FileNameStar
             ?? response.Content.Headers.ContentDisposition?.FileName
-            ?? $"billing-{runId}.csv";
+            ?? $"billing-{runId}.json";
 
-        return new FileStreamResult(new HttpResponseContentStream(response, contentStream), contentType)
+        return new EncodedFileStreamResult(
+            new HttpResponseContentStream(response, contentStream),
+            contentType,
+            response.Content.Headers.ContentEncoding.SingleOrDefault())
         {
             FileDownloadName = fileName,
         };
+    }
+
+    private static bool AcceptsGzip(StringValues acceptEncoding) =>
+        StringWithQualityHeaderValue.TryParseList(acceptEncoding, out var accepted) &&
+        accepted.Any(a => a.Value.Equals("gzip", StringComparison.OrdinalIgnoreCase) && a.Quality is not 0);
+
+    /// <summary>
+    /// Passes the calculator API's compressed response straight through with its Content-Encoding.
+    /// </summary>
+    internal sealed class EncodedFileStreamResult(Stream fileStream, string contentType, string? contentEncoding)
+        : FileStreamResult(fileStream, contentType)
+    {
+        public string? ContentEncoding => contentEncoding;
+
+        public override Task ExecuteResultAsync(ActionContext context)
+        {
+            if (contentEncoding is not null)
+            {
+                context.HttpContext.Response.Headers.ContentEncoding = contentEncoding;
+                context.HttpContext.Response.Headers.Vary = HeaderNames.AcceptEncoding;
+            }
+
+            return base.ExecuteResultAsync(context);
+        }
     }
 
     /// <summary>
