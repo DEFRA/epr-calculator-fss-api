@@ -1,6 +1,10 @@
 using System.Net;
 using System.Net.Http.Headers;
 using EPR.Calculator.FSS.API.Services;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
 
@@ -48,7 +52,7 @@ public class DownloadServiceTests
         Assert.IsNotNull(handler.LastRequest);
         Assert.AreEqual(HttpMethod.Get, handler.LastRequest.Method);
         Assert.AreEqual(
-            new Uri($"https://calculator-api.test/v1/downloadBillingFile/{runId}"),
+            new Uri($"https://calculator-api.test/v1/downloadBillingJson/{runId}"),
             handler.LastRequest.RequestUri);
     }
 
@@ -98,7 +102,7 @@ public class DownloadServiceTests
         var result = await service.DownloadFile(runId, CancellationToken.None);
 
         // Assert
-        Assert.AreEqual($"billing-{runId}.csv", result.FileDownloadName);
+        Assert.AreEqual($"billing-{runId}.json", result.FileDownloadName);
     }
 
     [TestMethod]
@@ -150,14 +154,82 @@ public class DownloadServiceTests
         Assert.IsFalse(innerStream.CanRead, "disposing the wrapper should dispose the underlying content stream");
     }
 
-    private DownloadService CreateService(HttpMessageHandler handler)
+    [TestMethod]
+    public async Task DownloadFile_WhenCallerAcceptsGzip_AsksForGzipAndPassesTheCompressedResponseThrough()
+    {
+        var compressed = new byte[] { 0x1f, 0x8b, 0x08, 0x00, 0x01, 0x02, 0x03 };
+        var handler = new FakeHttpMessageHandler(_ =>
+        {
+            var response = new HttpResponseMessage(HttpStatusCode.OK) { Content = new ByteArrayContent(compressed) };
+            response.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            response.Content.Headers.ContentEncoding.Add("gzip");
+            return response;
+        });
+        var service = CreateService(handler, callerAcceptEncoding: "gzip, deflate, br");
+
+        var result = await service.DownloadFile(1, CancellationToken.None);
+        var (headers, body) = await Execute(result);
+
+        Assert.AreEqual("gzip", handler.LastRequest!.Headers.AcceptEncoding.Single().Value);
+        Assert.AreEqual("gzip", headers.ContentEncoding.ToString());
+        Assert.AreEqual("Accept-Encoding", headers.Vary.ToString());
+        CollectionAssert.AreEqual(compressed, body);
+    }
+
+    [TestMethod]
+    public async Task DownloadFile_WhenCallerDoesNotAcceptGzip_DoesNotAskForIt()
+    {
+        var handler = new FakeHttpMessageHandler(_ => new HttpResponseMessage(HttpStatusCode.OK) { Content = new ByteArrayContent("{}"u8.ToArray()) });
+        var service = CreateService(handler, callerAcceptEncoding: "br");
+
+        var result = await service.DownloadFile(1, CancellationToken.None);
+        var (headers, body) = await Execute(result);
+
+        Assert.AreEqual(0, handler.LastRequest!.Headers.AcceptEncoding.Count);
+        Assert.AreEqual(0, headers.ContentEncoding.Count);
+        CollectionAssert.AreEqual("{}"u8.ToArray(), body);
+    }
+
+    [TestMethod]
+    public async Task DownloadFile_WithoutACaller_DoesNotAskForCompression()
+    {
+        var handler = new FakeHttpMessageHandler(_ => new HttpResponseMessage(HttpStatusCode.OK) { Content = new ByteArrayContent("{}"u8.ToArray()) });
+        var service = CreateService(handler);
+
+        await service.DownloadFile(1, CancellationToken.None);
+
+        Assert.AreEqual(0, handler.LastRequest!.Headers.AcceptEncoding.Count);
+    }
+
+    private DownloadService CreateService(HttpMessageHandler handler, string? callerAcceptEncoding = null)
     {
         var httpClient = new HttpClient(handler)
         {
             BaseAddress = new Uri("https://calculator-api.test/"),
         };
 
-        return new DownloadService(httpClient, mockLogger.Object);
+        var httpContextAccessor = new HttpContextAccessor();
+        if (callerAcceptEncoding is not null)
+        {
+            httpContextAccessor.HttpContext = new DefaultHttpContext();
+            httpContextAccessor.HttpContext.Request.Headers.AcceptEncoding = callerAcceptEncoding;
+        }
+
+        return new DownloadService(httpClient, httpContextAccessor, mockLogger.Object);
+    }
+
+    private static async Task<(IHeaderDictionary Headers, byte[] Body)> Execute(FileStreamResult result)
+    {
+        var httpContext = new DefaultHttpContext
+        {
+            RequestServices = new ServiceCollection().AddLogging().AddMvcCore().Services.BuildServiceProvider(),
+        };
+        var body = new MemoryStream();
+        httpContext.Response.Body = body;
+
+        await result.ExecuteResultAsync(new ActionContext(httpContext, new RouteData(), new Microsoft.AspNetCore.Mvc.Abstractions.ActionDescriptor()));
+
+        return (httpContext.Response.Headers, body.ToArray());
     }
 
     private sealed class FakeHttpMessageHandler(Func<HttpRequestMessage, HttpResponseMessage> responder) : HttpMessageHandler

@@ -47,6 +47,7 @@ builder.Services.AddHealthChecks();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IBlobStorageService, BlobStorageService>();
+builder.Services.AddScoped<IBillingService, BillingService>();
 builder.Services.AddScoped<IOrganisationService, OrganisationService>();
 
 builder.Services.Configure<EprCalculatorApiSettings>(
@@ -58,6 +59,7 @@ builder.Services.AddSingleton<TokenCredential>(
         : new ManagedIdentityCredential(ManagedIdentityId.SystemAssigned));
 
 builder.Services.AddTransient<EprCalculatorApiAuthHandler>();
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddHttpClient<IDownloadService, DownloadService>((serviceProvider, client) =>
 {
