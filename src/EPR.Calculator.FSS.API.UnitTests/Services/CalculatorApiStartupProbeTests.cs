@@ -1,3 +1,4 @@
+using EPR.Calculator.FSS.API.Clients.EprCalculatorApi;
 using EPR.Calculator.FSS.API.Configs;
 using EPR.Calculator.FSS.API.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -10,7 +11,7 @@ namespace EPR.Calculator.FSS.API.UnitTests.Services;
 [TestClass]
 public class CalculatorApiStartupProbeTests
 {
-    private readonly Mock<IDownloadService> mockDownloadService = new();
+    private readonly Mock<IEprCalculatorApiClient> mockEprCalculatorApiClient = new();
     private readonly Mock<ILogger<CalculatorApiStartupProbe>> mockLogger = new();
     private CalculatorApiStartupProbe probe = null!;
 
@@ -18,7 +19,7 @@ public class CalculatorApiStartupProbeTests
     public void Setup()
     {
         probe = new CalculatorApiStartupProbe(
-            mockDownloadService.Object,
+            mockEprCalculatorApiClient.Object,
             mockLogger.Object,
             TimeSpan.FromSeconds(1));
     }
@@ -27,8 +28,8 @@ public class CalculatorApiStartupProbeTests
     public async Task ProbeAsync_WhenCalculatorApiReportsFileNotFound_LogsSuccessAndDoesNotThrow()
     {
         // Arrange
-        mockDownloadService
-            .Setup(s => s.DownloadFile(-1, It.IsAny<CancellationToken>()))
+        mockEprCalculatorApiClient
+            .Setup(s => s.DownloadBillingFile(-1, It.IsAny<CancellationToken>()))
             .ThrowsAsync(new FileNotFoundException());
 
         // Act
@@ -43,8 +44,8 @@ public class CalculatorApiStartupProbeTests
     public async Task ExecuteAsync_WaitsForStartupDelayThenRunsProbe()
     {
         // Arrange
-        mockDownloadService
-            .Setup(s => s.DownloadFile(-1, It.IsAny<CancellationToken>()))
+        mockEprCalculatorApiClient
+            .Setup(s => s.DownloadBillingFile(-1, It.IsAny<CancellationToken>()))
             .ThrowsAsync(new FileNotFoundException());
 
         // Act
@@ -59,8 +60,8 @@ public class CalculatorApiStartupProbeTests
     public async Task ProbeAsync_WhenCallFails_LogsInfoAndDoesNotThrow()
     {
         // Arrange
-        mockDownloadService
-            .Setup(s => s.DownloadFile(-1, It.IsAny<CancellationToken>()))
+        mockEprCalculatorApiClient
+            .Setup(s => s.DownloadBillingFile(-1, It.IsAny<CancellationToken>()))
             .ThrowsAsync(new HttpRequestException("unauthorized"));
 
         // Act
@@ -75,8 +76,8 @@ public class CalculatorApiStartupProbeTests
         var streamContent = new MemoryStream("{}"u8.ToArray());
         var result = new FileStreamResult(streamContent, "application/json");
 
-        mockDownloadService
-            .Setup(s => s.DownloadFile(-1, It.IsAny<CancellationToken>()))
+        mockEprCalculatorApiClient
+            .Setup(s => s.DownloadBillingFile(-1, It.IsAny<CancellationToken>()))
             .ReturnsAsync(result);
 
         // Act
@@ -93,16 +94,16 @@ public class CalculatorApiStartupProbeTests
         // Arrange
         using var cancellationTokenSource = new CancellationTokenSource();
 
-        mockDownloadService
-            .Setup(s => s.DownloadFile(-1, cancellationTokenSource.Token))
+        mockEprCalculatorApiClient
+            .Setup(s => s.DownloadBillingFile(-1, cancellationTokenSource.Token))
             .ThrowsAsync(new FileNotFoundException());
 
         // Act
         await probe.ProbeAsync(cancellationTokenSource.Token);
 
         // Assert
-        mockDownloadService.Verify(
-            s => s.DownloadFile(-1, cancellationTokenSource.Token),
+        mockEprCalculatorApiClient.Verify(
+            s => s.DownloadBillingFile(-1, cancellationTokenSource.Token),
             Times.Once);
     }
 
