@@ -47,6 +47,7 @@ builder.Services.AddHealthChecks();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IBlobStorageService, BlobStorageService>();
+builder.Services.AddScoped<IBillingService, BillingService>();
 builder.Services.AddScoped<IOrganisationService, OrganisationService>();
 
 builder.Services.Configure<EprCalculatorApiSettings>(
