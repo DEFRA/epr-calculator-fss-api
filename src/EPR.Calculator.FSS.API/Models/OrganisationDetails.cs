@@ -1,4 +1,6 @@
-﻿namespace EPR.Calculator.FSS.API.Models;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace EPR.Calculator.FSS.API.Models;
 
 public record OrganisationDetails
 {
@@ -8,7 +10,8 @@ public record OrganisationDetails
 
     public required string? OrganisationTradingName { get; init; }
 
-    public required string FinancialYear {get; init; }
+    [RegularExpression(@"^[0-9]{4}-[0-9]{2}$")]
+    public required string FinancialYear { get; init; }
 
     public required DateTime ApprovedDate { get; init; }
 

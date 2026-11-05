@@ -1,0 +1,207 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Organisations details response",
+  "description": "Response body of GET /api/v1/organisations-details. Generated from the response models by OrganisationsDetailsSchemaGenerator - do not edit by hand.",
+  "type": "object",
+  "properties": {
+    "organisationsDetails": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "organisationId": {
+            "type": "string"
+          },
+          "organisationName": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "organisationTradingName": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "financialYear": {
+            "type": "string",
+            "pattern": "^[0-9]{4}-[0-9]{2}$"
+          },
+          "approvedDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "companiesHouseNumber": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "homeNationCode": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "serviceOfNoticeAddrLine1": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "serviceOfNoticeAddrLine2": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "serviceOfNoticeAddrCity": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "serviceOfNoticeAddrCounty": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "serviceOfNoticeAddrCountry": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "serviceOfNoticeAddrPostcode": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "serviceOfNoticeAddrPhoneNumber": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "soleTraderFirstName": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "soleTraderLastName": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "soleTraderPhoneNumber": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "soleTraderEmail": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "primaryContactPersonFirstName": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "primaryContactPersonLastName": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "primaryContactPersonPhoneNumber": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "primaryContactPersonEmail": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "subsidiaryDetails": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "subsidiaryId": {
+                  "type": "string"
+                },
+                "subsidiaryName": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "subsidiaryTradingName": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "financialYear": {
+                  "type": "string",
+                  "pattern": "^[0-9]{4}-[0-9]{2}$"
+                },
+                "approvedDate": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              },
+              "required": [
+                "subsidiaryId",
+                "subsidiaryName",
+                "subsidiaryTradingName",
+                "financialYear",
+                "approvedDate"
+              ]
+            }
+          }
+        },
+        "required": [
+          "organisationId",
+          "organisationName",
+          "organisationTradingName",
+          "financialYear",
+          "approvedDate",
+          "companiesHouseNumber",
+          "homeNationCode",
+          "serviceOfNoticeAddrLine1",
+          "serviceOfNoticeAddrLine2",
+          "serviceOfNoticeAddrCity",
+          "serviceOfNoticeAddrCounty",
+          "serviceOfNoticeAddrCountry",
+          "serviceOfNoticeAddrPostcode",
+          "serviceOfNoticeAddrPhoneNumber",
+          "soleTraderFirstName",
+          "soleTraderLastName",
+          "soleTraderPhoneNumber",
+          "soleTraderEmail",
+          "primaryContactPersonFirstName",
+          "primaryContactPersonLastName",
+          "primaryContactPersonPhoneNumber",
+          "primaryContactPersonEmail",
+          "subsidiaryDetails"
+        ]
+      }
+    }
+  },
+  "required": [
+    "organisationsDetails"
+  ]
+}
