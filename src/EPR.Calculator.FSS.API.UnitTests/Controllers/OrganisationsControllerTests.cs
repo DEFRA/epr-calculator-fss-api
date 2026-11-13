@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using EPR.Calculator.FSS.API.Controllers;
 using EPR.Calculator.FSS.API.Models;
-using EPR.Calculator.FSS.API.Services;
+using EPR.Calculator.FSS.API.Clients.EprCommonDataApi;
 using FluentAssertions;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Extensibility;
@@ -14,13 +14,13 @@ namespace EPR.Calculator.FSS.API.UnitTests.Controllers;
 [TestClass]
 public class OrganisationsControllerTests
 {
-    private readonly Mock<IOrganisationService> organisationServiceMock;
+    private readonly Mock<IEprCommonDataApiClient> eprCommonDataApiClientMock;
     private readonly OrganisationsController organisationController = null!;
 
     public OrganisationsControllerTests()
     {
-        this.organisationServiceMock = new Mock<IOrganisationService>();
-        this.organisationController = new OrganisationsController(organisationServiceMock.Object)
+        this.eprCommonDataApiClientMock = new Mock<IEprCommonDataApiClient>();
+        this.organisationController = new OrganisationsController(eprCommonDataApiClientMock.Object)
         {
             ControllerContext = new ControllerContext
             {
@@ -29,11 +29,12 @@ public class OrganisationsControllerTests
         };
     }
 
+    [TestMethod]
     public async Task GetOrganisationsDetails_WithValidParams()
     {
         // Arrange
-        this.organisationServiceMock
-           .Setup(service => service.GetOrganisationsDetails(It.IsAny<DateTime?>(), It.IsAny<RelativeYear?>(), It.IsAny<CancellationToken>()))
+        this.eprCommonDataApiClientMock
+           .Setup(client => client.GetBillingOrganisations(It.IsAny<DateTimeOffset?>(), It.IsAny<FinancialYear?>(), It.IsAny<CancellationToken>()))
            .ReturnsAsync(new List<OrganisationDetails>
                             {
                                 new OrganisationDetails
@@ -82,6 +83,28 @@ public class OrganisationsControllerTests
         orgs.Count.Should().Be(1);
         orgs[0].OrganisationId.Should().Be("12345");
         orgs[0].OrganisationName.Should().Be("Test Org");
+    }
+
+    [TestMethod]
+    public async Task GetOrganisationsDetails_PassesFiltersAndRequestAbortedToClient()
+    {
+        // Arrange
+        var approvedAfter = new DateTimeOffset(2025, 6, 1, 0, 0, 0, TimeSpan.Zero);
+        var financialYear = new FinancialYear("2025-26");
+        using var cancellationTokenSource = new CancellationTokenSource();
+        this.organisationController.HttpContext.RequestAborted = cancellationTokenSource.Token;
+
+        this.eprCommonDataApiClientMock
+           .Setup(client => client.GetBillingOrganisations(approvedAfter, financialYear, cancellationTokenSource.Token))
+           .ReturnsAsync([]);
+
+        // Act
+        await organisationController.GetOrganisationsDetails(approvedAfter, financialYear);
+
+        // Assert
+        this.eprCommonDataApiClientMock.Verify(
+            client => client.GetBillingOrganisations(approvedAfter, financialYear, cancellationTokenSource.Token),
+            Times.Once);
     }
 
     [TestMethod]

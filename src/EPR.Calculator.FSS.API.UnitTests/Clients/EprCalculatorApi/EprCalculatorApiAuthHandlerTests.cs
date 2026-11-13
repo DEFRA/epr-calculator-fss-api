@@ -1,11 +1,11 @@
 using System.Net;
 using Azure.Core;
+using EPR.Calculator.FSS.API.Clients.EprCalculatorApi;
 using EPR.Calculator.FSS.API.Configs;
-using EPR.Calculator.FSS.API.Services;
 using Microsoft.Extensions.Options;
 using Moq;
 
-namespace EPR.Calculator.FSS.API.UnitTests.Services;
+namespace EPR.Calculator.FSS.API.UnitTests.Clients.EprCalculatorApi;
 
 [TestClass]
 public class EprCalculatorApiAuthHandlerTests

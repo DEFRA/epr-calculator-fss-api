@@ -1,9 +1,11 @@
 using System.Net;
+using EPR.Calculator.FSS.API.Configs;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 
-namespace EPR.Calculator.FSS.API.Services;
+namespace EPR.Calculator.FSS.API.Clients.EprCalculatorApi;
 
-public interface IDownloadService
+public interface IEprCalculatorApiClient
 {
     /// <summary>
     /// Streams the billing CSV file for the given calculator run from the EPR Calculator API. (In future, should be amended to download json endpoint)
@@ -11,15 +13,19 @@ public interface IDownloadService
     /// <param name="runId">The calculator run ID to download the billing file for.</param>
     /// <param name="cancellationToken">The cancellation token for the request.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the download result.</returns>
-    Task<FileStreamResult> DownloadFile(int runId, CancellationToken cancellationToken);
+    Task<FileStreamResult> DownloadBillingFile(int runId, CancellationToken cancellationToken);
 }
 
-public class DownloadService(HttpClient httpClient, ILogger<DownloadService> logger) : IDownloadService
+public class EprCalculatorApiHttpClient(
+    HttpClient httpClient,
+    IOptions<EprCalculatorApiSettings> eprCalculatorApiSettings,
+    ILogger<EprCalculatorApiHttpClient> logger)
+    : IEprCalculatorApiClient
 {
-    public async Task<FileStreamResult> DownloadFile(int runId, CancellationToken cancellationToken)
+    public async Task<FileStreamResult> DownloadBillingFile(int runId, CancellationToken cancellationToken)
     {
         var response = await httpClient.GetAsync(
-            $"v1/downloadBillingFile/{runId}",
+            $"{eprCalculatorApiSettings.Value.BaseUrl.TrimEnd('/')}/v1/downloadBillingFile/{runId}",
             HttpCompletionOption.ResponseHeadersRead,
             cancellationToken);
 

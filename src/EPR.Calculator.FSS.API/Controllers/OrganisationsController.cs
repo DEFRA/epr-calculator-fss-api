@@ -1,6 +1,6 @@
 ﻿using EPR.Calculator.FSS.API.Helpers;
 using EPR.Calculator.FSS.API.Models;
-using EPR.Calculator.FSS.API.Services;
+using EPR.Calculator.FSS.API.Clients.EprCommonDataApi;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EPR.Calculator.FSS.API.Controllers;
@@ -11,7 +11,7 @@ namespace EPR.Calculator.FSS.API.Controllers;
 [ApiController]
 [Route("api/v1")]
 public class OrganisationsController(
-    IOrganisationService organisationService)
+    IEprCommonDataApiClient eprCommonDataApiClient)
     : ControllerBase
 {
     [HttpGet("organisations-details")]
@@ -36,9 +36,9 @@ public class OrganisationsController(
 
         return Ok(new OrganisationsDetailsResponse
         {
-            OrganisationsDetails = await organisationService.GetOrganisationsDetails(
-                approvedAfter    : approvedAfter?.UtcDateTime,
-                relativeYear     : financialYear?.ToRelativeYear(),
+            OrganisationsDetails = await eprCommonDataApiClient.GetBillingOrganisations(
+                approvedAfter    : approvedAfter,
+                financialYear    : financialYear,
                 cancellationToken: HttpContext.RequestAborted)
         });
     }
